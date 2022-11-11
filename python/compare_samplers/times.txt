@@ -1,0 +1,31 @@
+100k samples from 200-sided die.
+
+fldr_c_samples.dat:
+  setup: < 1 ms
+  sample: 16 ms
+measured with sys/time.h gettimeofday
+
+fldr_python_samples.dat:
+  setup: < 1 ms
+  sample: 290 ms
+measured with time.time
+
+optas_c_samples.dat: 
+  setup: 3 ms
+  sample: 45 ms
+measured with sys/time.h gettimeofday
+
+optas_python_samples.dat:
+  setup: 15 ms
+  sample 330 ms
+measured with time.time
+
+zar (ocaml):
+  setup: < 1 ms
+  sample: 132 ms
+measured with Unix.gettimeofday
+
+zar (python):
+  setup: < 1 ms
+  sample: 1.67 s
+measured with time.time

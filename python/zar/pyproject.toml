@@ -1,0 +1,23 @@
+[build-system]
+requires      = ["setuptools>=59.6.0", "wheel"]
+# requires      = ["wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zarpy"
+version = "0.9.0"
+description = "Formally verified-correct n-sided die roller"
+readme = "README.md"
+authors = [{ name = "Alexander Bagnall", email = "abagnalla@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["zar", "zarpy", "random", "sampler", "uniform", "die"]
+dependencies = []
+requires-python = ">=3.6.3"
+
+[project.urls]
+Homepage = "https://github.com/bagnalla/zar"
