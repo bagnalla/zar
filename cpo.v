@@ -386,7 +386,7 @@ Proof.
   apply dinf_spec; auto with order.
 Qed.
 
-Lemma Proper_sup {A} `{CPO A} (f g : nat -> A) :
+Lemma Proper_sup {A} `{dCPO A} (f g : nat -> A) :
   directed f ->
   directed g ->
   f === g ->
@@ -394,8 +394,8 @@ Lemma Proper_sup {A} `{CPO A} (f g : nat -> A) :
 Proof.
   intros Hf Hg Hfg.
   eapply supremum_unique.
-  - apply sup_spec; auto.
-  - rewrite Hfg; apply sup_spec; auto.
+  - apply dsup_spec; auto.
+  - rewrite Hfg; apply dsup_spec; auto.
 Qed.
 
 Lemma sup_shift {A} `{CPO A} (f : nat -> A) :

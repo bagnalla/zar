@@ -47,7 +47,7 @@ Class Dense (A B : Type) `{OType A} `{OType B} : Type :=
 
 (** A is a dCPO with basis B (B is compact and dense in A). *)
 Class aCPO (A B : Type) `{oA : OType A} `{oB : OType B}
-  {compact : Compact B} {dense : Dense A B} {cpoA : dCPO A} : Prop :=
+  { compact : Compact B} {dense : Dense A B} {cpoA : dCPO A} : Prop :=
   { incl_order : forall x y : B, x ⊑ y <-> incl x ⊑ incl y
   ; chain_ideal : forall a : A, chain (ideal a)
   ; monotone_ideal : monotone (@ideal _ _ _ _ dense)

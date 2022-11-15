@@ -107,7 +107,6 @@ Proof. intro t; induction t; constructor; auto. Qed.
 #[global]
   Instance Transitive_atree_le {I A} : Transitive (@atree_le I A).
 Proof.
-  unfold Transitive.
   intro x; induction x; intros y z Hxy Hyz.
   - constructor.
   - inv Hxy; auto.
@@ -373,11 +372,11 @@ Qed.
 CoFixpoint cotree_sup {I A} (ch : nat -> cotree I A) : cotree I A :=
   match LPO_option (fun n => not_cobot_dec (ch n)) with
   | Some n => match ch n with
-              | cobot => cobot
-              | coleaf x => coleaf x
-              | cotau _ => cotau (cotree_sup (step_tau ∘ ch))
-              | conode _ => conode (fun x => cotree_sup (step_node x ∘ ch))
-              end
+             | cobot => cobot
+             | coleaf x => coleaf x
+             | cotau _ => cotau (cotree_sup (step_tau ∘ ch))
+             | conode _ => conode (fun x => cotree_sup (step_node x ∘ ch))
+             end
   | None => cobot
   end.
 
