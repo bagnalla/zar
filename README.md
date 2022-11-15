@@ -1,5 +1,7 @@
 # Zar
 
+Paper: https://arxiv.org/abs/2211.06747
+
 ## Setup
 
 * Coq development:
