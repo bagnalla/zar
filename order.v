@@ -58,6 +58,13 @@ Notation "x '⊑' y" := (leq x y) (at level 70, no associativity) : order_scope.
 Notation "x '⊏' y" := (lt x y) (at level 70, no associativity) : order_scope.
 Local Open Scope order_scope.
 
+(** Pointed ordered types *)
+Class PType (A : Type) `{o : OType A} : Type :=
+  { bot : A
+  ; bot_le : forall x, bot ⊑ x }.
+
+Notation "⊥" := bot.
+
 (* [a] is an upper bound of [f] *)
 Definition upper_bound {I A : Type} `{OType A} (a : A) (f : I -> A) :=
   forall i, f i ⊑ a.
@@ -931,8 +938,7 @@ Lemma iter_n_eq {A} `{OType A} (F G : A -> A) (a b : A) (i : nat) :
   iter_n F a i === iter_n G b i.
 Proof. revert F G a b; induction i; intros F G a b HFG Hab; simpl; auto. Qed.
 
-Lemma chain_id {A} `{OType A} :
-  chain (fun i : nat => i).
+Lemma chain_id : chain (fun i : nat => i).
 Proof. intro i; simpl; lia. Qed.
 #[global] Hint Resolve chain_id : order.
 
@@ -972,9 +978,9 @@ Lemma iter_n_bounded {A} `{OType A} (F : A -> A) (z ub : A) (n : nat) :
   iter_n F z n ⊑ ub.
 Proof. revert z ub; induction n; intros z ub Hz HF; simpl; auto. Qed.
 
-(* Types for which the symmetric closure of the order relation
-   coincides with propositional equality. Obviously, depends on the
-   choice of order relation. *)
+(** Types for which the symmetric closure of the order relation
+    coincides with propositional equality. Obviously, depends on the
+    choice of order relation. *)
 Class ExtType (A : Type) `{OType A} : Type :=
   { ext : forall (a b : A), a === b -> a = b }.
 
