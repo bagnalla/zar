@@ -63,10 +63,10 @@ pip install numpy matplotlib scipy
 
 [extract/](extract/) contains driver code and scripts for evaluating extracted samplers (e.g., [dueling coins](dueling_coins.v), [n-sided die](./die.v), [geometric distribution](geometric.v), [discrete gaussian](gaussian.v), [hare and tortoise](hare.v)).
 
-[fast-loaded-dice-roller/](fast-loaded-dice-roller/) contains a clone of `https://github.com/probcomp/fast-loaded-dice-roller` modified to track entropy usage.
+[fast-loaded-dice-roller/](fast-loaded-dice-roller/) contains a clone of [https://github.com/probcomp/fast-loaded-dice-roller](https://github.com/probcomp/fast-loaded-dice-roller) modified to track entropy usage.
 
-[optimal-approximate-sampling/](optimal-approximate-sampling/) contains a clone of `https://github.com/probcomp/optimal-approximate-sampling` modified to track entropy usage.
+[optimal-approximate-sampling/](optimal-approximate-sampling/) contains a clone of [https://github.com/probcomp/optimal-approximate-sampling](https://github.com/probcomp/optimal-approximate-sampling) modified to track entropy usage.
 
-[python/zar/](python/zar/) contains the `zar` pip package source.
+[python/zar/](python/zar/) contains the [zarpy](https://pypi.org/project/zarpy/) pip package source.
 
-[python/tf/](python/tf/) contains the TensorFlow 2 project, with [batch_gen.py](python/tf/batch_gen.py) implementing a sampling-without-replacement generator on top of the `zar` sampler package.
+[python/tf/](python/tf/) contains the TensorFlow 2 project, with [batch_gen.py](python/tf/batch_gen.py) implementing a sampling-without-replacement generator on top of the [zarpy](https://pypi.org/project/zarpy/) sampler package.
