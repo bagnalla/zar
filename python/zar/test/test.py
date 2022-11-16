@@ -1,4 +1,4 @@
-from azar import seed, build, single, many
+from zarpy import seed, build, single, many
 from itertools import count, takewhile
 import math
 from math import sqrt
