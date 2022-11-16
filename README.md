@@ -12,7 +12,7 @@ opam install coq-itree
 make -j4
 ```
 
-* `zar` pip package (see [python/zar/test/test.py](python/zar/test/test.py) for an example
+* [zarpy](https://pypi.org/project/zarpy/) pip package (see [python/zar/test/test.py](python/zar/test/test.py) for an example
 of using it after installation):
 ```
 opam install pythonlib ppx_import ppx_deriving
