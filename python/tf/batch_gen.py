@@ -3,7 +3,7 @@
 
 import numpy as np
 from itertools import cycle, islice
-from uniform import seed, build, single, many
+from zar import seed, build, single, many
 
 class batch_gen(object):
     def __init__(self, batch_size, num_indices, replace=False,
