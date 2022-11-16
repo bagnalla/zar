@@ -4,7 +4,7 @@ NAME = "zarpy"
 
 setup(
     name=NAME,
-    version="0.9.0",
+    version="0.9.1",
     author="Alexander Bagnall",
     author_email="abagnalla@gmail.com",
     description="Formally verified-correct n-sided die roller",

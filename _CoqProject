@@ -5,6 +5,7 @@ axioms.v
 compile.v
 cocwp.v
 cocwp_facts.v
+colist.v
 cotree.v
 cpGCL.v
 cpo.v

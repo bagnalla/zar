@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zarpy"
-version = "0.9.0"
+version = "0.9.1"
 description = "Formally verified-correct n-sided die roller"
 readme = "README.md"
 authors = [{ name = "Alexander Bagnall", email = "abagnalla@gmail.com" }]
