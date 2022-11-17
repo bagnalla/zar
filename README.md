@@ -22,6 +22,11 @@ cd ..
 make install
 ```
 
+Or:
+```
+pip install zarpy
+```
+
 * Extracted sampler analysis scripts (e.g., [analyze.py](extract/geometric/analyze.py)):
 ```
 pip install numpy matplotlib scipy
