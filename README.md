@@ -1,3 +1,5 @@
+[![pypi](https://img.shields.io/pypi/v/zarpy)](https://pypi.org/project/zarpy/)
+
 # Zar
 
 Paper: https://arxiv.org/abs/2211.06747
