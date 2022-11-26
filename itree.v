@@ -83,19 +83,19 @@ Proof.
   - destruct e; compute; constructor; intro b; right; apply CH.
 Qed.
 
-Lemma icotree_coitree {A} (t : cotree bool A) :
-  total t ->
-  cotree_eq (icotree (coitree t)) t.
-Proof.
-  revert t; cofix CH; intros t Hbot.
-  destruct t.
-  - exfalso; eapply not_total_cobot; eauto.
-  - rewrite unf_eq; simpl; compute; constructor.
-  - rewrite unf_eq; simpl; compute; constructor.
-    apply CH, total_cotau; auto.
-  - rewrite unf_eq; simpl; compute; constructor; intro b.
-    apply CH, total_conode; auto.
-Qed.
+(* Lemma icotree_coitree {A} (t : cotree bool A) : *)
+(*   total t -> *)
+(*   cotree_eq (icotree (coitree t)) t. *)
+(* Proof. *)
+(*   revert t; cofix CH; intros t Hbot. *)
+(*   destruct t. *)
+(*   - exfalso; eapply not_total_cobot; eauto. *)
+(*   - rewrite unf_eq; simpl; compute; constructor. *)
+(*   - rewrite unf_eq; simpl; compute; constructor. *)
+(*     apply CH, total_cotau; auto. *)
+(*   - rewrite unf_eq; simpl; compute; constructor; intro b. *)
+(*     apply CH, total_conode; auto. *)
+(* Qed. *)
 
 Definition itwp {A} (f : A -> eR) : itree boolE A -> eR :=
   cotwp f ∘ icotree.
@@ -317,20 +317,20 @@ Proof.
     constructor; intro b; right; apply CH.
 Qed.
 
-Lemma itree_cotree_coitree {A} (ct : cotree bool A) :
-  total ct ->
-  itree_cotree_eq (coitree ct) ct.
-Proof.
-  revert ct; pcofix CH; intros ct Hbot.
-  pstep; unfold itree_cotree_eq_.
-  destruct ct.
-  - exfalso; eapply not_total_cobot; eauto.
-  - compute; constructor.
-  - apply total_cotau in Hbot.
-    compute; constructor; right; apply CH; auto.
-  - compute; constructor; intro b; right; apply CH;
-      eapply total_conode in Hbot; eauto.
-Qed.
+(* Lemma itree_cotree_coitree {A} (ct : cotree bool A) : *)
+(*   total ct -> *)
+(*   itree_cotree_eq (coitree ct) ct. *)
+(* Proof. *)
+(*   revert ct; pcofix CH; intros ct Hbot. *)
+(*   pstep; unfold itree_cotree_eq_. *)
+(*   destruct ct. *)
+(*   - exfalso; eapply not_total_cobot; eauto. *)
+(*   - compute; constructor. *)
+(*   - apply total_cotau in Hbot. *)
+(*     compute; constructor; right; apply CH; auto. *)
+(*   - compute; constructor; intro b; right; apply CH; *)
+(*       eapply total_conode in Hbot; eauto. *)
+(* Qed. *)
 
 Lemma itree_cotree_icotree_eq {A} (it : itree boolE A) (ct : cotree bool A) :
   itree_cotree_eq it ct ->

@@ -2068,56 +2068,56 @@ Qed.
   Instance Proper_inj {I A} : Proper (leq ==> leq) (@inj I A).
 Proof. intros a b Hab; induction Hab; simpl; constructor; auto. Qed.
 
-(* Monotone wrt the usual (disjunctive) ordering. A cotree is total
-   whenever there exists one of its finite approximations that is total. *)
-Inductive atotal {I A} : atree I A -> Prop :=
-| atotal_leaf : forall x, atotal (aleaf x)
-| atotal_tau : forall t, atotal t -> atotal (atau t)
-| atotal_node : forall k, (forall x, atotal (k x)) -> atotal (anode k).
+(* (* Monotone wrt the usual (disjunctive) ordering. A cotree is total *)
+(*    whenever there exists one of its finite approximations that is total. *) *)
+(* Inductive atotal {I A} : atree I A -> Prop := *)
+(* | atotal_leaf : forall x, atotal (aleaf x) *)
+(* | atotal_tau : forall t, atotal t -> atotal (atau t) *)
+(* | atotal_node : forall k, (forall x, atotal (k x)) -> atotal (anode k). *)
 
-Definition total {A} : cotree bool A -> Prop := co atotal.
+(* Definition total {A} : cotree bool A -> Prop := co atotal. *)
 
-Lemma monotone_atotal {I A} :
-  monotone (@atotal I A).
-Proof.
-  intros a b Hab H.
-  revert Hab H.
-  revert b; induction a; intros b Hab Hb; inv Hab; inv Hb; constructor.
-  - apply IHa; auto.
-  - intro i; eapply H; eauto; apply H1.
-Qed.
-#[global] Hint Resolve monotone_atotal : cotree.
+(* Lemma monotone_atotal {I A} : *)
+(*   monotone (@atotal I A). *)
+(* Proof. *)
+(*   intros a b Hab H. *)
+(*   revert Hab H. *)
+(*   revert b; induction a; intros b Hab Hb; inv Hab; inv Hb; constructor. *)
+(*   - apply IHa; auto. *)
+(*   - intro i; eapply H; eauto; apply H1. *)
+(* Qed. *)
+(* #[global] Hint Resolve monotone_atotal : cotree. *)
 
-Lemma not_total_cobot {A} : ~ total (@cobot bool A).
-Proof.
-  intro HC.
-  apply co_elim in HC; eauto with cotree.
-  destruct HC as [[] HC]; inv HC.
-Qed.
+(* Lemma not_total_cobot {A} : ~ total (@cobot bool A). *)
+(* Proof. *)
+(*   intro HC. *)
+(*   apply co_elim in HC; eauto with cotree. *)
+(*   destruct HC as [[] HC]; inv HC. *)
+(* Qed. *)
 
-Lemma total_coleaf {A} (x : A) :
-  total (coleaf x).
-Proof. apply co_intro with (S O); eauto with cotree; constructor. Qed.
+(* Lemma total_coleaf {A} (x : A) : *)
+(*   total (coleaf x). *)
+(* Proof. apply co_intro with (S O); eauto with cotree; constructor. Qed. *)
 
-Lemma total_cotau {A} (t : cotree bool A) :
-  total (cotau t) ->
-  total t.
-Proof.
-  intro Ht; apply co_elim in Ht; eauto with cotree.
-  destruct Ht as [i Ht]; simpl in Ht; unfold flip in Ht.
-  destruct i; inv Ht.
-  apply co_intro with i; eauto with cotree.
-Qed.
+(* Lemma total_cotau {A} (t : cotree bool A) : *)
+(*   total (cotau t) -> *)
+(*   total t. *)
+(* Proof. *)
+(*   intro Ht; apply co_elim in Ht; eauto with cotree. *)
+(*   destruct Ht as [i Ht]; simpl in Ht; unfold flip in Ht. *)
+(*   destruct i; inv Ht. *)
+(*   apply co_intro with i; eauto with cotree. *)
+(* Qed. *)
 
-Lemma total_conode {A} (k : bool -> cotree bool A) (b : bool) :
-  total (conode k) ->
-  total (k b).
-Proof.
-  intro Ht; apply co_elim in Ht; eauto with cotree.
-  destruct Ht as [i Ht]; simpl in Ht; unfold flip in Ht.
-  destruct i; inv Ht.
-  apply co_intro with i; eauto with cotree; apply H0.
-Qed.
+(* Lemma total_conode {A} (k : bool -> cotree bool A) (b : bool) : *)
+(*   total (conode k) -> *)
+(*   total (k b). *)
+(* Proof. *)
+(*   intro Ht; apply co_elim in Ht; eauto with cotree. *)
+(*   destruct Ht as [i Ht]; simpl in Ht; unfold flip in Ht. *)
+(*   destruct i; inv Ht. *)
+(*   apply co_intro with i; eauto with cotree; apply H0. *)
+(* Qed. *)
 
 Definition snip {A} (t : cotree bool (unit + A)) : cotree bool A :=
   cotree_bind' t (cotuple (const cobot) (@coleaf bool A)).
