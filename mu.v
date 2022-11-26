@@ -28,14 +28,11 @@ From zar Require Import
   cocwp
   cocwp_facts
   cotree
-  cpGCL
-  cwp
   misc
   order
   R
   eR
   tactics
-  tree
 .
 
 Local Open Scope eR_scope.
