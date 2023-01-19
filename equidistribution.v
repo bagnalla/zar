@@ -348,7 +348,7 @@ Lemma aproduces_bind {A B} (P : B -> Prop) bs (t : atree bool A) k :
   produces P bs (atree_cotree_bind k t) ->
   exists x bs' bs'', aproduces (eq x) bs' t /\ produces P bs'' (k x).
 Proof.
-  unfold atree_cotree_bind, morph.
+  unfold atree_cotree_bind, cofold.
   revert P bs k; induction t; simpl; intros P bs k Ht.
   - inv Ht.
   - exists a, (Streams.const false), bs; split; auto.
