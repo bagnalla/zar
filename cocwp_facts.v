@@ -69,7 +69,7 @@ Proof.
   2: { rewrite co_inj_t; reflexivity. }
   unfold compose.
   apply equ_arrow; intro a.
-  unfold atree_cotree_map, atree_cotree_bind, morph; simpl.
+  unfold atree_cotree_map, atree_cotree_bind, cofold; simpl.
   induction a; unfold compose; simpl.
   - rewrite co_fold_bot; reflexivity.
   - rewrite co_fold_leaf; try reflexivity; constructor.
@@ -299,13 +299,13 @@ Proof.
   - apply cotwp_bot.
   - reflexivity.
   - apply equ_eR.
-    unfold btwp, atree_cotree_bind, morph in *; simpl.
+    unfold btwp, atree_cotree_bind, cofold in *; simpl.
     rewrite co_fold_tau; eRauto.
     { rewrite IHt; reflexivity. }
     { apply continuous_id. }
     { apply monotone_avg. }
   - apply equ_eR.
-    unfold btwp, atree_cotree_bind, morph in *; simpl.
+    unfold btwp, atree_cotree_bind, cofold in *; simpl.
     rewrite co_fold_node; eRauto.
     { apply equ_eR; unfold compose; rewrite 2!H; reflexivity. }
     { apply monotone_id. }
@@ -406,14 +406,14 @@ Proof.
   - apply cotwlp_bot.
   - reflexivity.
   - apply equ_eR.
-    unfold btwlp, atree_cotree_bind, morph in *; simpl.
+    unfold btwlp, atree_cotree_bind, cofold in *; simpl.
     rewrite coop_fold_tau; eRauto.
     { rewrite IHt; auto; reflexivity. }
     { apply dec_continuous_id. }
     { apply monotone_avg. }
     { intro; apply fold_avg_bounded; auto. }
   - apply equ_eR.
-    unfold btwlp, atree_cotree_bind, morph in *; simpl.
+    unfold btwlp, atree_cotree_bind, cofold in *; simpl.
     rewrite coop_fold_node; eRauto.
     { apply equ_eR; unfold compose; rewrite 2!H; auto; reflexivity. }
     { apply monotone_id. }
@@ -532,21 +532,21 @@ Proof.
   apply equ_arrow; intro a.
   unfold compose.
   revert P f; induction a; intros P f; simpl.
-  - unfold atree_cotree_filter, morph. simpl.
+  - unfold atree_cotree_filter, cofold. simpl.
     unfold btwp; simpl.
     rewrite co_fold_bot.
     reflexivity.
   - unfold btwp; simpl.
-    unfold atree_cotree_filter, morph; simpl.
+    unfold atree_cotree_filter, cofold; simpl.
     destruct (P a).
     + rewrite co_fold_leaf; eRauto.
     + rewrite co_fold_bot; reflexivity.
-  - unfold btwp, atree_cotree_filter, morph in *; simpl.
+  - unfold btwp, atree_cotree_filter, cofold in *; simpl.
     unfold id.
     rewrite co_fold_tau; eRauto.
     { apply continuous_id. }
     { apply monotone_avg. }
-  - unfold btwp, atree_cotree_filter, morph in *; simpl.
+  - unfold btwp, atree_cotree_filter, cofold in *; simpl.
     unfold id, compose in *.
     rewrite co_fold_node; eRauto.
     { unfold compose; apply equ_eR.
