@@ -55,7 +55,7 @@ pip install numpy matplotlib scipy
 
 * Generating itrees: [itree.v](itree.v)
 
-## Order/Domain Theory and Algebraic Coinduction
+## Order/Domain Theory and Algebraic Coinductives
 
 * Basic order theory: [order.v](order.v)
 * CPOs: [cpo.v](cpo.v)
