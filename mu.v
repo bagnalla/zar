@@ -39,21 +39,21 @@ Local Open Scope eR_scope.
 
 Create HintDb mu.
 
-Definition amu {A} (f : A -> eR) : atree bool A -> eR :=
+Definition asum {A} (f : A -> eR) : atree bool A -> eR :=
   fold 0 f id (fun f => f false + f true).
 
-Definition mu {A} (f : A -> eR) : cotree bool A -> eR :=
-  co (amu f).
+Definition tcosum {A} (f : A -> eR) : cotree bool A -> eR :=
+  co (asum f).
 
 #[global]
-  Instance monotone_amu {A} (f : A -> eR) : Proper (leq ==> leq) (amu f).
+  Instance monotone_asum {A} (f : A -> eR) : Proper (leq ==> leq) (asum f).
 Proof.
   apply monotone_fold.
   { intros; eRauto. }
   { apply monotone_id. }
   intros g g' Hg; apply eRplus_le_compat; apply Hg.
 Qed.
-#[global] Hint Resolve monotone_amu : mu.
+#[global] Hint Resolve monotone_asum : mu.
 
 Definition atree_lang {A} : atree bool A -> cotree bool (list bool) :=
   fold cobot (const (coleaf [])) id (fun k => conode (fun b => cotree_map' (cons b) (k b))).
@@ -152,19 +152,19 @@ Proof.
   rewrite cotree_filter'_node, cotree_lang_node; reflexivity.
 Qed.
 
-Lemma amu_scalar {A} (f : A -> eR) (t : atree bool A) (c : eR) :
-  c * amu f t = amu (fun x => c * f x) t.
+Lemma asum_scalar {A} (f : A -> eR) (t : atree bool A) (c : eR) :
+  c * asum f t = asum (fun x => c * f x) t.
 Proof.
   revert f c; induction t; intros f c; simpl; eRauto.
-  unfold amu in *; simpl; unfold compose.
+  unfold asum in *; simpl; unfold compose.
   rewrite eRmult_plus_distr_l; rewrite 2!H; reflexivity.
 Qed.
 
-Lemma atreeR_amu {A B} (f : A -> eR) (g : B -> eR) (R : A -> B -> Prop)
+Lemma atreeR_asum {A B} (f : A -> eR) (g : B -> eR) (R : A -> B -> Prop)
   (a : atree bool A) (b : atree bool B) :
   (forall x y, R x y -> f x = g y) ->
   atreeR R a b ->
-  amu f a = amu g b.
+  asum f a = asum g b.
 Proof.
   intros Hfg Hab.
   revert Hfg; revert f g.
@@ -172,7 +172,7 @@ Proof.
   - reflexivity.
   - apply Hfg; auto.
   - apply IHHab; auto.
-  - unfold amu in *; simpl; unfold compose; erewrite 2!H0; eauto.
+  - unfold asum in *; simpl; unfold compose; erewrite 2!H0; eauto.
 Qed.
 
 Lemma monotone_atree_lang {A} :
@@ -191,26 +191,26 @@ Qed.
 #[global] Hint Resolve monotone_atree_lang : mu.
 
 Theorem cotwp_mu_lang {A} :
-  @cotwp A (const 1) = mu (fun bs => 1 / 2 ^ length bs) ∘ cotree_lang.
+  @cotwp A (const 1) = tcosum (fun bs => 1 / 2 ^ length bs) ∘ cotree_lang.
 Proof
   with eauto with aCPO cotcwp order mu.
-  unfold cotwp, mu, cotree_lang.
+  unfold cotwp, tcosum, cotree_lang.
   apply equ_f_eR.  
   rewrite co_co...
   apply Proper_co...
   { apply monotone_compose...
-    apply monotone_co, monotone_amu. }
+    apply monotone_co, monotone_asum. }
   unfold compose.
   apply equ_arrow; intro a.
   apply equ_eR.
-  unfold btwp, amu.
+  unfold btwp, asum.
   induction a; simpl.
-  - unfold atree_lang; simpl; unfold amu.
+  - unfold atree_lang; simpl; unfold asum.
     apply equ_eR; rewrite co_fold_bot; reflexivity.
-  - unfold atree_lang, amu, const; simpl; apply equ_eR.
+  - unfold atree_lang, asum, const; simpl; apply equ_eR.
     rewrite co_fold_leaf; simpl; eRauto.
   - apply IHa.
-  - unfold amu, atree_lang; simpl; apply equ_eR.
+  - unfold asum, atree_lang; simpl; apply equ_eR.
     rewrite co_fold_node; auto.
     2: { apply monotone_id. }
     2: { apply wcontinuous_sum; apply wcontinuous_apply. }
@@ -220,16 +220,16 @@ Proof
     rewrite 2!H.
     rewrite <- eRplus_combine_fract.
     unfold atree_lang.
-    assert (Heq: forall b, mu (fun bs => 1 / 2 ^ length bs) (atree_lang (a b)) / 2 =
-                             mu (fun bs => 1 / 2 ^ length bs)
-                               (cotree_map' (cons b) (atree_lang (a b)))).
-    { intro b; unfold mu, co, eRdiv.
+    assert (Heq: forall b, tcosum (fun bs => 1 / 2 ^ length bs) (atree_lang (a b)) / 2 =
+                        tcosum (fun bs => 1 / 2 ^ length bs)
+                          (cotree_map' (cons b) (atree_lang (a b)))).
+    { intro b; unfold tcosum, co, eRdiv.
       rewrite eRmult_comm.
       rewrite sup_scalar.
       f_equal; ext i.
       unfold compose.
-      rewrite amu_scalar.
-      apply atreeR_amu with
+      rewrite asum_scalar.
+      apply atreeR_asum with
         (R := fun x y => cons b x = y).
       * intros bs bs' Hbs; simpl in *; subst; simpl.
         destr; try lra.
@@ -245,19 +245,19 @@ Proof
       * unfold ideal; simpl; unfold flip.
         rewrite tprefix_map.
         apply atreeR_map. }
-    unfold mu in Heq.
+    unfold tcosum in Heq.
     unfold compose.
     unfold atree_lang in Heq.
     rewrite 2!Heq; reflexivity.
-  - apply continuous_wcontinuous, continuous_co, monotone_amu.
+  - apply continuous_wcontinuous, continuous_co, monotone_asum.
 Qed.
 
-Theorem cotwp_mu_preimage {A} (P : A -> bool) :
+Theorem cotwp_tcosum_preimage {A} (P : A -> bool) :
   cotwp (fun x => if P x then 1 else 0) ===
-    mu (fun bs => 1 / 2 ^ length bs) ∘ cotree_preimage P.
+    tcosum (fun bs => 1 / 2 ^ length bs) ∘ cotree_preimage P.
 Proof.
   rewrite cotwp_filter.
-  unfold mu, cotree_preimage, cotree_lang, cotree_filter'.
+  unfold tcosum, cotree_preimage, cotree_lang, cotree_filter'.
   rewrite <- Combinators.compose_assoc.
   apply Proper_compose_l.
   { apply Proper_monotone_equ, monotone_co, monotone_btwp. }
@@ -268,9 +268,9 @@ Qed.
 (* Pointwise variant. *)
 Corollary cotwp_mu_preimage' {A} (P : A -> bool) (t : cotree bool A) :
   cotwp (fun x => if P x then 1 else 0) t =
-    mu (fun bs => 1 / 2 ^ length bs) (cotree_preimage P t).
+    tcosum (fun bs => 1 / 2 ^ length bs) (cotree_preimage P t).
 Proof.
-  apply equ_eR; revert t; apply equ_arrow, cotwp_mu_preimage.
+  apply equ_eR; revert t; apply equ_arrow, cotwp_tcosum_preimage.
 Qed.
 
 Lemma atree_disjoint_map {A} (t : atree bool (list A)) (a : A) :
