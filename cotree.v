@@ -122,6 +122,12 @@ Proof. constructor; typeclasses eauto. Qed.
   Instance OType_atree {I A} : OType (atree I A) :=
   { leq := atree_le }.
 
+#[global]
+  Program
+  Instance PType_atree {I A} : PType (atree I A) :=
+  { bot := abot }.
+Next Obligation. constructor. Qed.
+
 Lemma atree_le_antisym {I A} (a b : atree I A) :
   a ⊑ b ->
   b ⊑ a ->
@@ -212,6 +218,12 @@ Proof. constructor; typeclasses eauto. Qed.
 #[global]
   Instance OType_cotree {I A} : OType (cotree I A) :=
   { leq := cotree_le }.
+
+#[global]
+  Program
+  Instance PType_cotree {I A} : PType (cotree I A) :=
+  { bot := cobot }.
+Next Obligation. constructor. Qed.
 
 #[global]
   Instance monotone_cotau {I A} : Proper (leq ==> leq) (@cotau I A).
@@ -1354,6 +1366,11 @@ Proof.
   apply supremum_sup, supremum_const', equ_arrow; intros []; reflexivity.
 Qed.
 
+Lemma co_fold_bot' {A B} `{o : OType B} `{@dCPO B o} `{@ExtType B o}
+  (z : B) (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) :
+  co (fold z f g h) cobot = z.
+Proof. apply ext, co_fold_bot. Qed.
+
 Lemma co_fold_leaf {A B} `{dCPO B}
   (z : B) (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (x : A) :
   z ⊑ f x ->
@@ -1365,6 +1382,12 @@ Proof.
   { intros []; simpl; auto; reflexivity. }
   exists (S O); intros n Hn; destruct n; try lia; reflexivity.
 Qed.
+
+Lemma co_tfold_leaf' {A B} `{o : OType B} `{@dCPO B o} `{@ExtType B o}
+  (z : B) (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (x : A) :
+  z ⊑ f x ->
+  co (fold z f g h) (coleaf x) = f x.
+Proof. intro Hz; apply ext, co_fold_leaf; auto. Qed.
 
 Lemma co_fold_tau {A B} `{dCPO B}
   (z : B) (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (t : cotree bool A) :
@@ -1414,6 +1437,15 @@ Proof.
         apply chain_directed, chain_ideal. } } }
   apply equ_arrow; intro i; reflexivity.
 Qed.
+
+Lemma co_fold_node' {A B} `{o : OType B} `{@dCPO B o} `{@ExtType B o}
+  (z : B) (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (k : bool -> cotree bool A) :
+  monotone g ->
+  wcontinuous h ->
+  (forall b, z ⊑ fold z f g h b) ->
+  z ⊑ h (fun _ => z) ->
+  co (fold z f g h) (conode k) = h (co (fold z f g h) ∘ k).
+Proof. intros Hg Hh Hz Hh'; apply ext, co_fold_node; auto. Qed.
 
 (** Computation lemmas for coop folds. *)
 Lemma coop_fold_bot {A B} `{ldCPO B}
