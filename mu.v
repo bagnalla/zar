@@ -55,6 +55,22 @@ Proof.
 Qed.
 #[global] Hint Resolve monotone_asum : mu.
 
+Lemma tcosum_bot {A} (f : A -> eR) :
+  tcosum f bot = 0.
+Proof. apply co_fold_bot'. Qed.
+
+Lemma tcosum_leaf {A} (f : A -> eR) (a : A) :
+  tcosum f (coleaf a) = f a.
+Proof. apply co_tfold_leaf'; eRauto. Qed.
+
+Lemma tcosum_node {A} (f : A -> eR) (k : bool -> cotree bool A) :
+  tcosum f (conode k) = tcosum f (k false) + tcosum f (k true).
+Proof. 
+  unfold tcosum, asum; rewrite co_fold_node'; eRauto.
+  { apply monotone_id. }
+  apply wcontinuous_sum; apply wcontinuous_apply.
+Qed.
+
 Definition atree_lang {A} : atree bool A -> cotree bool (list bool) :=
   fold cobot (const (coleaf [])) id (fun k => conode (fun b => cotree_map' (cons b) (k b))).
 
