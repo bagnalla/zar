@@ -2391,3 +2391,18 @@ Lemma eRmult_eRlt a b :
   0 < a * b ->
   0 < b.
 Proof. intros Ha Hab; apply eRmult_lt_compat_l with a; eRauto. Qed.  
+
+Lemma eRmult_le_div (a b c : eR) :
+  a <> 0 ->
+  a <> infty ->
+  a * b <= c ->
+  b <= c / a.
+Proof.
+  intros Ha Ha' Hle.
+  apply eRmult_le_reg_r with a; auto.
+  - eRauto.
+  - unfold eRdiv.
+    rewrite eRmult_assoc.
+    rewrite eRinv_l; auto.
+    rewrite eRmult_comm; eRauto.
+Qed.

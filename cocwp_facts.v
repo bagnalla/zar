@@ -944,3 +944,51 @@ Proof.
   rewrite cofail_cowlp.
   apply eRminus_pos_lt; eRauto.
 Qed.
+
+Lemma monotone_btwp' {A} (f g : A -> eR) (t : atree bool A) :
+  f ⊑ g ->
+  btwp f t <= btwp g t.
+Proof.
+  unfold btwp.
+  revert f g; induction t; intros f g Hfg; simpl.
+  - reflexivity.
+  - apply Hfg.
+  - apply IHt; auto.
+  - unfold compose.
+    rewrite <- 2!eRplus_combine_fract.
+    apply eRplus_le_compat; apply eRmult_le_compat_r, H; auto.
+Qed.
+
+Lemma monotone_cotwp {A} (f g : A -> eR) (t : cotree bool A) :
+  f ⊑ g ->
+  cotwp f t <= cotwp g t.
+Proof.
+  intro Hfg.
+  apply leq_eRle.
+  unfold cotwp.
+  apply ge_dsup.
+  { apply monotone_directed.
+    - apply monotone_btwp.
+    - apply chain_directed, chain_ideal. }
+  intro i; unfold compose.
+  apply le_dsup with i.
+  { apply monotone_directed.
+    - apply monotone_btwp.
+    - apply chain_directed, chain_ideal. }
+  unfold compose.
+  apply monotone_btwp'; auto.
+Qed.
+
+Theorem markov_inequality {A} (f : A -> eR) (a : eR) (t : cotree bool A) :
+  a <> 0 ->
+  a <> infty ->
+  cotwp (fun x => if eRle_dec a (f x) then 1 else 0) t <= cotwp f t / a.
+Proof.
+  intros Ha Ha'.
+  unfold eRdiv.
+  apply eRmult_le_div; auto.
+  rewrite cotwp_scalar.
+  apply monotone_cotwp.
+  intro x.
+  destr; eRauto.
+Qed.
