@@ -48,7 +48,7 @@ Local Open Scope eR_scope.
 Definition Sigma01 : Type := cotree bool (list bool).
 
 Definition measure (U : Sigma01) : eR :=
-  mu (fun bs => 1 / 2 ^ length bs) U.
+  tcosum (fun bs => 1 / 2 ^ length bs) U.
 
 Fixpoint count {A} (P : A -> Prop) (l : list A) : nat :=
   match l with
