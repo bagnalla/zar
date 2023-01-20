@@ -282,7 +282,7 @@ Proof.
 Qed.
 
 (* Pointwise variant. *)
-Corollary cotwp_mu_preimage' {A} (P : A -> bool) (t : cotree bool A) :
+Corollary cotwp_tcosum_preimage' {A} (P : A -> bool) (t : cotree bool A) :
   cotwp (fun x => if P x then 1 else 0) t =
     tcosum (fun bs => 1 / 2 ^ length bs) (cotree_preimage P t).
 Proof.

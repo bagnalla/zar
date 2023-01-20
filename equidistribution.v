@@ -193,7 +193,7 @@ Section cotree_equidistribution.
     destruct Huniform as [n0 Huniform].
     exists n0; intros n Hn; specialize (Huniform n Hn).
     unfold compose in *.
-    rewrite cotwp_mu_preimage'.
+    rewrite cotwp_tcosum_preimage'.
     unfold measure in Huniform.
     rewrite <- cotree_freq_bitstreams_samples; apply Huniform.
   Qed.
@@ -258,7 +258,7 @@ Section itree_equidistribution.
     unfold compose in *.
     erewrite itwp_cotwp.
     2: { apply itree_cotree_icotree. }
-    rewrite cotwp_mu_preimage'.
+    rewrite cotwp_tcosum_preimage'.
     unfold measure in Huniform.
     rewrite <- itree_freq_bitstreams_samples; apply Huniform.
   Qed.
