@@ -72,13 +72,13 @@ Proof.
 Qed.
 
 Definition atree_lang {A} : atree bool A -> cotree bool (list bool) :=
-  fold cobot (const (coleaf [])) id (fun k => conode (fun b => cotree_map' (cons b) (k b))).
+  fold cobot (const (coleaf [])) id (fun k => conode (fun b => cotree_map (cons b) (k b))).
 
 Definition cotree_lang {A} : cotree bool A -> cotree bool (list bool) :=
   co atree_lang.
 
 Definition cotree_preimage {A} (P : A -> bool) : cotree bool A -> cotree bool (list bool) :=
-  cotree_lang ∘ cotree_filter' P.
+  cotree_lang ∘ cotree_filter P.
 
 (** Computation lemmas for cotree_lang. *)
 
@@ -113,7 +113,7 @@ Qed.
 
 Lemma cotree_lang_node {A} (k : bool -> cotree bool A) :
   cotree_lang (conode k) =
-    conode (fun b => cotree_map' (cons b) (cotree_lang (k b))).
+    conode (fun b => cotree_map (cons b) (cotree_lang (k b))).
 Proof.
   apply cotree_equ_eq.
   unfold cotree_lang, atree_lang.
@@ -137,7 +137,7 @@ Lemma cotree_preimage_bot {A} (P : A -> bool) :
 Proof.
   apply cotree_equ_eq.
   unfold cotree_preimage, compose.
-  rewrite cotree_filter'_bot, cotree_lang_bot; reflexivity.
+  rewrite cotree_filter_bot, cotree_lang_bot; reflexivity.
 Qed.
 
 Lemma cotree_preimage_leaf {A} (P : A -> bool) (x : A) :
@@ -145,7 +145,7 @@ Lemma cotree_preimage_leaf {A} (P : A -> bool) (x : A) :
 Proof.
   apply cotree_equ_eq.
   unfold cotree_preimage, compose.
-  rewrite cotree_filter'_leaf.
+  rewrite cotree_filter_leaf.
   destruct (P x).
   - rewrite cotree_lang_leaf; reflexivity.
   - rewrite cotree_lang_bot; reflexivity.
@@ -156,16 +156,16 @@ Lemma cotree_preimage_tau {A} (P : A -> bool) (t : cotree bool A) :
 Proof.
   apply cotree_equ_eq.
   unfold cotree_preimage, compose.
-  rewrite cotree_filter'_tau, cotree_lang_tau; reflexivity.
+  rewrite cotree_filter_tau, cotree_lang_tau; reflexivity.
 Qed.
 
 Lemma cotree_preimage_node {A} (P : A -> bool) (k : bool -> cotree bool A) :
   cotree_preimage P (conode k) =
-    conode (fun b => cotree_map' (cons b) (cotree_preimage P (k b))).
+    conode (fun b => cotree_map (cons b) (cotree_preimage P (k b))).
 Proof.
   apply cotree_equ_eq.
   unfold cotree_preimage, compose.
-  rewrite cotree_filter'_node, cotree_lang_node; reflexivity.
+  rewrite cotree_filter_node, cotree_lang_node; reflexivity.
 Qed.
 
 Lemma asum_scalar {A} (f : A -> eR) (t : atree bool A) (c : eR) :
@@ -238,7 +238,7 @@ Proof
     unfold atree_lang.
     assert (Heq: forall b, tcosum (fun bs => 1 / 2 ^ length bs) (atree_lang (a b)) / 2 =
                         tcosum (fun bs => 1 / 2 ^ length bs)
-                          (cotree_map' (cons b) (atree_lang (a b)))).
+                          (cotree_map (cons b) (atree_lang (a b)))).
     { intro b; unfold tcosum, co, eRdiv.
       rewrite eRmult_comm.
       rewrite sup_scalar.
@@ -273,7 +273,7 @@ Theorem cotwp_tcosum_preimage {A} (P : A -> bool) :
     tcosum (fun bs => 1 / 2 ^ length bs) ∘ cotree_preimage P.
 Proof.
   rewrite cotwp_filter.
-  unfold tcosum, cotree_preimage, cotree_lang, cotree_filter'.
+  unfold tcosum, cotree_preimage, cotree_lang, cotree_filter.
   rewrite <- Combinators.compose_assoc.
   apply Proper_compose_l.
   { apply Proper_monotone_equ, monotone_co, monotone_btwp. }
@@ -352,7 +352,7 @@ Theorem disjoint_cotree_preimage {A} (P : A -> bool) (t : cotree bool A) :
 Proof.
   unfold cotree_disjoint, cotree_preimage.
   unfold compose.
-  unfold cotree_filter', cotree_lang.
+  unfold cotree_filter, cotree_lang.
   apply co_coopP; eauto with cotree order mu aCPO.
   { apply cocontinuous_coop; eauto with cotree order. }
   cointro.

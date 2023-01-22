@@ -173,13 +173,13 @@ Fixpoint to_itree_open (t : tree) : itree boolE (unit + St) :=
   | Choice _ k => Vis GetBool (to_itree_open ∘ k)
   | Fix st G g k =>
       ITree.iter (fun s => if G s then
-                          y <- to_itree_open (g s) ;;
-                          match y with
-                          | inl tt => ret (inr (inl tt))
-                          | inr s' => ret (inl s')
-                          end
-                        else
-                          ITree.map inr (to_itree_open (k s))) st
+                             y <- to_itree_open (g s) ;;
+                             match y with
+                             | inl tt => ret (inr (inl tt))
+                             | inr s' => ret (inl s')
+                             end
+                           else
+                             ITree.map inr (to_itree_open (k s))) st
   end.
 
 Definition tie_itree {A : Type} {E : Type -> Type} (t : itree E (unit + A))
@@ -196,17 +196,17 @@ Lemma itree_cotree_eq_bind {A B} (it : itree boolE A) (ct : cotree bool A)
   (R : itree boolE B -> cotree bool B -> Prop) :
   itree_cotree_eq it ct ->
   (forall x, paco2 itree_cotree_eq_ R (f x) (g x)) ->
-  paco2 itree_cotree_eq_ R (ITree.bind it f) (cotree_bind' ct g).
+  paco2 itree_cotree_eq_ R (ITree.bind it f) (cotree_bind ct g).
 Proof.
   revert it ct f g.
   pcofix CH; intros it ct f g Ht Hfg.
   punfold Ht; pstep; unfold itree_cotree_eq_ in *.
-  remember (cotree_bind' ct g) as x.
+  remember (cotree_bind ct g) as x.
   compute.
   rewrite 2!_observe_observe.
   destruct (observe it) eqn:Hit.
   - inv Ht.
-    rewrite cotree_bind'_leaf.
+    rewrite cotree_bind_leaf.
     specialize (Hfg r0); punfold Hfg.
     unfold itree_cotree_eq_ in Hfg.
     eapply itree_cotree_eqF_impl.
@@ -216,10 +216,10 @@ Proof.
     + left; eapply itree_cotree_eq_impl; eauto.
     + right; auto.
   - inv Ht; dupaco.
-    rewrite cotree_bind'_tau.
+    rewrite cotree_bind_tau.
     constructor; right; apply CH; auto.
   - inv Ht; existT_inv.
-    rewrite cotree_bind'_node.
+    rewrite cotree_bind_node.
     constructor; intro b; specialize (H3 b); dupaco.
     right; apply CH; auto.
 Qed.
@@ -250,15 +250,15 @@ Proof.
   punfold Hz; unfold itree_cotree_eq_ in Hz.
   destruct (observe (f z)) eqn:Hfz; inv Hz.
   - destruct r0.
-    + rewrite cotree_bind'_leaf.
+    + rewrite cotree_bind_leaf.
       constructor; right; apply CH; auto.
-    + rewrite cotree_bind'_leaf; constructor.
-  - rewrite cotree_bind'_tau.
+    + rewrite cotree_bind_leaf; constructor.
+  - rewrite cotree_bind_tau.
     dupaco; constructor; left.
     apply itree_cotree_eq_bind; auto.
     intros []; pstep; constructor.
     right; apply CH; auto.
-  - rewrite cotree_bind'_node.
+  - rewrite cotree_bind_node.
     existT_inv; constructor; intro b; left.
     apply itree_cotree_eq_bind.
     + specialize (H0 b); dupaco; auto.
@@ -270,16 +270,16 @@ Qed.
   than with standard coinduction. *)
 Lemma itree_cotree_eq_map {A B} (it : itree boolE A) (ct : cotree bool A) (f : A -> B) :
   itree_cotree_eq it ct ->
-  itree_cotree_eq (ITree.map f it) (cotree_map' f ct).
+  itree_cotree_eq (ITree.map f it) (cotree_map f ct).
 Proof.
   revert it ct f; pcofix CH; intros it ct f Heq.
   punfold Heq; pstep; unfold itree_cotree_eq_ in *.
-  remember (cotree_map' f ct) as t.
+  remember (cotree_map f ct) as t.
   compute; rewrite 2!_observe_observe.
   destruct (observe it) eqn:Hit; inv Heq.
-  - rewrite cotree_map'_leaf; constructor.
-  - dupaco; rewrite cotree_map'_tau; constructor; right; apply CH; auto.
-  - existT_inv; rewrite cotree_map'_node.
+  - rewrite cotree_map_leaf; constructor.
+  - dupaco; rewrite cotree_map_tau; constructor; right; apply CH; auto.
+  - existT_inv; rewrite cotree_map_node.
     constructor; intro b; specialize (H3 b); dupaco; right; apply CH; auto.
 Qed.
 
