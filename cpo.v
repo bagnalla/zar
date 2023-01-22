@@ -107,10 +107,12 @@ Proof. intro Hf; unfold inf; destruct inf_prim; simpl; apply i, H0; auto. Qed.
 #[global]
   Instance CPO_dCPO {A} `{CPO A} : dCPO A.
 Proof. constructor; intros f Hf; apply H0. Qed.
+#[global] Hint Resolve CPO_dCPO : order.
 
 #[global]
   Instance lCPO_ldCPO {A} `{lCPO A} : ldCPO A.
 Proof. constructor; intros f Hf; apply H0. Qed.
+#[global] Hint Resolve lCPO_ldCPO : order.
 
 (** [Prop] has suprema and infima. *)
 
@@ -121,14 +123,16 @@ Proof.
   - intros i Hi; exists i; auto.
   - intros ub Hub [i Hi]; eapply Hub; eauto.
 Qed.
+#[global] Hint Resolve CPO_Prop : order.
 
 #[global]
-  Instance LCPO_Prop : lCPO Prop.
+  Instance lCPO_Prop : lCPO Prop.
 Proof.
   constructor; intros f; exists (forall i, f i); split.
   - intros i Hi; auto.
   - intros ub Hub x i; apply Hub; auto.
 Qed.
+#[global] Hint Resolve lCPO_Prop : order.
 
 Lemma ge_inf {A} `{lCPO A} (f : nat -> A) (a : A) (i : nat) :
   f i ⊑ a ->

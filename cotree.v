@@ -1878,20 +1878,26 @@ Proof.
     try reflexivity; intros; constructor.
 Qed.
 
-Inductive atree_some {I A} (P : A -> Prop) : atree I A -> Prop :=
-| atree_some_leaf : forall x, P x -> atree_some P (aleaf x)
-| atree_some_tau : forall t, atree_some P t -> atree_some P (atau t)
-| atree_some_node : forall f x,
-    atree_some P (f x) ->
-    atree_some P (anode f).
+(* Inductive atree_some {I A} (P : A -> Prop) : atree I A -> Prop := *)
+(* | atree_some_leaf : forall x, P x -> atree_some P (aleaf x) *)
+(* | atree_some_tau : forall t, atree_some P t -> atree_some P (atau t) *)
+(* | atree_some_node : forall f x, *)
+(*     atree_some P (f x) -> *)
+(*     atree_some P (anode f). *)
 
-Inductive atree_all {I A} (P : A -> Prop) : atree I A -> Prop :=
-| atree_all_bot : atree_all P abot
-| atree_all_leaf : forall x, P x -> atree_all P (aleaf x)
-| atree_all_tau : forall t, atree_all P t -> atree_all P (atau t)
-| atree_all_node : forall f,
-    (forall i, atree_all P (f i)) ->
-    atree_all P (anode f).
+(* Inductive atree_all {I A} (P : A -> Prop) : atree I A -> Prop := *)
+(* | atree_all_bot : atree_all P abot *)
+(* | atree_all_leaf : forall x, P x -> atree_all P (aleaf x) *)
+(* | atree_all_tau : forall t, atree_all P t -> atree_all P (atau t) *)
+(* | atree_all_node : forall f, *)
+(*     (forall i, atree_all P (f i)) -> *)
+(*     atree_all P (anode f). *)
+
+Definition atree_some {I A} (P : A -> Prop) : atree I A -> Prop :=
+  fold False P id (fun k => exists i, k i).
+
+Definition atree_all {I A} (P : A -> Prop) : atree I A -> Prop :=
+  fold True P id (fun k => forall i, k i).
 
 Definition cotree_some {A} (P : A -> Prop) : cotree bool A -> Prop :=
   co (atree_some P).
@@ -1902,27 +1908,146 @@ Definition cotree_all {A} (P : A -> Prop) : cotree bool A -> Prop :=
 #[global]
   Instance monotone_atree_some {I A} (P : A -> Prop) : Proper (leq ==> leq) (@atree_some I A P).
 Proof.
-  intro a; induction a; intros b Hab Hsome; inv Hsome; inv Hab.
-  - constructor; auto.
-  - constructor; apply IHa; auto.
-  - econstructor; eapply H; eauto; apply H2.
+  apply monotone_fold; auto with cotree order.
+  - intros ? [].
+  - intros f g Hfg [i Hf].
+    exists i; apply Hfg; auto.
 Qed.
 #[global] Hint Resolve monotone_atree_some : cotree.
+
+(* #[global] *)
+(*   Instance monotone_atree_some {I A} (P : A -> Prop) : Proper (leq ==> leq) (@atree_some I A P). *)
+(* Proof. *)
+(*   intro a; induction a; intros b Hab Hsome; inv Hsome; inv Hab. *)
+(*   - constructor; auto. *)
+(*   - constructor; apply IHa; auto. *)
+(*   - econstructor; eapply H; eauto; apply H2. *)
+(* Qed. *)
+(* #[global] Hint Resolve monotone_atree_some : cotree. *)
 
 Corollary continuous_cotree_some {A} (P : A -> Prop) :
   continuous (cotree_some P).
 Proof. apply continuous_co, monotone_atree_some. Qed.
 
-#[global]
-  Instance antimonotone_atree_all {I A} (P : A -> Prop) : Proper (leq ==> flip leq) (@atree_all I A P).
+Lemma cotree_some_bot {A} (P : A -> Prop) :
+  ~ cotree_some P cobot.
 Proof.
-  intro a; induction a; intros b Hab Hall; simpl.
-  - constructor.
-  - inv Hab; auto.
-  - inv Hab; inv Hall; constructor; eapply IHa; eauto.
-  - inv Hab; inv Hall; constructor; intro i; eapply H; eauto; apply H1.
+  intro HC; apply co_elim in HC; eauto with cotree order.
+  destruct HC as [[] []].
+Qed.
+
+(** Introduction rule 1 for cotree_some. *)
+Lemma cotree_some_intro_leaf {A} (P : A -> Prop) (a : A) :
+  P a ->
+  cotree_some P (coleaf a).
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_leaf...
+  intros [].
+Qed.
+
+(** Introduction rule 2 for cotree_some. *)
+Lemma cotree_some_intro_node {A} (P : A -> Prop) (b : bool) (k : bool -> cotree bool A) :
+  cotree_some P (k b) ->
+  cotree_some P (conode k).
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_node...
+  { apply continuous_wcontinuous, continuous_exists. }
+  { intros ? []. }
+  intros [].
+Qed.
+
+(** Elimination rule 1 for cotree_some. *)
+Lemma cotree_some_elim_leaf {A} (P : A -> Prop) (a : A) :
+  cotree_some P (coleaf a) ->
+  P a.
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_leaf...
+  intros [].
+Qed.
+
+(** Elimination rule 2 for cotree_some. *)
+Lemma cotree_some_elim_node {A} (P : A -> Prop) (k : bool -> cotree bool A) :
+  cotree_some P (conode k) ->
+  exists b, cotree_some P (k b).
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_node...
+  { apply continuous_wcontinuous, continuous_exists. }
+  { intros ? []. }
+  intros [].
+Qed.
+
+Lemma monotone_forall {I} :
+  Proper (leq ==> leq) (fun k : I -> Prop => forall i : I, k i).
+Proof. intros f g; simpl; unfold impl; intros Hfg Hf i; apply Hfg, Hf. Qed.
+#[global] Hint Resolve monotone_forall : cotree.
+
+#[global]
+  Instance antimonotone_atree_all {I A} (P : A -> Prop)
+  : Proper (leq ==> flip leq) (@atree_all I A P).
+Proof.
+  apply antimonotone_fold; auto with cotree order; intros ? ?; constructor.
 Qed.
 #[global] Hint Resolve antimonotone_atree_all : cotree.
+
+(* #[global] *)
+(*   Instance antimonotone_atree_all {I A} (P : A -> Prop) : Proper (leq ==> flip leq) (@atree_all I A P). *)
+(* Proof. *)
+(*   intro a; induction a; intros b Hab Hall; simpl. *)
+(*   - constructor. *)
+(*   - inv Hab; auto. *)
+(*   - inv Hab; inv Hall; constructor; eapply IHa; eauto. *)
+(*   - inv Hab; inv Hall; constructor; intro i; eapply H; eauto; apply H1. *)
+(* Qed. *)
+(* #[global] Hint Resolve antimonotone_atree_all : cotree. *)
+
+(** Introduction rule 1 for cotree_all. *)
+Lemma cotree_all_intro_leaf {A} (P : A -> Prop) (a : A) :
+  P a ->
+  cotree_all P (coleaf a).
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_leaf...
+  intro; apply I.
+Qed.
+
+(** Introduction rule 2 for cotree_all. *)
+Lemma cotree_all_intro_node {A} (P : A -> Prop) (k : bool -> cotree bool A) :
+  (forall b, cotree_all P (k b)) ->
+  cotree_all P (conode k).
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_node...
+  { apply dec_continuous_dec_wcontinuous, dec_continuous_forall. }
+  { intros ? ?; apply I. }
+  intro; apply I.
+Qed.
+
+(** Elimination rule 1 for cotree_all. *)
+Lemma cotree_all_elim_leaf {A} (P : A -> Prop) (a : A) :
+  cotree_all P (coleaf a) ->
+  P a.
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_leaf...
+  intro; apply I.
+Qed.
+
+(** Elimination rule 2 for cotree_all. *)
+Lemma cotree_all_elim_node {A} (P : A -> Prop) (k : bool -> cotree bool A) (b : bool) :
+  cotree_all P (conode k) ->
+  cotree_all P (k b).
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_node...
+  { intro H; apply H. }
+  { apply dec_continuous_dec_wcontinuous, dec_continuous_forall. }
+  { intros ? ?; apply I. }
+  intro; apply I.
+Qed.
 
 Corollary cocontinuous_cotree_all {A} (P : A -> Prop) :
   cocontinuous (cotree_all P).
@@ -1931,40 +2056,42 @@ Proof. apply cocontinuous_coop, antimonotone_atree_all. Qed.
 Lemma atree_some_exists {I A} (P : A -> Prop) (t : atree I A) :
   atree_some P t <-> exists x, atree_some (eq x) t /\ P x.
 Proof.
+  unfold atree_some.
   split.
-  - revert P; induction t; intros P Hsome; inv Hsome.
-    + exists a; split; auto; constructor; reflexivity.
-    + apply IHt in H0; destruct H0 as [x [Hsome Hx]].
-      exists x; split; auto; constructor; auto.
-    + apply H in H1; destruct H1 as [y [Hsome Hy]].
-      exists y; split; auto; econstructor; eauto.
-  - revert P; induction t; intros P [x [Hsome Hx]].
-    + inv Hsome.
-    + inv Hsome; constructor; auto.
-    + inv Hsome; constructor; apply IHt; exists x; split; auto.
-    + inv Hsome; econstructor; apply H; eexists; split; eauto.
+  - revert P; induction t; simpl; intros P Hsome; firstorder.
+    apply H in H0; destruct H0; firstorder.
+  - revert P; induction t; simpl; intros P [x [Hsome Hx]]; subst; firstorder.
+    eexists; apply H; exists x; split; eauto.
 Qed.
 
 Lemma atree_some_map {I A B} (P : B -> Prop) (t : atree I A) (f : A -> B) :
   atree_some P (atree_map f t) ->
   atree_some (P ∘ f) t.
 Proof.
-  revert P f; induction t; simpl;
-    intros P f Hsome; unfold compose; inv Hsome.
-  - constructor; auto.
-  - constructor; apply IHt; auto.
-  - econstructor; eapply H; eauto.
+  unfold atree_some.
+  revert P f; induction t; unfold compose; simpl; auto; intros P f [i Hi].
+  exists i; apply H; auto.
 Qed.
+
+(* Lemma atree_map_some {I A B} (P : B -> Prop) (t : atree I A) (f : A -> B) : *)
+(*   atree_some (P ∘ f) t -> *)
+(*   atree_some P (atree_map f t). *)
+(* Proof. *)
+(*   revert P f; induction t; simpl; *)
+(*     unfold compose; intros P f Hsome; inv Hsome. *)
+(*   - constructor; auto. *)
+(*   - constructor; apply IHt; auto. *)
+(*   - econstructor; eapply H; eauto. *)
+(* Qed. *)
 
 Lemma atree_map_some {I A B} (P : B -> Prop) (t : atree I A) (f : A -> B) :
   atree_some (P ∘ f) t ->
   atree_some P (atree_map f t).
 Proof.
-  revert P f; induction t; simpl;
-    unfold compose; intros P f Hsome; inv Hsome.
-  - constructor; auto.
-  - constructor; apply IHt; auto.
-  - econstructor; eapply H; eauto.
+  unfold atree_some.
+  revert P f; induction t; simpl; unfold compose; intros P f; auto.
+  - unfold id; auto.
+  - intros [i Hi]; exists i; apply H; auto.
 Qed.
 
 Lemma tprefix_map {A B} (t : cotree bool A) (f : A -> B) (i : nat) :
@@ -1978,74 +2105,144 @@ Proof.
   - rewrite cotree_map_node; f_equal; ext x; apply IHi.
 Qed.
 
+(* Lemma atree_some_impl {I A} (t : atree I A) (P Q : A -> Prop) : *)
+(*   (forall x, P x -> Q x) -> *)
+(*   atree_some P t -> *)
+(*   atree_some Q t. *)
+(* Proof. *)
+(*   revert P Q; induction t; intros P Q HPQ Hsome; inv Hsome. *)
+(*   - constructor; apply HPQ; auto. *)
+(*   - constructor; eapply IHt; eauto. *)
+(*   - econstructor; eapply H; eauto. *)
+(* Qed. *)
+
+(* Lemma atree_all_map {I A B} (P : B -> Prop) (t : atree I A) (f : A -> B) : *)
+(*   atree_all (P ∘ f) t -> *)
+(*   atree_all P (atree_map f t). *)
+(* Proof. *)
+(*   revert P f; induction t; simpl; *)
+(*     intros P f Hall; unfold compose; inv Hall. *)
+(*   - constructor; auto. *)
+(*   - constructor; auto. *)
+(*   - constructor; apply IHt; auto. *)
+(*   - econstructor; intro b; eapply H; eauto. *)
+(* Qed. *)
+
 Lemma atree_some_impl {I A} (t : atree I A) (P Q : A -> Prop) :
   (forall x, P x -> Q x) ->
   atree_some P t ->
   atree_some Q t.
 Proof.
-  revert P Q; induction t; intros P Q HPQ Hsome; inv Hsome.
-  - constructor; apply HPQ; auto.
-  - constructor; eapply IHt; eauto.
-  - econstructor; eapply H; eauto.
+  unfold atree_some.
+  revert P Q; induction t; simpl; intros P Q HPQ; auto.
+  - unfold id; apply IHt; auto.
+  - intros [i Hi]; exists i; eapply H; eauto.
 Qed.
 
 Lemma atree_all_map {I A B} (P : B -> Prop) (t : atree I A) (f : A -> B) :
   atree_all (P ∘ f) t ->
   atree_all P (atree_map f t).
 Proof.
-  revert P f; induction t; simpl;
-    intros P f Hall; unfold compose; inv Hall.
-  - constructor; auto.
-  - constructor; auto.
-  - constructor; apply IHt; auto.
-  - econstructor; intro b; eapply H; eauto.
+  unfold atree_all.
+  revert P f; induction t; simpl; firstorder.
 Qed.
 
-Inductive atree_disjoint {I A} `{OType A} : atree I A -> Prop :=
-| atree_disjoint_bot : atree_disjoint abot
-| atree_disjoint_leaf : forall x, atree_disjoint (aleaf x)
-| atree_disjoint_tau : forall t, atree_disjoint t -> atree_disjoint (atau t)
-| atree_disjoint_node : forall f,
-    (forall i, atree_disjoint (f i)) ->
-    (forall i j, i <> j -> forall x, atree_some (eq x) (f i) ->
-                                     atree_all (incomparable x) (f j)) ->
-    atree_disjoint (anode f).
+(* Inductive atree_disjoint {I A} `{OType A} : atree I A -> Prop := *)
+(* | atree_disjoint_bot : atree_disjoint abot *)
+(* | atree_disjoint_leaf : forall x, atree_disjoint (aleaf x) *)
+(* | atree_disjoint_tau : forall t, atree_disjoint t -> atree_disjoint (atau t) *)
+(* | atree_disjoint_node : forall f, *)
+(*     (forall i, atree_disjoint (f i)) -> *)
+(*     (forall i j, i <> j -> forall x, atree_some (eq x) (f i) -> *)
+(*                                      atree_all (incomparable x) (f j)) -> *)
+(*     atree_disjoint (anode f). *)
 
-Definition cotree_disjoint {A} `{OType A} : cotree bool A -> Prop :=
-  coop (atree_disjoint).
+(* Definition cotree_disjoint {A} `{OType A} : cotree bool A -> Prop := *)
+(*   coop (atree_disjoint). *)
 
-#[global]
-  Instance antimonotone_atree_disjoint {I A} `{OType A}
-  : Proper (leq ==> flip leq) (@atree_disjoint I A _).
-Proof.
-  intro a; induction a; simpl; intros b Hab Hb; inv Hab; auto.
-  - constructor.
-  - inv Hb; constructor; eapply IHa; eauto.
-  - inv Hb; constructor.
-    + intro i; eapply H0; eauto; apply H2.
-    + intros i j Hij x Hx; unfold compose.
-      eapply antimonotone_atree_all.
-      { apply H2. }
-      eapply H4; eauto.
-      eapply monotone_atree_some; eauto; apply H2.
-Qed.
-#[global] Hint Resolve antimonotone_atree_disjoint : cotree.
+(* #[global] *)
+(*   Instance antimonotone_atree_disjoint {I A} `{OType A} *)
+(*   : Proper (leq ==> flip leq) (@atree_disjoint I A _). *)
+(* Proof. *)
+(*   intro a; induction a; simpl; intros b Hab Hb; inv Hab; auto. *)
+(*   - constructor. *)
+(*   - inv Hb; constructor; eapply IHa; eauto. *)
+(*   - inv Hb; constructor. *)
+(*     + intro i; eapply H0; eauto; apply H2. *)
+(*     + intros i j Hij x Hx; unfold compose. *)
+(*       eapply antimonotone_atree_all. *)
+(*       { apply H2. } *)
+(*       eapply H4; eauto. *)
+(*       eapply monotone_atree_some; eauto; apply H2. *)
+(* Qed. *)
+(* #[global] Hint Resolve antimonotone_atree_disjoint : cotree. *)
+
+Definition atree_disjoint {I A} `{OType A} (a b : atree I A) : Prop :=
+  atree_all (fun x => atree_all (incomparable x) b) a /\
+    atree_all (fun x => atree_all (incomparable x) a) b.
+
+Definition cotree_disjoint {A} `{OType A} (a b : cotree bool A) : Prop :=
+  cotree_all (fun x => cotree_all (incomparable x) b) a /\
+    cotree_all (fun x => cotree_all (incomparable x) a) b.
+
+(** Can technically be generalized to arbitrary index type but it's
+    cleaner this way for our use case.*)
+Inductive atree_pairwise_disjoint {A} `{OType A} : atree bool A -> Prop :=
+| atree_pairwise_disjoint_bot : atree_pairwise_disjoint abot
+| atree_pairwise_disjoint_leaf : forall x, atree_pairwise_disjoint (aleaf x)
+| atree_pairwise_disjoint_tau : forall t,
+    atree_pairwise_disjoint t ->
+    atree_pairwise_disjoint (atau t)
+| atree_pairwise_disjoint_node : forall f,
+    (forall i, atree_pairwise_disjoint (f i)) ->
+    atree_disjoint (f true) (f false) ->
+    atree_pairwise_disjoint (anode f).
+
+Definition cotree_pairwise_disjoint {A} `{OType A} : cotree bool A -> Prop :=
+  coop (atree_pairwise_disjoint).
 
 Lemma atree_all_impl {I A} (t : atree I A) (P Q : A -> Prop) :
   (forall x, P x -> Q x) ->
   atree_all P t ->
   atree_all Q t.
 Proof.
-  revert P Q; induction t; intros P Q HPQ Hsome; inv Hsome.
-  - constructor.
-  - constructor; apply HPQ; auto.
-  - constructor; eapply IHt; eauto.
-  - econstructor; intro b; eapply H; eauto.
+  unfold atree_all.
+  revert P Q; induction t; simpl; firstorder.
 Qed.
+
+#[global]
+  Instance antimonotone_atree_pairwise_disjoint {A} `{OType A}
+  : Proper (leq ==> flip leq) (@atree_pairwise_disjoint A _).
+Proof.
+  intro a; induction a; simpl; intros b Hab Hb; inv Hab; auto.
+  - constructor.
+  - inv Hb; constructor.
+    eapply IHa; eauto.
+  - inv Hb; constructor.
+    + intro i; eapply H0; eauto; apply H2.
+    + destruct H4 as [H4 H4'].
+      split.
+      * eapply antimonotone_atree_all.
+        { apply H2. }
+        eapply atree_all_impl; eauto.
+        simpl; intros x Hx.
+        eapply antimonotone_atree_all; eauto; apply H2.
+      * eapply antimonotone_atree_all.
+        { apply H2. }
+        eapply atree_all_impl; eauto.
+        simpl; intros x Hx.
+        eapply antimonotone_atree_all; eauto; apply H2.
+Qed.
+#[global] Hint Resolve antimonotone_atree_pairwise_disjoint : cotree.
 
 Lemma atree_all_true {I A} (t : atree I A) :
   atree_all (const True) t.
-Proof. unfold const; induction t; constructor; auto. Qed.
+Proof. unfold const; induction t; firstorder. Qed.
+
+Lemma atree_all_true' {I A} (P : A -> Prop) (t : atree I A) :
+  (forall x, P x) ->
+  atree_all P t.
+Proof. intro; induction t; firstorder. Qed.
 
 Lemma atree_cotree_bind_assoc {A B C}
   (t : atree bool A) (f : A -> cotree bool B) (g : B -> cotree bool C) :

@@ -70,7 +70,7 @@ Definition in_Sigma01 (U : Sigma01) (s : Stream bool) : Prop :=
 
 Definition uniform (bitstreams : nat -> Stream bool) : Prop :=
   forall U : Sigma01,
-    cotree_disjoint U ->
+    cotree_pairwise_disjoint U ->
     converges (freq (in_Sigma01 U) ∘ prefix bitstreams) (measure U).
 
 Inductive produces {A} (P : A -> Prop) : Stream bool -> cotree bool A -> Prop :=
@@ -114,30 +114,30 @@ Proof.
       destruct Hsome as [i Hsome].
       apply IHproduces.
       apply atree_some_exists in Hsome.
-      destruct Hsome as [l [H1 H2]].
+      destruct Hsome as [l [H1 H2] ].
       apply atree_some_exists in H1.
-      destruct H1 as [l' [Hsome Hl]]; subst.
+      destruct H1 as [l' [Hsome Hl] ]; subst.
       inv H2.
       { destruct i; simpl in Hsome.
         - inv Hsome.
-        - inv Hsome.
-          unfold compose in H1. simpl in H1.
-          rewrite tprefix_map in H1.
-          apply atree_some_map in H1.
-          unfold compose in H1.
-          apply atree_some_exists in H1.
-          destruct H1 as [l [H1 Heq]].
+        - destruct Hsome as [c H0].
+          unfold compose in H0. simpl in H0.
+          rewrite tprefix_map in H0.
+          apply atree_some_map in H0.
+          unfold compose in H0.
+          apply atree_some_exists in H0.
+          destruct H0 as [l [H0 Heq] ].
           inv Heq. }
       destruct i.
       { inv Hsome. }
       { simpl in Hsome; unfold flip in Hsome; simpl in Hsome.
         unfold compose in Hsome.
-        inv Hsome.
+        destruct Hsome as [c H1].
+        unfold compose in H1.
         rewrite tprefix_map in H1.
         apply atree_some_map in H1.
-        unfold compose in H1.
         apply atree_some_exists in H1.
-        destruct H1 as [l' [Hsome Hl']].
+        destruct H1 as [l' [Hsome Hl'] ].
         inv Hl'.
         eapply co_intro; eauto with cotree order.
         apply atree_some_exists; exists l'; split; eauto.
@@ -189,7 +189,7 @@ Section cotree_equidistribution.
   Proof.
     intros eps Heps.
     pose proof env.(bitstreams_uniform) as Huniform.
-    specialize (Huniform _ (disjoint_cotree_preimage P t) _ Heps).
+    specialize (Huniform _ (pairwise_disjoint_cotree_preimage P t) _ Heps).
     destruct Huniform as [n0 Huniform].
     exists n0; intros n Hn; specialize (Huniform n Hn).
     unfold compose in *.
@@ -223,8 +223,8 @@ Proof.
 Qed.
 
 Corollary disjoint_itree_preimage {A} (P : A -> bool) (t : itree boolE A) :
-  cotree_disjoint (itree_preimage P t).
-Proof. apply disjoint_cotree_preimage. Qed.
+  cotree_pairwise_disjoint (itree_preimage P t).
+Proof. apply pairwise_disjoint_cotree_preimage. Qed.
 
 (** ITree equidistribution theorem. *)
 Section itree_equidistribution.
