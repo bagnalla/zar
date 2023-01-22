@@ -289,78 +289,146 @@ Proof.
   apply equ_eR; revert t; apply equ_arrow, cotwp_tcosum_preimage.
 Qed.
 
-Lemma atree_disjoint_map {A} (t : atree bool (list A)) (a : A) :
-  atree_disjoint t ->
-  atree_disjoint (atree_map (cons a) t).
+(* Lemma atree_disjoint_map {A} (t : atree bool (list A)) (a : A) : *)
+(*   atree_disjoint t -> *)
+(*   atree_disjoint (atree_map (cons a) t). *)
+(* Proof. *)
+(*   revert a; induction t; intros a' Hdisj; simpl; inv Hdisj; constructor; auto. *)
+(*   - intro b; apply H; auto. *)
+(*   - intros b b' Hneq bs Hsome. *)
+(*     unfold compose in *. *)
+(*     apply atree_some_map in Hsome. *)
+(*     apply atree_all_map. *)
+(*     destruct bs. *)
+(*     { apply atree_some_exists in Hsome. *)
+(*       destruct Hsome as [? [? HC]]; inv HC. } *)
+(*     eapply H2 with (x:=bs) in Hneq. *)
+(*     { eapply atree_all_impl. *)
+(*       2: { apply Hneq. } *)
+(*       intros bs' Hbs'; unfold compose. *)
+(*       intros [HC|HC]; inv HC; auto. } *)
+(*     eapply atree_some_impl. *)
+(*     2: { apply Hsome. } *)
+(*     intros bs' Hbs'. *)
+(*     inv Hbs'; reflexivity. *)
+(* Qed. *)
+
+(* Lemma atree_disjoint_lang {A} (t : atree bool A) (i : nat ) : *)
+(*   atree_disjoint (ideal (atree_lang t) i). *)
+(* Proof. *)
+(*   revert i; induction t; intros i. *)
+(*   - destruct i; constructor. *)
+(*   - destruct i; constructor. *)
+(*   - apply IHt. *)
+(*   - destruct i. *)
+(*     + constructor. *)
+(*     + simpl; unfold flip; simpl. *)
+(*       constructor; intro b. *)
+(*       * unfold compose. *)
+(*         specialize (H b i). *)
+(*         unfold ideal in H; simpl in H; unfold flip in H. *)
+(*         rewrite tprefix_map. *)
+(*         apply atree_disjoint_map; auto. *)
+(*       * unfold compose; intros b' Hneq bs Hsome. *)
+(*         rewrite tprefix_map in Hsome. *)
+(*         rewrite tprefix_map. *)
+(*         apply atree_some_map in Hsome. *)
+(*         apply atree_all_map. *)
+(*         apply atree_some_exists in Hsome. *)
+(*         destruct Hsome as [bs' [Hsome Hbs']]. *)
+(*         unfold compose in Hbs'. *)
+(*         inv Hbs'. *)
+(*         clear H0. *)
+(*         apply atree_all_impl with (const True). *)
+(*         { intros bs _. *)
+(*           unfold compose. *)
+(*           unfold incomparable. *)
+(*           intros [HC|HC]; inv HC; congruence. } *)
+(*         apply atree_all_true. *)
+(* Qed. *)
+
+(* Theorem disjoint_cotree_preimage {A} (P : A -> bool) (t : cotree bool A) : *)
+(*   cotree_disjoint (cotree_preimage P t). *)
+(* Proof. *)
+(*   unfold cotree_disjoint, cotree_preimage. *)
+(*   unfold compose. *)
+(*   unfold cotree_filter, cotree_lang. *)
+(*   apply co_coopP; eauto with cotree order mu aCPO. *)
+(*   { apply cocontinuous_coop; eauto with cotree order. } *)
+(*   cointro. *)
+(*   { apply monotone_antimonotone_compose; eauto with cotree order aCPO mu. *)
+(*     apply antimonotone_coop; eauto with cotree order. } *)
+(*   intro i. *)
+(*   cointro; eauto with cotree order. *)
+(*   intro j. *)
+(*   cointro; eauto with cotree order. *)
+(*   apply atree_disjoint_lang. *)
+(* Qed. *)
+
+Lemma incomparable_cons {A} (a : A) (b c : list A) :
+  incomparable b c ->
+  incomparable (a :: b) (a :: c).
+Proof.
+  unfold incomparable.
+  intros Hinc []; inv H; apply Hinc.
+  - left; auto.
+  - right; auto.
+Qed.
+
+Lemma itree_all_incomparable_map_cons {A} (t : atree bool (list A)) l a :
+  atree_all (incomparable l) t ->
+  atree_all (incomparable (a :: l)) (atree_map (cons a) t).
+Proof.
+  unfold atree_all.
+  revert l a; induction t; simpl; intros l b Hall.
+  - constructor.
+  - apply incomparable_cons; auto.
+  - unfold id in *; eauto.
+  - intros []; apply H, Hall.
+Qed.
+
+Lemma atree_pairwise_disjoint_map {A} (t : atree bool (list A)) (a : A) :
+  atree_pairwise_disjoint t ->
+  atree_pairwise_disjoint (atree_map (cons a) t).
 Proof.
   revert a; induction t; intros a' Hdisj; simpl; inv Hdisj; constructor; auto.
   - intro b; apply H; auto.
-  - intros b b' Hneq bs Hsome.
-    unfold compose in *.
-    apply atree_some_map in Hsome.
-    apply atree_all_map.
-    destruct bs.
-    { apply atree_some_exists in Hsome.
-      destruct Hsome as [? [? HC]]; inv HC. }
-    eapply H2 with (x:=bs) in Hneq.
-    { eapply atree_all_impl.
-      2: { apply Hneq. }
-      intros bs' Hbs'; unfold compose.
-      intros [HC|HC]; inv HC; auto. }
-    eapply atree_some_impl.
-    2: { apply Hsome. }
-    intros bs' Hbs'.
-    inv Hbs'; reflexivity.
+  - destruct H2 as [Ht Hf]; split; apply atree_all_map; unfold compose;
+      eapply atree_all_impl; eauto; intro;
+      apply itree_all_incomparable_map_cons; auto.
 Qed.
 
-Lemma atree_disjoint_lang {A} (t : atree bool A) (i : nat ) :
-  atree_disjoint (ideal (atree_lang t) i).
+Lemma atree_pairwise_disjoint_lang {A} (t : atree bool A) (i : nat ) :
+  atree_pairwise_disjoint (ideal (atree_lang t) i).
 Proof.
   revert i; induction t; intros i.
   - destruct i; constructor.
   - destruct i; constructor.
-  - apply IHt.
+  - auto.
   - destruct i.
     + constructor.
     + simpl; unfold flip; simpl.
-      constructor; intro b.
-      * unfold compose.
+      constructor.
+      * intro b; unfold compose.
         specialize (H b i).
         unfold ideal in H; simpl in H; unfold flip in H.
         rewrite tprefix_map.
-        apply atree_disjoint_map; auto.
-      * unfold compose; intros b' Hneq bs Hsome.
-        rewrite tprefix_map in Hsome.
-        rewrite tprefix_map.
-        apply atree_some_map in Hsome.
-        apply atree_all_map.
-        apply atree_some_exists in Hsome.
-        destruct Hsome as [bs' [Hsome Hbs']].
-        unfold compose in Hbs'.
-        inv Hbs'.
-        clear H0.
-        apply atree_all_impl with (const True).
-        { intros bs _.
-          unfold compose.
-          unfold incomparable.
-          intros [HC|HC]; inv HC; congruence. }
-        apply atree_all_true.
+        apply atree_pairwise_disjoint_map; auto.
+      * unfold compose.
+        rewrite 2!tprefix_map.
+        split; apply atree_all_map, atree_all_true'; intro bs;
+          apply atree_all_map, atree_all_true';
+          intros bs' [HC|HC]; inv HC; congruence.
 Qed.
 
-Theorem disjoint_cotree_preimage {A} (P : A -> bool) (t : cotree bool A) :
-  cotree_disjoint (cotree_preimage P t).
-Proof.
-  unfold cotree_disjoint, cotree_preimage.
-  unfold compose.
-  unfold cotree_filter, cotree_lang.
-  apply co_coopP; eauto with cotree order mu aCPO.
-  { apply cocontinuous_coop; eauto with cotree order. }
+Theorem pairwise_disjoint_cotree_preimage {A} (P : A -> bool) (t : cotree bool A) :
+  cotree_pairwise_disjoint (cotree_preimage P t).
+Proof with eauto with cotree order mu aCPO.
+  unfold cotree_disjoint, cotree_preimage, compose, cotree_filter, cotree_lang.
+  apply co_coopP...
   cointro.
-  { apply monotone_antimonotone_compose; eauto with cotree order aCPO mu.
-    apply antimonotone_coop; eauto with cotree order. }
-  intro i.
-  cointro; eauto with cotree order.
-  intro j.
-  cointro; eauto with cotree order.
-  apply atree_disjoint_lang.
+  { apply monotone_antimonotone_compose... }
+  intro i; cointro...
+  intro j; cointro...
+  apply atree_pairwise_disjoint_lang.
 Qed.

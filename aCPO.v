@@ -295,6 +295,7 @@ Section aCPO.
       destruct Hch' as [Hub Hlub].
       apply Hub.
   Qed.
+  Hint Resolve cocontinuous_coop : aCPO.
 
   Lemma monotone_incl : monotone incl.
   Proof.
