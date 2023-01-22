@@ -26,10 +26,10 @@ Definition cotree_loop_F {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
   (f : A -> cotree bool (unit + A))
   : (A -> cotree bool (unit + A)) -> A -> cotree bool (unit + A) :=
   fun k x => if e x then
-            cotree_bind' (g x) (fun y => match y with
-                                      | inl _ => coleaf (inl tt)
-                                      | inr z => cotau (k z)
-                                      end)
+            cotree_bind (g x) (fun y => match y with
+                                     | inl _ => coleaf (inl tt)
+                                     | inr z => cotau (k z)
+                                     end)
           else
             f x.
 
@@ -44,11 +44,11 @@ Definition cotree_loop_approx {A} (x : A) (e : A -> bool)
 Definition cotree_loop {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
   (f : A -> cotree bool (unit + A)) (x : A) : cotree bool (unit + A) :=
   cotree_iter (fun y => if e y then
-                       cotree_bind' (g y) (fun lr => match lr with
-                                                  | inl _ => coleaf (inr (inl tt))
-                                                  | inr z => coleaf (inl z)
-                                                  end)
-                     else cotree_map' inr (f y)) x.
+                       cotree_bind (g y) (fun lr => match lr with
+                                                 | inl _ => coleaf (inr (inl tt))
+                                                 | inr z => coleaf (inl z)
+                                                 end)
+                     else cotree_map inr (f y)) x.
 
 (** Old version (most proofs below are wrt this one). *)
 Fixpoint to_cotree'' (t : tree) : cotree bool (unit + St) :=
@@ -75,16 +75,16 @@ Definition tie_cotree (t : cotree bool (unit + St)) : cotree bool St :=
 
 (** This can be used instead *)
 Definition iid_F {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree bool A :=
-  fun b => cotree_bind' a (fun y => match y with
-                              | inl _ => cotau b
-                              | inr z => coleaf z
-                              end).
+  fun b => cotree_bind a (fun y => match y with
+                             | inl _ => cotau b
+                             | inr z => coleaf z
+                             end).
 
 (** Doesn't include tau nodes. Easier to reason about when doing the
     geometric series proof, and is obviously equivalent under cotwp to
     the version (iid_F) with tau nodes.*)
 Definition iid_F' {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree bool A :=
-  fun b => cotree_bind' a (cotuple (const b) (@coleaf bool A)).
+  fun b => cotree_bind a (cotuple (const b) (@coleaf bool A)).
 
 (** iter iid_F'
     a0 = cobot
@@ -112,7 +112,7 @@ Definition to_cotree : tree -> cotree bool St := tie_cotree ∘ to_cotree_open.
 Fixpoint iid_chain_ {A} (t : cotree bool (unit + A)) (n : nat) : cotree bool (unit + A) :=
   match n with
   | O => coleaf (inl tt)
-  | S n' => cotree_bind' (iid_chain_ t n')
+  | S n' => cotree_bind (iid_chain_ t n')
              (cotuple (const t) (@coleaf bool (unit + A) ∘ inr))
   end.
 

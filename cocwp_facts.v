@@ -52,7 +52,7 @@ Qed.
 
 (** Example of Proper_co followed by induction on atree. *)
 Lemma cotree_bind_map_sum t g :
-  cotree_bind' (cotree_map' inr t)
+  cotree_bind (cotree_map inr t)
     (fun lr : St + (unit + St) => match lr with
                                | inl j => cotau (g j)
                                | inr x => coleaf x
@@ -60,7 +60,7 @@ Lemma cotree_bind_map_sum t g :
 Proof.
   apply cotree_ext, equ_cotree_eq.
   replace t with (co inj t) by apply co_inj_t.
-  unfold cotree_bind', cotree_map'.
+  unfold cotree_bind, cotree_map.
   rewrite co_co''; eauto with cotree order.
   apply Proper_co'.
   { apply monotone_compose; eauto with cotree order aCPO.
@@ -102,9 +102,9 @@ Proof.
       unfold cotree_loop_F, cotree_iter_F.
       apply equ_arrow; intro s; destruct (b s); unfold compose.
       * apply eq_equ; f_equal; auto.
-        rewrite cotree_bind'_assoc.
+        rewrite cotree_bind_assoc.
         f_equal; auto.
-        ext x; destruct x; auto; rewrite cotree_bind'_leaf.
+        ext x; destruct x; auto; rewrite cotree_bind_leaf.
         { reflexivity. }
         apply cotree_ext; constructor; apply equ_cotree_eq, equ_arrow; auto.
       * rewrite cotree_bind_map_sum, H0; reflexivity.
@@ -265,10 +265,10 @@ Qed.
     co_compose to turn the LHS into a single comorphism, then
     Proper_co to show equality of LHS and RHS. *)
 Lemma cotwp_bind {A B} (f : B -> eR) (t : cotree bool A) (k : A -> cotree bool B) :
-  cotwp f (cotree_bind' t k) = cotwp (cotwp f ∘ k) t.
+  cotwp f (cotree_bind t k) = cotwp (cotwp f ∘ k) t.
 Proof.
   unfold cotwp.
-  unfold cotree_bind'.
+  unfold cotree_bind.
   apply equ_eR.
   set (g := btwp f).
   set (h := atree_cotree_bind k).
@@ -365,11 +365,11 @@ Proof. apply fold_avg_bounded. Qed.
 (** See above. *)
 Lemma cotwlp_bind {A B} (f : B -> eR) (t : cotree bool A) (k : A -> cotree bool B) :
   bounded f 1 ->
-  cotwlp f (cotree_bind' t k) = cotwlp (cotwlp f ∘ k) t.
+  cotwlp f (cotree_bind t k) = cotwlp (cotwlp f ∘ k) t.
 Proof.
   intro Hf.
   unfold cotwlp.
-  unfold cotree_bind'.
+  unfold cotree_bind.
   apply equ_eR.
   set (g := btwlp f).
   set (h := atree_cotree_bind k).
@@ -522,9 +522,9 @@ Proof.
 Qed.
 
 Lemma cotwp_filter {A} (P : A -> bool) (f : A -> eR) :
-  cotwp (fun x => if P x then f x else 0) === cotwp f ∘ cotree_filter' P.
+  cotwp (fun x => if P x then f x else 0) === cotwp f ∘ cotree_filter P.
 Proof.
-  unfold cotwp, cotree_filter'.
+  unfold cotwp, cotree_filter.
   rewrite co_co; eauto with cotcwp cotree order.
   apply Proper_co; eauto with cotcwp order.
   { apply monotone_compose; eauto with cotree order.
@@ -643,42 +643,42 @@ Proof.
   apply btwp_scalar.
 Qed.
 
-Lemma cotree_bind'_iid_chain_ {A} t i :
-  cotree_bind' (iid_chain_ t i)
+Lemma cotree_bind_iid_chain_ {A} t i :
+  cotree_bind (iid_chain_ t i)
     (fun x : unit + A => match x with
                       | inl _ => t
                       | inr b => coleaf (inr b)
                       end) =
-    cotree_bind' t
+    cotree_bind t
       (fun x : unit + A => match x with
                         | inl _ => iid_chain_ t i
                         | inr b => coleaf (inr b)
                         end).
 Proof.
   revert t; induction i; intro t; simpl.
-  { rewrite cotree_bind'_leaf.
+  { rewrite cotree_bind_leaf.
     replace (fun x : unit + A => match x with
                               | inl _ => coleaf (inl tt)
                               | inr b => coleaf (inr b)
                               end) with
       (@coleaf bool (unit + A)).
     2: { ext lr; destruct lr as [[]|?]; reflexivity. }
-    rewrite cotree_bind'_id_r; reflexivity. }
+    rewrite cotree_bind_id_r; reflexivity. }
   rewrite IHi.
-  rewrite cotree_bind'_assoc.
+  rewrite cotree_bind_assoc.
   f_equal.
   ext lr; destruct lr as [[]|a]; auto.
-  rewrite cotree_bind'_leaf; reflexivity.
+  rewrite cotree_bind_leaf; reflexivity.
 Qed.
 
-Lemma cotree_bind'_iid_chain_snip {A} t i :
-  cotree_bind' (iid_chain_ t i)
+Lemma cotree_bind_iid_chain_snip {A} t i :
+  cotree_bind (iid_chain_ t i)
     (fun x : unit + A =>
        match x with
        | inl _ => snip t
        | inr b => coleaf b
        end) =
-    cotree_bind' t
+    cotree_bind t
       (fun x : unit + A =>
          match x with
          | inl _ => snip (iid_chain_ t i)
@@ -706,7 +706,7 @@ Proof.
   2: { unfold compose; ext lr; destruct lr; auto; rewrite snip_leaf; auto. }
   rewrite <- snip_bind.
   f_equal.
-  apply cotree_bind'_iid_chain_.
+  apply cotree_bind_iid_chain_.
 Qed.
 
 Lemma iid_chain_iter_n {A} (t : cotree bool (unit + A)) :
@@ -718,12 +718,12 @@ Proof.
   unfold compose. unfold iid_F' in *.
   unfold snip in *.
   rewrite <- IHi; clear IHi.
-  rewrite cotree_bind'_assoc.
+  rewrite cotree_bind_assoc.
   etransitivity.
-  2: { apply cotree_bind'_iid_chain_snip. }
+  2: { apply cotree_bind_iid_chain_snip. }
   f_equal.
   ext lr; destruct lr as [[]|a]; simpl; auto.
-  rewrite cotree_bind'_leaf; reflexivity.
+  rewrite cotree_bind_leaf; reflexivity.
 Qed.
 
 Lemma cotwp_cotuple_const_inl {A} a t :
