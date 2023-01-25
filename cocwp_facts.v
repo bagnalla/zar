@@ -64,7 +64,7 @@ Proof.
   rewrite co_co''; eauto with cotree order.
   apply Proper_co'.
   { apply monotone_compose; eauto with cotree order aCPO.
-    apply monotone_co; eauto with cotree. }
+    apply monotone_co; eauto with cotree order. }
   { apply Proper_inj. }
   2: { rewrite co_inj_t; reflexivity. }
   unfold compose.
