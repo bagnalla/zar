@@ -566,6 +566,33 @@ Proof.
   unfold compose; rewrite 2!H; eRauto.
 Qed.
 
+Lemma btwlp_costrict {A} (t : atree bool A) :
+  btwlp (fun _ : A => 1) t = 1.
+Proof.
+  unfold btwlp; induction t; simpl; auto.
+  unfold compose; rewrite 2!H; eRauto.
+  rewrite <- eRplus_combine_fract.
+  apply eRplus_half_plus_half.
+Qed.
+
+Lemma cotwp_strict {A} :
+  cotwp (fun _ : A => 0) = const 0.
+Proof.
+  symmetry; apply co_unique_ext.
+  - apply monotone_btwp.
+  - apply continuous_wcontinuous, continuous_const.
+  - ext t; rewrite btwp_strict; reflexivity.
+Qed.
+
+Lemma cotwlp_costrict {A} :
+  cotwlp (fun _ : A => 1) = const 1.
+Proof.
+  symmetry; apply coop_unique_ext.
+  - apply antimonotone_btwlp; intro; reflexivity.
+  - apply cocontinuous_const.
+  - ext t; rewrite btwlp_costrict; reflexivity.
+Qed.
+
 Lemma btwp_cotuple {A B} (t : atree bool (A + B)) (f : A -> eR) (g : B -> eR) :
   btwp (cotuple f g) t = btwp (cotuple f (const 0)) t + btwp (cotuple (const 0) g) t.
 Proof.
