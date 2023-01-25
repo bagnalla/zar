@@ -65,6 +65,11 @@ Class PType (A : Type) `{o : OType A} : Type :=
 
 Notation "⊥" := bot.
 
+Lemma bot_leq {A} `{PType A} :
+  forall a : A, ⊥ ⊑ a.
+Proof. intro; apply bot_le. Qed.
+#[global] Hint Resolve bot_leq : order.
+
 (* [a] is an upper bound of [f] *)
 Definition upper_bound {I A : Type} `{OType A} (a : A) (f : I -> A) :=
   forall i, f i ⊑ a.
