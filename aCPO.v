@@ -176,6 +176,13 @@ Section aCPO.
     co f (incl b) === f b.
   Proof. intro Hmono; revert b; apply equ_arrow, co_incl; auto. Qed.
 
+  (** Pointwise variant. *)
+  Corollary co_incl'_ext {C} `{o : OType C} `{@dCPO C o} `{@ExtType C o}
+    (f : basis A -> C) (b : basis A) :
+    monotone f ->
+    co f (incl b) = f b.
+  Proof. intro Hf; apply ext, co_incl'; auto. Qed.
+
   (** [coop f] is the unique morphism (continuous function) satisfying
       this equation. [coop f] is equal to f on all basis elements for
       which f was originally defined. *)

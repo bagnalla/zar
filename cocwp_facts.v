@@ -670,6 +670,40 @@ Proof.
   apply btwp_scalar.
 Qed.
 
+Lemma btwp_sum {A} (f g : A -> eR) (t : atree bool A) :
+  btwp (fun a => f a + g a) t = btwp f t + btwp g t.
+Proof.
+  unfold btwp.
+  revert f; induction t; intros f; simpl; eRauto.
+  unfold compose.
+  rewrite 2!H,  eRplus_combine_fract.
+  rewrite <- 2!eRplus_assoc, eRplus_comm4; reflexivity.
+Qed.
+
+Lemma cotwp_sum {A} (f g : A -> eR) (t : cotree bool A) :
+  cotwp (fun a => f a + g a) t = cotwp f t + cotwp g t.
+Proof.
+  symmetry.
+  set (h := fun t => cotwp f t + cotwp g t).
+  replace (cotwp f t + cotwp g t) with (h t) by reflexivity.
+  cut (h = cotwp (fun a => f a + g a)).
+  { intros ->; reflexivity. }
+  apply co_unique_ext.
+  - apply monotone_btwp.
+  - unfold h.
+    apply wcontinuous_sum;
+      apply continuous_wcontinuous, continuous_co, monotone_btwp.
+  - clear t.
+    ext t.
+    rewrite btwp_sum.
+    unfold compose, h.
+    f_equal; apply co_incl'_ext, monotone_btwp.
+Qed.
+
+Lemma cotwp_linear {A} (c : eR) (f g : A -> eR) (t : cotree bool A) :
+  cotwp (fun a => c * f a + g a) t = c * cotwp f t + cotwp g t.
+Proof. rewrite cotwp_sum, cotwp_scalar; reflexivity. Qed.
+
 Lemma cotree_bind_iid_chain_ {A} t i :
   cotree_bind (iid_chain_ t i)
     (fun x : unit + A => match x with
