@@ -272,6 +272,7 @@ Section aCPO.
       destruct Hch' as [Hub Hlub].
       apply Hub.
   Qed.
+  Hint Resolve continuous_co : aCPO.
 
   (** The coop-version of any antimonotone basis function is cocontinuous. *)
   Theorem cocontinuous_coop {C} `{ldCPO C} (f : basis A -> C) :
@@ -303,11 +304,11 @@ Section aCPO.
     destruct H as [Hincl _ _ _ _].
     apply Hincl; auto.
   Qed.
-  
+
   (** Uniqueness property. This is the primary proof principle. *)
   Theorem co_unique {C} `{dCPO C} (f : basis A -> C) (g : A -> C) :
     monotone f ->
-    continuous g ->
+    wcontinuous g ->
     g ∘ incl === f ->
     g === co f.
   Proof.
@@ -320,7 +321,7 @@ Section aCPO.
     - intro i; unfold compose.
       simpl in *.
       etransitivity; eauto.
-      apply continuous_monotone; auto.
+      apply wcontinuous_monotone; auto.
       destruct H as [? ? ? ? Hsup].
       destruct (Hsup a) as [Hub _].
       apply Hub.
@@ -329,12 +330,22 @@ Section aCPO.
       destruct H as [? ? ? ? Hsup].
       pose proof (Hsup a) as Ha.
       apply Hg in Ha.
-      2: { apply directed_f_ideal; auto.
+      2: { apply chain_f_ideal; auto.
            apply monotone_incl. }
       destruct Ha as [Hub Hlub].
       apply Hlub.
       intro i; unfold compose.
       etransitivity; eauto.
+  Qed.
+
+  Corollary co_unique_ext {C} `{o : OType C} `{@dCPO C o} `{@ExtType C o}
+    (f : basis A -> C) (g : A -> C) :
+    monotone f ->
+    wcontinuous g ->
+    g ∘ incl = f ->
+    g = co f.
+  Proof.
+    intros Hf Hg Heq; apply ext, co_unique; auto. rewrite Heq; reflexivity.
   Qed.
 
   (** The comorphism lemma. *)
@@ -344,7 +355,7 @@ Section aCPO.
   Proof.
     intro Hf; split.
     - apply co_incl; auto.
-    - intros; apply co_unique; auto.
+    - intros; apply co_unique; auto with order.
   Qed.
 
   (** Useful variant. *)
@@ -356,7 +367,7 @@ Section aCPO.
   Proof.
     intros Hf Hg Hgf.
     revert a; apply equ_arrow.
-    apply co_unique; auto.
+    apply co_unique; auto with order.
     apply equ_arrow; auto.
   Qed.
 
@@ -411,6 +422,16 @@ Section aCPO.
     rewrite cocontinuous_sup; auto.
     - reflexivity.
     - apply directed_f_ideal, monotone_incl.
+  Qed.
+
+  Corollary coop_unique_ext {C} `{o : OType C} `{@ldCPO C o} `{@ExtType C o}
+    (f : basis A -> C) (g : A -> C) :
+    antimonotone f ->
+    cocontinuous g ->
+    g ∘ incl = f ->
+    g = coop f.
+  Proof.
+    intros Hf Hg Heq; apply ext, coop_unique; auto; rewrite Heq; reflexivity.
   Qed.
 
   Corollary coop_unique' {C} `{ldCPO C} (f : basis A -> C) (g : A -> C) (a : A) :
@@ -475,11 +496,10 @@ Section aCPO.
     co f === co g.
   Proof.
     intros Hf Hg Hfg.
-    apply co_unique; auto.
-    - apply continuous_co; auto.
-    - rewrite <- Hfg.
-      apply equ_arrow; intro b.
-      apply co_incl'; auto.
+    apply co_unique; auto with order aCPO.
+    rewrite <- Hfg.
+    apply equ_arrow; intro b.
+    apply co_incl'; auto.
   Qed.
 
   Corollary Proper_co' {C} `{dCPO C} (f g : basis A -> C) (x y : A) :
@@ -853,9 +873,8 @@ Qed.
 Lemma co_incl_id {A B} `{aCPO A B} :
   co incl === @id A.
 Proof.
-  symmetry; apply co_unique.
+  symmetry; apply co_unique; auto with order.
   - apply monotone_incl.
-  - apply continuous_id.
   - reflexivity.
 Qed.
 
