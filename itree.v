@@ -61,27 +61,27 @@ CoFixpoint icotree {A} (t : itree boolE A) : cotree bool A :=
   | VisF GetBool k => conode (icotree ∘ k)
   end.
 
-(** cotrees to itrees. If there are no occurrences of [coitree] in the
-  construction of an itree, then it will be executable. *)
-CoFixpoint coitree {A} (t : cotree bool A) : itree boolE A :=
-  match t with
-  | cobot => Tau (coitree t)
-  | coleaf x => Ret x
-  | cotau t' => Tau (coitree t')
-  | conode k => Vis GetBool (coitree ∘ k)
-  end.
+(* (** cotrees to itrees. If there are no occurrences of [coitree] in the *) *)
+(* (*   construction of an itree, then it will be executable. *) *)
+(* CoFixpoint coitree {A} (t : cotree bool A) : itree boolE A := *)
+(*   match t with *)
+(*   | cobot => Tau (coitree t) *)
+(*   | coleaf x => Ret x *)
+(*   | cotau t' => Tau (coitree t') *)
+(*   | conode k => Vis GetBool (coitree ∘ k) *)
+(*   end. *)
 
-Lemma coitree_icotree {A} (t : itree boolE A) :
-  coitree (icotree t) ≅ t.
-Proof.
-  revert t; pcofix CH; intros t.
-  pstep; unfold eqit_.
-  rewrite unf_eq; simpl.
-  destruct (observe t) eqn:Ht.
-  - compute; constructor; reflexivity.
-  - compute; constructor; right; apply CH.
-  - destruct e; compute; constructor; intro b; right; apply CH.
-Qed.
+(* Lemma coitree_icotree {A} (t : itree boolE A) : *)
+(*   coitree (icotree t) ≅ t. *)
+(* Proof. *)
+(*   revert t; pcofix CH; intros t. *)
+(*   pstep; unfold eqit_. *)
+(*   rewrite unf_eq; simpl. *)
+(*   destruct (observe t) eqn:Ht. *)
+(*   - compute; constructor; reflexivity. *)
+(*   - compute; constructor; right; apply CH. *)
+(*   - destruct e; compute; constructor; intro b; right; apply CH. *)
+(* Qed. *)
 
 (* Lemma icotree_coitree {A} (t : cotree bool A) : *)
 (*   total t -> *)
@@ -267,7 +267,8 @@ Proof.
 Qed.
 
 (** Example of comorphism computation lemmas playing nicer with paco
-  than with standard coinduction. *)
+    than with standard coinduction? TODO: check this statement by
+    trying with standard coinduction. *)
 Lemma itree_cotree_eq_map {A B} (it : itree boolE A) (ct : cotree bool A) (f : A -> B) :
   itree_cotree_eq it ct ->
   itree_cotree_eq (ITree.map f it) (cotree_map f ct).
@@ -297,7 +298,7 @@ Proof.
     + apply itree_cotree_eq_map; eauto.
 Qed.
 
-Corollary to_itree_to_cotree (t : tree) :
+Theorem to_itree_to_cotree (t : tree) :
   itree_cotree_eq (to_itree t) (to_cotree t).
 Proof.
   unfold to_itree, to_cotree, compose, tie_itree, tie_cotree.
@@ -346,21 +347,21 @@ Proof.
   - existT_inv; constructor; intro b; specialize (H3 b); dupaco; apply CH; auto.
 Qed.
 
-Lemma itree_cotree_coitree_eq {A} (it : itree boolE A) (ct : cotree bool A) :
-  itree_cotree_eq it ct ->
-  it ≅ coitree ct.
-Proof.
-  revert it ct; pcofix CH; intros it ct Heq.
-  punfold Heq; pstep.
-  unfold itree_cotree_eq_ in Heq.
-  unfold eqit_.
-  rewrite unf_eq.
-  destruct ct; simpl; inv Heq.
-  - compute; constructor; reflexivity.
-  - dupaco; compute; constructor; right; apply CH; auto.
-  - compute; constructor; intro b; specialize (H1 b); dupaco.
-    right; apply CH; auto.
-Qed.
+(* Lemma itree_cotree_coitree_eq {A} (it : itree boolE A) (ct : cotree bool A) : *)
+(*   itree_cotree_eq it ct -> *)
+(*   it ≅ coitree ct. *)
+(* Proof. *)
+(*   revert it ct; pcofix CH; intros it ct Heq. *)
+(*   punfold Heq; pstep. *)
+(*   unfold itree_cotree_eq_ in Heq. *)
+(*   unfold eqit_. *)
+(*   rewrite unf_eq. *)
+(*   destruct ct; simpl; inv Heq. *)
+(*   - compute; constructor; reflexivity. *)
+(*   - dupaco; compute; constructor; right; apply CH; auto. *)
+(*   - compute; constructor; intro b; specialize (H1 b); dupaco. *)
+(*     right; apply CH; auto. *)
+(* Qed. *)
 
 (** Related itrees and cotrees are semantically equivalent. *)
 Theorem itwp_cotwp {A} (it : itree boolE A) (ct : cotree bool A) (f : A -> eR) :
