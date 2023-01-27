@@ -284,7 +284,7 @@ Proof.
     constructor; intro b; specialize (H3 b); dupaco; right; apply CH; auto.
 Qed.
 
-Theorem to_itree_open_to_cotree_open (t : tree) :
+Lemma to_itree_open_to_cotree_open (t : tree) :
   itree_cotree_eq (to_itree_open t) (to_cotree_open t).
 Proof.
   induction t; simpl.
