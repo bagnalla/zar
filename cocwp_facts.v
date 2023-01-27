@@ -635,8 +635,8 @@ Proof.
   apply btwp_cotuple.
 Qed.
 
-Lemma tie_cotree_iid_tie_cotree :
-  tie_cotree_iid = tie_cotree.
+Lemma tie_cotree_iid_tie_cotree {A} :
+  @tie_cotree_iid A = @tie_cotree A.
 Proof.
   ext ct.
   unfold tie_cotree_iid, tie_cotree, cotree_iter, iter.
@@ -881,7 +881,7 @@ Proof.
   f_equal; rewrite iid_chain_iter_n; reflexivity.
 Qed.
 
-Theorem cotwp_tie_cotree_iid (t : cotree bool (unit + St)) (f : St -> eR) :
+Theorem cotwp_tie_cotree_iid {A} (t : cotree bool (unit + A)) (f : A -> eR) :
   cofail t < 1 -> cotwp f (tie_cotree_iid t) = cowp f t / (1 - cofail t).
 Proof.
   intro Hlt.
@@ -979,7 +979,7 @@ Proof.
   - apply cofail_cowlp.
 Qed.
 
-Lemma cocwp_cotwp_tie_cotree (t : cotree bool (unit + St)) (f : St -> eR) :
+Lemma cocwp_cotwp_tie_cotree {A} (t : cotree bool (unit + A)) (f : A -> eR) :
   cofail t < 1 ->
   cocwp f t = cotwp f (tie_cotree t).
 Proof.
@@ -992,13 +992,15 @@ Proof.
   { eRauto. }
   unfold cofail, cowpfail, cowlp.
   replace (cotuple (const 0) (const 1)) with
-    (fun x => 1 - cotuple (fun _ : unit => 1) (fun _ : St => 0) x).
+    (fun x => 1 - cotuple (fun _ : unit => 1) (fun _ : A => 0) x).
   2: { ext lr; destruct lr; eRauto. }
   apply cotwp_cotwlp_sum_1.
   intros [[]|s]; simpl; eRauto.
 Qed.
 
-Corollary cotwp_tie_cotree_iid_wlp (t : cotree bool (unit + St)) (f : St -> eR) :
+(** Note: tie_cotree and tie_cotree_iid are the same (see
+    tie_cotree_iid_tie_cotree lemma). *)
+Corollary cotwp_tie_cotree_iid_wlp {A} (t : cotree bool (unit + A)) (f : A -> eR) :
   0 < cowlp (const 1) t -> cotwp f (tie_cotree_iid t) = cowp f t / cowlp (const 1) t.
 Proof.
   intro Hlt; rewrite cowlp_cofail; apply cotwp_tie_cotree_iid.

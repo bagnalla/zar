@@ -40,7 +40,7 @@ Definition cotree_loop_approx {A} (x : A) (e : A -> bool)
   : cotree bool (unit + A) :=
   iter_n (cotree_loop_F e g f) (const cobot) n x.
 
-(* Designed to match the itree construction. *)
+(** Designed to match the itree construction. *)
 Definition cotree_loop {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
   (f : A -> cotree bool (unit + A)) (x : A) : cotree bool (unit + A) :=
   cotree_iter (fun y => if e y then
@@ -70,7 +70,7 @@ Fixpoint to_cotree_open (t : tree) : cotree bool (unit + St) :=
   | Fix st G g k => cotree_loop G (to_cotree_open ∘ g) (to_cotree_open ∘ k) st
   end.
 
-Definition tie_cotree (t : cotree bool (unit + St)) : cotree bool St :=
+Definition tie_cotree {A} (t : cotree bool (unit + A)) : cotree bool A :=
   cotree_iter (const t) tt.
 
 (** This can be used instead *)
@@ -82,7 +82,7 @@ Definition iid_F {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree bool
 
 (** Doesn't include tau nodes. Easier to reason about when doing the
     geometric series proof, and is obviously equivalent under cotwp to
-    the version (iid_F) with tau nodes.*)
+    the version with tau nodes (iid_F).*)
 Definition iid_F' {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree bool A :=
   fun b => cotree_bind a (cotuple (const b) (@coleaf bool A)).
 
@@ -95,7 +95,7 @@ Definition iid_F' {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree boo
        = bind t (cotuple (bind t (cotuple (const (snip t)) coleaf)) coleaf)
  *)
 
-Definition tie_cotree_iid (t : cotree bool (unit + St)) : cotree bool St :=
+Definition tie_cotree_iid {A} (t : cotree bool (unit + A)) : cotree bool A :=
   iter (iid_F t) cobot.
 
 Definition to_cotree : tree -> cotree bool St := tie_cotree ∘ to_cotree_open.
