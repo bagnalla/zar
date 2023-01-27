@@ -998,6 +998,19 @@ Proof.
   intros [[]|s]; simpl; eRauto.
 Qed.
 
+Corollary cotwp_tie_cotree_to_cotree_open_tcwp (t : tree) (f : St -> eR) :
+  tree_unbiased t ->
+  twpfail t (const 0) < 1 ->
+  cotwp f (tie_cotree (to_cotree_open t)) = tcwp t f.
+Proof.
+  intros Hub Ht.
+  unfold twpfail in Ht.
+  rewrite twp_cotwp in Ht; auto.
+  rewrite <- to_cotree_open_to_cotree'' in Ht.
+  rewrite <- cocwp_cotwp_tie_cotree; auto.
+  rewrite tcwp_cotcwp; auto.
+Qed.
+
 (** Note: tie_cotree and tie_cotree_iid are the same (see
     tie_cotree_iid_tie_cotree lemma). *)
 Corollary cotwp_tie_cotree_iid_wlp {A} (t : cotree bool (unit + A)) (f : A -> eR) :
