@@ -1949,16 +1949,6 @@ Proof.
 Qed.
 #[global] Hint Resolve monotone_atree_some : cotree.
 
-(* #[global] *)
-(*   Instance monotone_atree_some {I A} (P : A -> Prop) : Proper (leq ==> leq) (@atree_some I A P). *)
-(* Proof. *)
-(*   intro a; induction a; intros b Hab Hsome; inv Hsome; inv Hab. *)
-(*   - constructor; auto. *)
-(*   - constructor; apply IHa; auto. *)
-(*   - econstructor; eapply H; eauto; apply H2. *)
-(* Qed. *)
-(* #[global] Hint Resolve monotone_atree_some : cotree. *)
-
 Corollary continuous_cotree_some {A} (P : A -> Prop) :
   continuous (cotree_some P).
 Proof. apply continuous_co, monotone_atree_some. Qed.
