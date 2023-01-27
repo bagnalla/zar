@@ -998,7 +998,7 @@ Proof.
   intros [[]|s]; simpl; eRauto.
 Qed.
 
-Corollary cotwp_tie_cotree_to_cotree_open_tcwp (t : tree) (f : St -> eR) :
+Theorem cotwp_tie_cotree_to_cotree_open_tcwp (t : tree) (f : St -> eR) :
   tree_unbiased t ->
   twpfail t (const 0) < 1 ->
   cotwp f (tie_cotree (to_cotree_open t)) = tcwp t f.
