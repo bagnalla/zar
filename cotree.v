@@ -2068,6 +2068,16 @@ Proof with eauto with order cotree.
 Qed.
 
 (** Introduction rule 2 for cotree_all. *)
+Lemma cotree_all_intro_tau {A} (P : A -> Prop) (t : cotree bool A) :
+  cotree_all P t ->
+  cotree_all P (cotau t).
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_tau...
+  { intros ? ?; apply I. }
+Qed.
+
+(** Introduction rule 3 for cotree_all. *)
 Lemma cotree_all_intro_node {A} (P : A -> Prop) (k : bool -> cotree bool A) :
   (forall b, cotree_all P (k b)) ->
   cotree_all P (conode k).
@@ -2090,6 +2100,16 @@ Proof with eauto with order cotree.
 Qed.
 
 (** Elimination rule 2 for cotree_all. *)
+Lemma cotree_all_elim_tau {A} (P : A -> Prop) (t : cotree bool A) :
+  cotree_all P (cotau t) ->
+  cotree_all P t.
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  rewrite coop_fold_tau...
+  { intros ? ?; apply I. }
+Qed.
+
+(** Elimination rule 3 for cotree_all. *)
 Lemma cotree_all_elim_node {A} (P : A -> Prop) (k : bool -> cotree bool A) (b : bool) :
   cotree_all P (conode k) ->
   cotree_all P (k b).
