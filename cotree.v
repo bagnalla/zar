@@ -1319,8 +1319,7 @@ Definition cofold {A B} `{PType B} (f : A -> B) (g : B -> B) (h : (bool -> B) ->
   : cotree bool A -> B :=
   co (fold ⊥ f g h).
 
-(** Extraction primitive for cofold. Only safe for total cotrees (no
-    occurrences of cobot). *)
+(** Extraction primitive for cofold. Not guaranteed to terminate. *)
 Extract Constant cofold => "
   \ o p f g h t ->
     case t of
@@ -2056,6 +2055,14 @@ Qed.
 (*   - inv Hab; inv Hall; constructor; intro i; eapply H; eauto; apply H1. *)
 (* Qed. *)
 (* #[global] Hint Resolve antimonotone_atree_all : cotree. *)
+
+Lemma cotree_all_bot {A} (P : A -> Prop) (a : A) :
+  cotree_all P cobot.
+Proof with eauto with order cotree.
+  unfold cotree_all, atree_all.
+  apply coop_intro...
+  intros []; simpl; auto.
+Qed.
 
 (** Introduction rule 1 for cotree_all. *)
 Lemma cotree_all_intro_leaf {A} (P : A -> Prop) (a : A) :
