@@ -1000,11 +1000,11 @@ Qed.
 
 Theorem cotwp_tie_cotree_to_cotree_open_tcwp (t : tree) (f : St -> eR) :
   tree_unbiased t ->
-  twpfail t (const 0) < 1 ->
+  tfail t < 1 ->
   cotwp f (tie_cotree (to_cotree_open t)) = tcwp t f.
 Proof.
   intros Hub Ht.
-  unfold twpfail in Ht.
+  unfold tfail, twpfail in Ht.
   rewrite twp_cotwp in Ht; auto.
   rewrite <- to_cotree_open_to_cotree'' in Ht.
   rewrite <- cocwp_cotwp_tie_cotree; auto.

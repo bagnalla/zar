@@ -1332,7 +1332,7 @@ Extract Constant cofold => "
 
 #[global]
   Instance monotone_fold {I A B} `{OType B} (z : B) (f : A -> B) (g : B -> B) (h : (I -> B) -> B)
-  {Hz : forall b, z ⊑ fold z f g h b}
+  {Hz : forall t, z ⊑ fold z f g h t}
   {Hg : Proper (leq ==> leq) g}
   {Hh : Proper (leq ==> leq) h}
   : Proper (leq ==> leq) (fold z f g h).
@@ -1349,7 +1349,7 @@ Qed.
 #[global]
   Instance antimonotone_fold {I A B} `{OType B}
   (z : B) (f : A -> B) (g : B -> B) (h : (I -> B) -> B)
-  {Hz : forall b, fold z f g h b ⊑ z}
+  {Hz : forall t, fold z f g h t ⊑ z}
   {Hg : Proper (leq ==> leq) g} {Hh : Proper (leq ==> leq) h}
   : Proper (leq ==> flip leq) (fold z f g h).
 Proof.
@@ -1473,6 +1473,13 @@ Lemma cofold_leaf {A B} `{o : OType B} `{@PType B o} `{@dCPO B o}
   (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (x : A) :
   cofold f g h (coleaf x) === f x.
 Proof. apply co_fold_leaf, bot_le. Qed.
+
+Lemma cofold_tau {A B} `{o : OType B} `{@PType B o} `{@dCPO B o}
+  (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (t : cotree bool A) :
+  continuous g ->
+  monotone h ->
+  cofold f g h (cotau t) === g (cofold f g h t).
+Proof. intros Hg Hh; apply co_fold_tau; intros; auto; apply bot_le. Qed.
 
 Lemma cofold_node {A B} `{o : OType B} `{@PType B o} `{@dCPO B o}
   (f : A -> B) (g : B -> B) (h : (bool -> B) -> B) (k : bool -> cotree bool A) :
@@ -1971,6 +1978,17 @@ Proof with eauto with order cotree.
 Qed.
 
 (** Introduction rule 2 for cotree_some. *)
+Lemma cotree_some_intro_tau {A} (P : A -> Prop) (b : bool) (t : cotree bool A) :
+  cotree_some P t ->
+  cotree_some P (cotau t).
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_tau...
+  { apply continuous_monotone, continuous_exists. }
+  { intros ? []. }
+Qed.
+
+(** Introduction rule 3 for cotree_some. *)
 Lemma cotree_some_intro_node {A} (P : A -> Prop) (b : bool) (k : bool -> cotree bool A) :
   cotree_some P (k b) ->
   cotree_some P (conode k).
@@ -1993,6 +2011,17 @@ Proof with eauto with order cotree.
 Qed.
 
 (** Elimination rule 2 for cotree_some. *)
+Lemma cotree_some_elim_tau {A} (P : A -> Prop) (t : cotree bool A) :
+  cotree_some P (cotau t) ->
+  cotree_some P t.
+Proof with eauto with order cotree.
+  unfold cotree_some, atree_some.
+  rewrite co_fold_tau...
+  { apply continuous_monotone, continuous_exists. }
+  { intros ? []. }
+Qed.
+
+(** Elimination rule 3 for cotree_some. *)
 Lemma cotree_some_elim_node {A} (P : A -> Prop) (k : bool -> cotree bool A) :
   cotree_some P (conode k) ->
   exists b, cotree_some P (k b).
