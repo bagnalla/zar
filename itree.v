@@ -182,6 +182,27 @@ Fixpoint to_itree_open (t : tree) : itree boolE (unit + St) :=
                              ITree.map inr (to_itree_open (k s))) st
   end.
 
+(* (** Should be equivalent to the above. *) *)
+(* Fixpoint to_itree_open' (t : tree) : itree boolE (unit + St) := *)
+(*   match t with *)
+(*   | Leaf x => ret (inr x) *)
+(*   | Fail => ret (inl tt) *)
+(*   | Choice _ k => Vis GetBool (to_itree_open' ∘ k) *)
+(*   | Fix st G g k => *)
+(*       x <- ITree.iter (fun s => if G s then *)
+(*                               y <- to_itree_open' (g s) ;; *)
+(*                               match y with *)
+(*                               | inl tt => ret (inr (inl tt)) *)
+(*                               | inr s' => ret (inl s') *)
+(*                               end *)
+(*                             else *)
+(*                               ret (inr (inr s))) st ;; *)
+(*       match x with *)
+(*       | inl _ => ret (inl tt) *)
+(*       | inr st' => to_itree_open (k st') *)
+(*       end *)
+(*   end. *)
+
 Definition tie_itree {A : Type} {E : Type -> Type} (t : itree E (unit + A))
   : itree E A :=
   ITree.iter (const t) tt.
