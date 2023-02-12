@@ -199,6 +199,19 @@ Fixpoint reduce_btree {A} (t : btree (unit + A)) : btree (unit + A) :=
   | _ => t
   end.
 
+(** More general -- coalesce leaf nodes. *)
+Fixpoint reduce_btree' {A} `{EqType A} (t : btree A) : btree A :=
+  match t with
+  | BNode l r =>
+      let l' := reduce_btree' l in
+      let r' := reduce_btree' r in
+      match (l', r') with
+      | (BLeaf x, BLeaf y) => if eqb x y then BLeaf x else BNode l' r'
+      | _ => BNode l' r'
+      end
+  | _ => t
+  end.
+
 Lemma reduce_btree_infer {A} (f : A -> eR) (t : btree (unit + A)) (c : eR) :
   btree_infer (cotuple (fun _ => c) f) (reduce_btree t) =
     btree_infer (cotuple (fun _ => c) f) t.
@@ -219,6 +232,28 @@ Proof.
         { rewrite <- IHt1, IHt2; eRauto. }
       * rewrite <- IHt1, <- IHt2; simpl; eRauto.
     + rewrite IHt1, IHt2; reflexivity.
+  - simpl; rewrite <- IHt1, IHt2; simpl; eRauto.
+Qed.
+
+Lemma reduce_btree'_infer {A} `{EqType A} (f : A -> eR) (t : btree A) :
+  btree_infer f (reduce_btree' t) = btree_infer f t.
+Proof.
+  revert f; induction t; intro f; simpl; auto.
+  destruct (reduce_btree' t1) eqn:Ht1.
+  - simpl in *.
+    + destruct (reduce_btree' t2) eqn:Ht2; simpl.
+      * simpl in *.
+        { rewrite <- IHt1, <- IHt2.
+          rewrite Q2eR_one_half.
+          rewrite 2!eRmult_half_div_2.
+          rewrite eRplus_combine_fract.
+          destruct (eqb_spec a a0); subst; simpl.
+          - rewrite <- eRmult_2_plus.
+            rewrite eRmult_div_cancel; eRauto.
+          - rewrite Q2eR_one_half.
+            rewrite 2!eRmult_half_div_2.
+            rewrite eRplus_combine_fract; auto. }
+      * rewrite <- IHt1, <- IHt2; simpl; eRauto.
   - simpl; rewrite <- IHt1, IHt2; simpl; eRauto.
 Qed.
 
@@ -410,15 +445,16 @@ Qed.
 
 Definition bernoulli_btree (n d : nat) : btree (unit + bool) :=
   (* btree_opt (btree_map (sum_map (fun x => x) (fun i => Nat.ltb i n)) *)
-  btree_map (sum_map (fun x => x) (fun i => Nat.ltb i n)) (uniform_btree d).
+  reduce_btree' (btree_map (sum_map (fun x => x) (fun i => Nat.ltb i n)) (uniform_btree d)).
+
+(* Eval compute in (bernoulli_btree 1 3). *)
 
 Definition bernoulli_tree_open (n d : nat) : tree :=
   bernoulli_btree_to_tree (bernoulli_btree n d).
 
 Definition bernoulli_tree (p : Q) : tree :=
-  Fix (upd ϵ (vint 0) empty) (fun s => is_int (s ϵ))
-    (fun _ => bernoulli_tree_open (Z.to_nat (Qnum p)) (Pos.to_nat (Qden p)))
-    Leaf.
+  let t := bernoulli_tree_open (Z.to_nat (Qnum p)) (Pos.to_nat (Qden p)) in
+  Fix (upd ϵ (vint 0) empty) (fun s => is_int (s ϵ)) (fun _ => t) Leaf.
 
 (** TODO: could omit Fix node when n is a power of 2 (to enable more
 aggressive optimizations since Fix nodes complicate things). *)
@@ -678,6 +714,7 @@ Proof.
   unfold bernoulli_btree.
   intro Hnd.
   (* rewrite btree_infer_btree_opt. *)
+  rewrite reduce_btree'_infer.
   rewrite btree_infer_fmap_bool.
   unfold compose, const.
   apply btree_infer_uniform_btree_lt; auto.
@@ -698,6 +735,7 @@ Lemma btree_infer_bernoulli_btree_const_1 n d :
 Proof.
   unfold bernoulli_btree.
   (* rewrite btree_infer_btree_opt. *)
+  rewrite reduce_btree'_infer.
   rewrite btree_infer_fmap_bool.
   apply btree_infer_uniform_btree_const_1.
 Qed.
@@ -777,6 +815,7 @@ Proof.
   intro Hlt.
   unfold bernoulli_btree.
   (* rewrite btree_infer_btree_opt. *)
+  rewrite reduce_btree'_infer.
   rewrite btree_infer_fmap_bool.
   unfold compose.
   unfold const.
