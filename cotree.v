@@ -1326,7 +1326,7 @@ Extract Constant cofold => "
       Cobot -> bot o p
       Coleaf a -> f a
       Cotau t' -> g (cofold o p f g h t')
-      Conode k -> g (cofold o p f g h . k)
+      Conode k -> g (cofold o p f g h Prelude.. k)
 ".
 
 #[global]
