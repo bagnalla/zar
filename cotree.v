@@ -1613,14 +1613,12 @@ Definition cotree_map {A B} (f : A -> B) (t : cotree bool A) : cotree bool B :=
 #[global]
   Instance monotone_atree_cotree_map {I A B} (f : A -> B) :
   Proper (leq ==> leq) (@atree_cotree_map I A B f).
-Proof.
-  intro a; revert f; induction a; intros f b Hab; inv Hab; simpl.
-  - constructor.
-  - reflexivity.
-  - constructor; apply IHa; auto.
-  - constructor; intro x; apply H, H1.
-Qed.
+Proof. apply monotone_fold; auto with cotree order. Qed.
 #[global] Hint Resolve monotone_atree_cotree_map : cotree.
+
+Lemma continuous_cotree_map {A B} (f : A -> B) :
+  continuous (cotree_map f).
+Proof. apply continuous_co; apply monotone_atree_cotree_map. Qed.
 
 Definition atree_cotree_filter {I A} (P : A -> bool) : atree I A -> cotree I A :=
   fold ⊥ (fun x => if P x then coleaf x else cobot) (@cotau I A) (@conode I A).
