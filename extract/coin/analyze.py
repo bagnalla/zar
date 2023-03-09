@@ -1,7 +1,8 @@
 from collections import namedtuple
-from itertools import count, takewhile
+from itertools import takewhile
 import math
 from math import factorial, sqrt
+from itertools import count
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,33 +10,29 @@ from scipy.stats import cumfreq, describe, relfreq
 
 Record = namedtuple('Record', 'sample bits time')
 
-N = 200
-
-def pmf(k):
-    return 1 / N if 0 <= k and k < N else 0
+p = 2/3
 
 # d is the empirical dictionary, true_d an association list of support
 # of the true distribution.
 def total_variation(d, true_d):
-    return sum(abs(lookup(i, d) - p) for i, p in true_d) / 2
+    return sum(abs(lookup(i, d) - q) for i, q in true_d) / 2
 
 def log2(n):
     return 0 if n == 0 else math.log2(n)
 
 def KL(d, true_d):
-    return sum(lookup(i, d) * log2(lookup(i, d) / p) for i, p in true_d)
+    return sum(lookup(i, d) * log2(lookup(i, d) / q) for i, q in true_d)
 
-# Symmetric mean absolute percentage error. From ProbFuzz paper pg 7.
-def smape(d):
-    return sum(abs(p - pmf(i)) / (abs(p) + abs(pmf(i))) for i, p in d) \
-        / len(d)
+# # Symmetric mean absolute percentage error. From ProbFuzz paper pg 7.
+# def smape(d):
+#     return sum(abs(q - p) / (abs(q) + p) for i, q in d) \
+#         / len(d)
 
 # Dictionary lookup with default 0.
 def lookup(key, d):
     return d.get(key) or 0
 
 def analyze(records):
-    print("N = %d" % N)
     print("# samples: %d" % len(records))
 
     # Analyze sample values.
@@ -47,14 +44,14 @@ def analyze(records):
     print("μ: %f" % samples_d.mean)
     print("σ: %f" % sqrt(samples_d.variance))
 
-    true_d = list(takewhile(lambda x: x[1] > 0, ((i, pmf(i)) for i in count(1))))
+    true_d = [(0, 1 - p), (1, p)]
 
     samples_hist = relfreq(samples, numbins=len(unique_samples))
-    d = list(zip(count(1), samples_hist.frequency))
+    d = list(zip(count(), samples_hist.frequency))
     dd = dict(d)
     print("total variation distance: %f" % total_variation(dd, true_d))
     print("KL divergence: %f" % KL(dd, true_d))
-    print("SMAPE: %f" % smape(d))
+    # print("SMAPE: %f" % smape(d))
 
     # Analyze sample bitstring lengths.
     bitstring_lengths = [len(r.bits) for r in records]

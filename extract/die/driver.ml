@@ -1,5 +1,5 @@
 open Random
-open Sampler
+open Die
 
 let bits : bool list ref = ref []
 

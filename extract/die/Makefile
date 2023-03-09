@@ -1,11 +1,11 @@
 default: init
-	ocamlopt sampler.cmx driver.ml
+	ocamlopt die.cmx driver.ml
 	./a.out
 
 entropy: init
-	ocamlopt sampler.cmx entropy.ml
+	ocamlopt die.cmx entropy.ml
 	./a.out
 
 init:
-	rm -f sampler.mli
-	ocamlopt sampler.ml
+	rm -f die.mli
+	ocamlopt die.ml

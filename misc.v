@@ -9,8 +9,10 @@ From Coq Require Import
   List
   Lia
   RelationClasses
+  Basics
 .
 Import ListNotations.
+Local Open Scope program_scope.
 
 Require Import tactics.
 
@@ -200,6 +202,34 @@ Proof.
     + intro HC; apply Hin; auto.
 Qed.
 
+Lemma Forall_not_in_countb_list_0 {A} (l : list A) (P : A -> bool) :
+  List.Forall (not ∘ is_true ∘ P) l ->
+  countb_list P l = 0.
+Proof.
+  unfold compose.
+  induction l; simpl; intro Hl; auto.
+  inv Hl; destruct (P a); auto; congruence.
+Qed.
+
+Lemma List_forall_lt_range (n : nat) :
+  List.Forall (fun x : nat => (x < n)%nat) (range n).
+Proof.
+  induction n; simpl.
+  { constructor. }
+  apply List.Forall_app; split; auto.
+  eapply List.Forall_impl; eauto.
+  intros m Hlt; simpl in Hlt; lia.
+Qed.
+
+Lemma List_forall_neq_range (n : nat) :
+  List.Forall (fun x : nat => ~ is_true (x =? n)%nat) (range n).
+Proof.
+  apply List.Forall_impl with (P := fun x => (x < n)%nat).
+  - intros m Hlt Heq.
+    apply EqNat.beq_nat_true_stt in Heq; lia.
+  - apply List_forall_lt_range.
+Qed.
+  
 Lemma countb_list_app {A : Type} (f : A -> bool) (l1 l2 : list A) :
   countb_list f (l1 ++ l2) = (countb_list f l1 + countb_list f l2)%nat.
 Proof. induction l1; auto; simpl; rewrite IHl1; lia. Qed.
@@ -283,16 +313,24 @@ Lemma Forall_list_rel {A} (R : A -> A -> Prop) l :
   list_rel R l l.
 Proof. induction l; intro Hl; inv Hl; constructor; auto. Qed.
 
+Lemma Forall_const_true {A} (l : list A) :
+  List.Forall (const True) l.
+Proof. induction l; constructor; auto; apply I. Qed.
+
 (* Types with decidable equality *)
 Class EqType (A : Type) : Type :=
   { eqb : A -> A -> bool
   ; eqb_spec : forall x y, reflect (x = y) (eqb x y)
   }.
 
+Lemma unit_eqb_spec (x y : unit) :
+  reflect (x = y) true.
+Proof. destruct x, y; constructor; reflexivity. Qed.
+
 #[global]
   Program Instance EqType_unit : EqType unit :=
-  {| eqb := fun _ _ => true |}.
-Next Obligation. destruct x, y; constructor; reflexivity. Qed.
+  {| eqb := fun _ _ => true
+   ; eqb_spec := unit_eqb_spec |}.
 
 #[global]
   Instance EqType_bool : EqType bool :=

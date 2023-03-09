@@ -396,6 +396,9 @@ Qed.
 Definition cpGCL_to_tree (c : cpGCL) : St -> tree :=
   opt ∘ debias ∘ elim_choices ∘ compile c.
 
+Definition cpGCL_to_itree_open (c : cpGCL) : St -> itree boolE (unit + St) :=
+  to_itree_open ∘ opt ∘ debias ∘ elim_choices ∘ compile c.
+
 Definition cpGCL_to_itree (c : cpGCL) : St -> itree boolE St :=
   to_itree ∘ opt ∘ debias ∘ elim_choices ∘ compile c.
 
