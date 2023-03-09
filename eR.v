@@ -2172,12 +2172,31 @@ Proof.
   rewrite IHl, eRmult_plus_distr_l; reflexivity.
 Qed.
 
+Lemma sum_map_scalar_r {A} (l : list A) a f :
+  sum (map (fun x => f x * a) l) = sum (map f l) * a.
+Proof.
+  revert a f; induction l; intros b f; simpl.
+  { eRauto. }
+  rewrite IHl, eRmult_plus_distr_r; reflexivity.
+Qed.
+
 Lemma sum_app (l1 l2 : list eR) :
   sum (l1 ++ l2) = sum l1 + sum l2.
 Proof.
   revert l2; induction l1; intro l2; simpl.
   { eRauto. }
   rewrite IHl1, eRplus_assoc; reflexivity.
+Qed.
+
+Lemma sum_map_count {A} (l : list A) (P : A -> bool) :
+  sum (List.map (fun x => if P x then 1 else 0) l) = INeR (countb_list P l).
+Proof.
+  induction l; simpl.
+  { rewrite INeR_0; auto. }
+  destruct (P a) eqn:HPa.
+  - rewrite IHl; simpl.
+    rewrite INeR_S; auto.
+  - eRauto.
 Qed.
 
 Lemma sum_map_ub {A} (l : list A) f ub :

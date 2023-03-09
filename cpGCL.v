@@ -11,11 +11,12 @@ Declare Scope cpGCL_scope.
 
 From zar Require Import cpo misc order.
 
-(** Values are bools, nats, or ints. *)
+(** Values are bools, nats, ints, or rationals. *)
 Variant val : Type :=
 | vbool : bool -> val
 | vnat : nat -> val
-| vint : Z -> val.
+| vint : Z -> val
+| vrat : Q -> val.
 
 (** A program state is a map from identifiers (nat for now) to values. *)
 Definition St : Set := string -> val.
@@ -48,6 +49,12 @@ Definition is_int (v : val) : bool :=
   | _ => false
   end.
 
+Definition is_rat (v : val) : bool :=
+  match v with
+  | vrat _ => true
+  | _ => false
+  end.
+
 Definition as_bool (v : val) : bool :=
   match v with
   | vbool b => b
@@ -64,6 +71,12 @@ Definition as_int (v : val) : Z :=
   match v with
   | vint n => n
   | _ => Z0
+  end.
+
+Definition as_rat (v : val) : Q :=
+  match v with
+  | vrat q => q
+  | _ => 0
   end.
 
 Inductive cpGCL : Type :=
@@ -88,7 +101,10 @@ Definition const_val : val -> expr := const.
 Coercion vbool : bool >-> val.
 Coercion vnat : nat >-> val.
 Coercion vint : Z >-> val.
+Coercion vrat : Q >-> val.
 Coercion const_val : val >-> expr.
+
+(* Coercion as_bool : val >-> bool. *)
 
 Notation "'skip'" :=
   CSkip (at level 0) : cpGCL_scope.
@@ -110,10 +126,13 @@ Notation "'if' e 'then' c1 'else' c2 'end'" :=
 Notation "'while' e 'do' c 'end'" :=
   (CWhile e c) (at level 89, e at level 99, c at level 99) : cpGCL_scope.
 Notation "'obs' e" :=
-  (CObserve e) (at level 89, e at level 99) : cpGCL_scope.
+  (CObserve e) (at level 0, e at level 85, no associativity) : cpGCL_scope.
 (* Notation "{ c1 } [ p ] { c2 }" := *)
 (*   (CChoice p c1 c2) (at level 89, p at level 99, *)
 (*       c1 at level 99, c2 at level 99) : cpGCL_scope. *)
+
+(* Notation "'unif' e f" := *)
+(*   (CUniform e f) (at level 0, e at level 85, f at level 85, no associativity) : cpGCL_scope. *)
 
 (** A cpGCL command is well-formed when all p values in choice
     commands are valid probabilities in all states. *)

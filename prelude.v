@@ -31,6 +31,9 @@ Definition plus (v1 v2 : val) : val :=
 Definition flip (x : string) (p : Q) : cpGCL :=
   CChoice (const p) (fun b => x <-- b).
 
+Definition flip' (x : string) (p : St -> Q) : cpGCL :=
+  CChoice p (fun b => x <-- b).
+
 Fixpoint string_of_atree (t : atree bool string) : string :=
   match t with
   | abot => "⊥"
@@ -52,3 +55,6 @@ Definition is_prime (n : nat) : bool :=
   end.
 
 (* Eval compute in (List.map (fun n => (n, is_prime n)) (range 24)). *)
+
+(* Definition unif (x : string) (e : St -> nat) : cpGCL := *)
+(*   CUniform e (fun n => x <-- Z.of_nat n). *)

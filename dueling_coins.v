@@ -12,8 +12,8 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From cwp Require Import
-  compile cotree cotcwp cpGCL cpo cwp equidistribution eR misc itree order tactics tree.
+From zar Require Import
+  compile cotree cocwp cpGCL cpo cwp equidistribution eR misc itree order tactics tree.
 Local Open Scope cpGCL_scope.
 
 Require Import prelude.
@@ -46,8 +46,14 @@ Section dueling_coins_equidistribution.
   Qed.
 End dueling_coins_equidistribution.
 
-(** Extracting the sampler. *)
-From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
-Definition sampler : itree boolE bool :=
-  ITree.map (fun s => as_bool (s "a")) (cpGCL_to_itree (dueling_coins (1#20)) empty).
-Extraction "extract/dueling_coins/dueling_coins.ml" sampler.
+(* (** Extracting the sampler. *) *)
+(* From Coq Require Import ExtrOcamlBasic ExtrOcamlString. *)
+(* Definition sampler : itree boolE bool := *)
+(*   ITree.map (fun s => as_bool (s "a")) (cpGCL_to_itree (dueling_coins (1#20)) empty). *)
+(* Extraction "extract/dueling_coins/dueling_coins.ml" sampler. *)
+
+From Coq Require Import ExtrHaskellBasic ExtrHaskellString.
+Extraction Language Haskell.
+Definition sampler (p : Q) : itree boolE bool :=
+  ITree.map (fun s => as_bool (s "a")) (cpGCL_to_itree (dueling_coins p) empty).
+Extraction "extract/dueling_coins/Sampler.hs" sampler.

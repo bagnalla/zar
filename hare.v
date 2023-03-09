@@ -8,7 +8,7 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From cwp Require Import compile cpGCL gaussian itree Q tree.
+From zar Require Import compile cpGCL gaussian itree Q tree.
 
 Local Open Scope cpGCL_scope.
 
@@ -94,7 +94,8 @@ Definition hare_tortoise : cpGCL :=
                skip);
     "time" <-- (fun s => (as_int (s "time") + 1)%Z)
   end;
-  obs (fun s => Z.leb 20 (as_int (s "time"))).
+  obs (fun s => true).
+  (* obs (fun s => Z.leb 20 (as_int (s "time"))). *)
   (* obs (fun s => Z.leb (as_int (s "time")) 10). *)
 
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.

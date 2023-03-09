@@ -128,6 +128,17 @@ Proof.
   - rewrite IHt1, IHt2; f_equal; f_equal; eRauto.
 Qed.
 
+Lemma twp_uniform_btree_to_tree_rat (f : Q -> eR) (t : btree (unit + nat)) :
+  twp (uniform_btree_to_tree t) (fun s => match s ϵ with
+                                       | vrat b => f b
+                                       | _ => 0
+                                       end) = 0.
+Proof.
+  unfold twp, uniform_btree_to_tree; revert f; induction t; intro f; simpl.
+  - destruct a; constructor.
+  - rewrite IHt1, IHt2; f_equal; f_equal; eRauto.
+Qed.
+
 Lemma tree_unbiased_btree_to_tree {A} (f : A -> val) (t : btree A) :
   tree_unbiased (btree_to_tree f t).
 Proof.
@@ -961,15 +972,42 @@ Proof.
                end) + (match s ϵ with
                        | vbool _ => 1
                        | _ => 0
-                       end)).
+                       end) + (match s ϵ with
+                               | vrat _ => 1
+                               | _ => 0
+                               end)).
   2: { ext s; destruct (s ϵ); simpl; eRauto. }
   unfold uniform_tree_open.
-  rewrite twp_sum.
+  rewrite 2!twp_sum.
   rewrite twp_uniform_btree_to_tree_bool.
-  rewrite eRplus_0_r.
+  rewrite twp_uniform_btree_to_tree_rat.
+  rewrite 2!eRplus_0_r.
   rewrite twp_uniform_btree_to_tree'.
   apply btree_infer_uniform_btree_lt_1; auto.
 Qed.
+
+(* Lemma twp_uniform_tree_open_lt_1 n : *)
+(*   (0 < n)%nat -> *)
+(*   twp (uniform_tree_open n) *)
+(*     (fun s : St => if negb (is_nat (s ϵ)) then 1 else 0) < 1. *)
+(* Proof. *)
+(*   intro Hd. *)
+(*   replace (fun s : St => if negb (is_nat (s ϵ)) then 1 else 0) with *)
+(*     (fun s => (match s ϵ with *)
+(*                | vint _ => 1 *)
+(*                | _ => 0 *)
+(*                end) + (match s ϵ with *)
+(*                        | vbool _ => 1 *)
+(*                        | _ => 0 *)
+(*                        end)). *)
+(*   2: { ext s; destruct (s ϵ); simpl; eRauto. } *)
+(*   unfold uniform_tree_open. *)
+(*   rewrite twp_sum. *)
+(*   rewrite twp_uniform_btree_to_tree_bool. *)
+(*   rewrite eRplus_0_r. *)
+(*   rewrite twp_uniform_btree_to_tree'. *)
+(*   apply btree_infer_uniform_btree_lt_1; auto. *)
+(* Qed. *)
 
 Lemma twpfail_uniform_tree_const_1 n :
   (0 < n)%nat ->
@@ -1153,11 +1191,15 @@ Proof.
                       end) + (match s ϵ with
                               | vbool _ => 1
                               | _ => 0
-                              end)).
+                              end) + (match s ϵ with
+                                      | vrat _ => 1
+                                      | _ => 0
+                                      end)).
     2: { ext s; destruct (s ϵ); simpl; eRauto. }
-    rewrite twp_sum.
+    rewrite 2!twp_sum.
     rewrite twp_uniform_btree_to_tree_bool.
-    rewrite eRplus_0_r.
+    rewrite twp_uniform_btree_to_tree_rat.
+    rewrite 2!eRplus_0_r.
     rewrite twp_uniform_btree_to_tree'.
     rewrite btree_infer_uniform_btree_n; auto.
     replace (cotuple (const 1) (const 0)) with
@@ -1179,11 +1221,15 @@ Proof.
                       end) + (match s ϵ with
                               | vbool _ => 1
                               | _ => 0
-                              end)).
+                              end) + (match s ϵ with
+                                      | vrat _ => 1
+                                      | _ => 0
+                                      end)).
     2: { ext s; destruct (s ϵ); simpl; eRauto. }
-    rewrite twp_sum.
+    rewrite 2!twp_sum.
     rewrite twp_uniform_btree_to_tree_bool.
-    rewrite eRplus_0_r.
+    rewrite twp_uniform_btree_to_tree_rat.
+    rewrite 2!eRplus_0_r.
     rewrite twp_uniform_btree_to_tree'.
     rewrite btree_infer_complement'.
     2: { intros []; eRauto. }
@@ -1284,6 +1330,18 @@ Proof.
   rewrite IHt1, IHt2; eRauto.
 Qed.
 
+Lemma twp_bernoulli_btree_to_tree_vrat t f :
+  twp_ false (uniform_btree_to_tree t)
+    (fun s => match s ϵ with
+              | vrat b => f b
+              | _ => 0
+              end) = 0.
+Proof.
+  revert f; induction t; intros f; simpl.
+  { destruct a as [[]|a]; simpl; auto. }
+  rewrite IHt1, IHt2; eRauto.
+Qed.
+
 Lemma btree_infer_bounded {A} (t : btree A) f ub :
   bounded f ub ->
   btree_infer f t <= ub.
@@ -1374,8 +1432,8 @@ Proof.
   intro Hn.
   replace (fun s : St => f (as_nat (s ϵ))) with
     (fun s => sum (map (fun i => if Nat.eqb (as_nat (s ϵ)) i then
-                                   f (as_nat (s ϵ)) else 0) (range n)) +
-                if n <=? as_nat (s ϵ) then f (as_nat (s ϵ)) else 0).
+                             f (as_nat (s ϵ)) else 0) (range n)) +
+             if n <=? as_nat (s ϵ) then f (as_nat (s ϵ)) else 0).
   2: { clear Hn; ext s.
        destruct (s ϵ) eqn:HsO; simpl.
        - revert f s b HsO.
@@ -1428,16 +1486,31 @@ Proof.
            specialize (IHn f s z HsO).
            simpl in IHn.
            rewrite eRplus_0_r in IHn.
+           apply IHn.
+       - revert f s q HsO.
+         induction n; simpl; intros f s q HsO.
+         + eRauto.
+         + rewrite eRplus_0_r.
+           rewrite map_app.
+           unfold sum.
+           rewrite fold_right_app.
+           simpl.
+           unfold sum in IHn.
+           rewrite eRplus_0_r.
+           destruct n; simpl; auto.
+           specialize (IHn f s q HsO).
+           simpl in IHn.
+           rewrite eRplus_0_r in IHn.
            apply IHn. }
   unfold twp.
   rewrite twp__sum.
   replace (fun s : St =>
              sum
                (map (fun i : nat => if as_nat (s ϵ) =? i then
-                                      f (as_nat (s ϵ)) else 0) (range n))) with
+                                 f (as_nat (s ϵ)) else 0) (range n))) with
     (fun s => sum (map (fun f => f s)
-                     (map (fun i s => if as_nat (s ϵ) =? i then
-                                        f (as_nat (s ϵ)) else 0) (range n)))).
+                  (map (fun i s => if as_nat (s ϵ) =? i then
+                                  f (as_nat (s ϵ)) else 0) (range n)))).
   2: { ext s; rewrite map_map; reflexivity. }
   rewrite twp_sum.
   replace (twp_ false (uniform_tree n)
@@ -1449,16 +1522,20 @@ Proof.
        { unfold uniform_tree_open.
          replace (fun s : St => if negb (is_nat (s ϵ)) then 1 else 0) with
            (fun s => (match s ϵ with
-                      | vint _ => 1
-                      | _ => 0
-                      end) + (match s ϵ with
-                              | vbool _ => 1
-                              | _ => 0
-                              end)).
+                   | vint _ => 1
+                   | _ => 0
+                   end) + (match s ϵ with
+                           | vbool _ => 1
+                           | _ => 0
+                           end) + (match s ϵ with
+                                   | vrat _ => 1
+                                   | _ => 0
+                                   end)).
          2: { ext s; destruct (s ϵ); simpl; eRauto. }
-         unfold twp; rewrite twp__sum.
+         unfold twp; rewrite 2!twp__sum.
          rewrite twp_uniform_btree_to_tree'.
          rewrite twp_bernoulli_btree_to_tree_vbool; eRauto.
+         rewrite twp_bernoulli_btree_to_tree_vrat; eRauto.
          unfold uniform_btree.
          unfold const.
          rewrite reduce_btree_infer.
