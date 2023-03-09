@@ -1,13 +1,128 @@
-# Zar: formally verified-correct n-sided die roller.
+# Zar: formally verified biased coin and n-sided die.
 
 `import zarpy` to use the package.
 
+See the [paper](https://arxiv.org/abs/2211.06747) (to appear in
+PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
+
+## Why use this package?
+
+### Probabilistic choice
+
+A common operation in randomized algorithms is probabilistic choice:
+for some `p ∈ [0,1]`, execute action `a1` with probability `p` or `a2`
+with probability `1-p` (i.e., flip a biased coin to determine the path
+of execution). A quick-and-dirty method for performing probabilistic
+choice is as follows:
+
+```python
+if random() < p:
+  execute a1
+else:
+  execute a2
+```
+
+where `p` is a float in the range `[0,1]` and `random()` produces a
+random float in the range `[0,1)`. While good enough for many
+applications, this approach is technically not always correct due to
+float roundoff error. I.e., `a1` can only be expected to execute with
+probability `p + ϵ` for some small error term ϵ, invalidating any
+correctness guarantees of your overall system that depend on the
+correctness of its probabilistic choices.
+
+This package provides an alternative that is guaranteed (by formal
+proof in Coq) to execute `a1` with probability exactly equal to `p`
+(where `n` and `d` are integers such that `p = n/d`):
+
+```python
+from zarpy import build_coin, flip
+build_coin(n, d) # Build and cache coin with bias p = n/d
+if flip(): # Generate a Boolean value with Pr(True) = p 
+  execute a1
+else:
+  execute a2
+```
+
+### Uniform sampling
+
+Another common operation is randomly drawing from a finite collection
+of values with equal (uniform) probabilities. An old trick for drawing
+an integer uniformly from the range `[0, n)` is to generate a random
+integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
+
+```python
+x = rand() % n # Assign x random value from [0,n)
+```
+
+but this method suffers from modulo biasq when `n` is not a power of
+2, causing some values to occur with higher probability than others
+(see, e.g., [this
+article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
+for more information on modulo bias). This package provides a uniform
+sampler that is guaranteed for any integer `0 < n` to generate samples
+from `[0,n)` with probability `1/n` of each. Although the python
+function `random.randint` is ostensibly free from modulo bias, our
+implementation comes with *formal proof* of correctness.
+
+The samplers provided by this package have been implemented and
+verified in Coq and extracted to OCaml and bundled into Python package
+via pythonlib. Validity of the correctness proofs is thus dependent on
+correctness of Coq's extraction mechanism, a small amount of OCaml
+shim code (viewable
+[here](https://github.com/bagnalla/zar/blob/main/python/zar/ocaml/zarpy.ml)),
+and the pythonlib library.
+
+## Proofs of correctness
+
+The coin and die samplers are implemented as probabilistic programs
+and compiled to [interaction
+trees](https://github.com/DeepSpec/InteractionTrees) by the
+[Zar](https://github.com/bagnalla/zar) probabilistic programming
+system. See the file
+[zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for their
+implementations and proofs of correctness.
+
+The correctness proofs are two-fold. For example, for biased coin with
+bias `p`, we prove:
+
+*
+  [coin_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L43):
+  the probability of `true` according to a formal weakest
+  pre-expectation semantics on interaction trees is equal to `p`, and
+
+*
+  [coin_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L60):
+  when the source of random bits is uniformly distributed, for any
+  sequence of coin flips the proportion of `true` samples converges to
+  `p` as the number of samples goes to +∞.
+
+See [the paper] for a more detailed explanation.
+
+Similarly, the theorem
+[die_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L80)
+proves semantic correctness of the n-sided die, and
+[die_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L124)
+equidistribution of its samples.
+
+## Usage
+
 `seed()` initializes the PRNG.
 
-`build(n)` builds and caches an n-sided die to be used by subsequent calls for generating samples.
+### Biased coin
 
-`single()` produces a single sample using the cached sampler.
+`build_coin(num, denom)` builds and caches a coin with `Pr(True) =
+num/denom` where `num` is a nonnegative integer and `denom` is a
+positive integer.
 
-`many(n)` produces n samples using the cached sampler.
+`flip()` produces a single Boolean sample by flipping the cached coin.
 
-`many_entropy(n)` produces n (x, b) pairs where x is a sample and b is the number of uniform random bits used to obtain x.
+`flip_n(n)` produces n Boolean samples by flipping the cached coin.
+
+### N-sided die
+
+`build_die(n)` builds and caches an n-sided die that generates
+integers uniformly at random from the range `[0,n)`.
+
+`roll()` produces a single sample by rolling the cached die.
+
+`roll_n(n)` produces n samples by rolling the cached die.

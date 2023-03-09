@@ -1,4 +1,5 @@
 Update info in pyproject.toml.
+Clear dist directory.
 
 python3 -m build
 
