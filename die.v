@@ -28,7 +28,7 @@ Proof. intro Hlt; repeat constructor; auto. Qed.
 
 (** The probability of assigning any m < n to the output variable is
     equal to 1/n. *)
-Lemma die_correct (out : string) (n m : nat) :
+Theorem die_correct (out : string) (n m : nat) :
   (m < n)%nat ->
   cwp (die out n) (fun s => if Nat.eqb (as_nat (s out)) m then 1 else 0) empty =
     1 / INeR n.
