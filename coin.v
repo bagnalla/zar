@@ -31,7 +31,7 @@ Qed.
 
 (** The probability of assigning `true` to the output variable is
     equal to p. *)
-Lemma coin_correct (out : string) (p : Q) :
+Theorem coin_correct (out : string) (p : Q) :
   (p <= 1)%Q ->
   cwp (coin out p) (fun s => if as_bool (s out) then 1 else 0) empty = Q2eR p.
 Proof.
