@@ -167,14 +167,14 @@ Require Import cpGCL.
 
 (** Cotree sampling theorem. *)
 Section cotree_equidistribution.
-  Context (env : SamplingEnvironment) (t : cotree bool St) (P : St -> bool).
+  Context {A} (env : SamplingEnvironment) (t : cotree bool A) (P : A -> bool).
 
-  Variable samples : nat -> St.
+  Variable samples : nat -> A.
   Hypothesis bitstreams_samples : forall i, produces (eq (samples i)) (env.(bitstreams) i) t.
 
   Lemma cotree_freq_bitstreams_samples (n : nat) :
     freq (in_Sigma01 (cotree_preimage P t)) (prefix env.(bitstreams) n) =
-      freq (fun x : St => is_true (P x)) (prefix samples n).
+      freq (fun x => is_true (P x)) (prefix samples n).
   Proof.
     unfold freq; f_equal.
     2: { f_equal; rewrite 2!length_prefix; reflexivity. }
@@ -228,15 +228,15 @@ Proof. apply pairwise_disjoint_cotree_preimage. Qed.
 
 (** ITree equidistribution theorem. *)
 Section itree_equidistribution.
-  Context (t : itree boolE St) (P : St -> bool)
-    (bitstreams : nat -> Stream bool) (samples : nat -> St).
+  Context {A} (t : itree boolE A) (P : A -> bool)
+    (bitstreams : nat -> Stream bool) (samples : nat -> A).
 
   Hypothesis bitstreams_uniform : uniform bitstreams.
   Hypothesis bitstreams_samples : forall i, iproduces (eq (samples i)) (bitstreams i) t.
 
   Lemma itree_freq_bitstreams_samples (n : nat) :
     freq (in_Sigma01 (itree_preimage P t)) (prefix bitstreams n) =
-      freq (fun x : St => is_true (P x)) (prefix samples n).
+      freq (fun x => is_true (P x)) (prefix samples n).
   Proof.
     unfold freq; f_equal.
     2: { f_equal; rewrite 2!length_prefix; reflexivity. }
@@ -248,7 +248,7 @@ Section itree_equidistribution.
 
   Theorem itree_samples_equidistributed :
     converges (freq (is_true ∘ P) ∘ prefix samples)
-      (itwp (fun s => if P s then 1 else 0) t).
+      (itwp (fun x => if P x then 1 else 0) t).
   Proof.
     intros eps Heps.
     pose proof bitstreams_uniform as Huniform.

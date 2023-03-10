@@ -34,8 +34,6 @@ From zar Require Import
 Local Open Scope eR_scope.
 Local Open Scope order_scope.
 
-Create HintDb cotcwp.
-
 Lemma chain_cotree_loop_approx {A} (x : A) (e : A -> bool)
   (g : A -> cotree bool (unit + A))
   (f : A -> cotree bool (unit + A)) :
@@ -147,7 +145,7 @@ Proof.
   - intros g g' Hg; simpl.
     apply eRle_div, eRplus_le_compat; apply Hg.
 Qed.
-#[global] Hint Resolve monotone_btwp : cotcwp.
+#[global] Hint Resolve monotone_btwp : cocwp.
 
 Lemma fold_avg_bounded {A} (f : A -> eR) (t : atree bool A) :
   bounded f 1 ->
@@ -179,17 +177,17 @@ Proof.
   - apply monotone_id.
   - apply monotone_avg.
 Qed.
-#[global] Hint Resolve antimonotone_btwlp : cotcwp.
+#[global] Hint Resolve antimonotone_btwlp : cocwp.
 
 Corollary continuous_cotwp {A} (f : A -> eR) : continuous (cotwp f).
 Proof. apply continuous_co, monotone_btwp. Qed.
-#[global] Hint Resolve continuous_cotwp : cotcwp.
+#[global] Hint Resolve continuous_cotwp : cocwp.
 
 Corollary cocontinuous_cotwlp {A} (f : A -> eR) :
   bounded f 1 ->
   cocontinuous (cotwlp f).
 Proof. intro Hf; apply cocontinuous_coop, antimonotone_btwlp; auto. Qed.
-#[global] Hint Resolve cocontinuous_cotwlp : cotcwp.
+#[global] Hint Resolve cocontinuous_cotwlp : cocwp.
 
 Lemma wcontinuous_avg : wcontinuous (fun k : bool -> eR => (k false + k true) / 2).
 Proof.
@@ -525,10 +523,10 @@ Lemma cotwp_filter {A} (P : A -> bool) (f : A -> eR) :
   cotwp (fun x => if P x then f x else 0) === cotwp f ∘ cotree_filter P.
 Proof.
   unfold cotwp, cotree_filter.
-  rewrite co_co; eauto with cotcwp cotree order.
-  apply Proper_co; eauto with cotcwp order.
+  rewrite co_co; eauto with cocwp cotree order.
+  apply Proper_co; eauto with cocwp order.
   { apply monotone_compose; eauto with cotree order.
-    apply monotone_co; eauto with cotcwp. }
+    apply monotone_co; eauto with cocwp. }
   apply equ_arrow; intro a.
   unfold compose.
   revert P f; induction a; intros P f; simpl.
@@ -888,7 +886,7 @@ Proof.
   unfold tie_cotree_iid.
   unfold cotree_iter.
   unfold iter.
-  rewrite continuous_sup_eR; auto with cotcwp.
+  rewrite continuous_sup_eR; auto with cocwp.
   2: { apply chain_directed, chain_iter_n'.
        - constructor.
        - apply continuous_monotone, continuous_iid_F. }
@@ -936,7 +934,7 @@ Proof.
   eapply supremum_infimum_sum.
   6: { apply sup_spec. }
   6: { apply inf_spec. }
-  { apply chain_f_ideal; eauto with cotcwp order. }
+  { apply chain_f_ideal; eauto with cocwp order. }
   { apply dec_chain_f_ideal, antimonotone_btwlp; intro; eRauto. }
   { intro i; unfold compose. simpl. unfold flip.
     apply btwp_bounded; eauto. }
@@ -1067,4 +1065,27 @@ Proof.
   apply monotone_cotwp.
   intro x.
   destr; eRauto.
+Qed.
+
+Lemma cotwp_map_btwp {A B} (f : A -> B) (g : B -> eR) (t : atree bool A) :
+  cotwp g (atree_cotree_map f t) = btwp (g ∘ f) t.
+Proof.
+  unfold atree_cotree_map, btwp, compose.
+  induction t; simpl.
+  - rewrite cotwp_bot; auto.
+  - rewrite cotwp_leaf; auto.
+  - rewrite cotwp_tau; unfold id; auto.
+  - rewrite cotwp_node.
+    unfold compose; rewrite 2!H; reflexivity.
+Qed.
+
+(** Useful lemma that might be worth pointing out in journal article? *)
+Lemma cotwp_map {A B} (f : A -> B) (g : B -> eR) (t : cotree bool A) :
+  cotwp g (cotree_map f t) = cotwp (g ∘ f) t.
+Proof.
+  unfold cotree_map; apply ext.
+  rewrite co_co'; eauto with cotree order cocwp.
+  apply Proper_co'; eauto with cotree order cocwp; try reflexivity.
+  apply eq_equ.
+  ext x; apply cotwp_map_btwp.
 Qed.

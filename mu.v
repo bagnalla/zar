@@ -209,7 +209,7 @@ Qed.
 Theorem cotwp_mu_lang {A} :
   @cotwp A (const 1) = tcosum (fun bs => 1 / 2 ^ length bs) ∘ cotree_lang.
 Proof
-  with eauto with aCPO cotcwp order mu.
+  with eauto with aCPO cocwp order mu.
   unfold cotwp, tcosum, cotree_lang.
   apply equ_f_eR.  
   rewrite co_co...
