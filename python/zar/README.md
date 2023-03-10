@@ -23,8 +23,8 @@ where `p` is a float in the range `[0,1]` and `random()` produces a
 random float in the range `[0,1)`. While good enough for many
 applications, this approach is not always correct due to float
 roundoff error. We can only expect `a1` to be executed with
-probability `p + ϵ` for some small error term `ϵ`, technically
-invalidating any correctness guarantees of our overall system that
+probability `p + ϵ` for some small error term `ϵ`, which technically
+invalidates any correctness guarantees of our overall system that
 depend on the correctness of its probabilistic choices.
 
 Zarpy provides an alternative that is guaranteed (by formal proof in
@@ -54,7 +54,7 @@ e.g., [this
 article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
 for more information on modulo bias). Zarpy provides a uniform sampler
 that is guaranteed for any integer `0 < n` to generate samples from
-`[0,n)` with probability `1/n` of each:
+`[0,n)` with probability `1/n` each:
 ```python
 from zarpy import build_die, roll
 build_die(n)
@@ -71,24 +71,25 @@ The samplers provided by Zarpy have been implemented and verified in
 Coq and extracted to OCaml and bundled into Python package via
 [pythonlib](https://github.com/janestreet/pythonlib). Validity of the
 correctness proofs is thus dependent on the correctness of Coq's
-extraction mechanism, a small amount of OCaml shim code (viewable
+extraction mechanism, the OCaml compiler and runtime, a small amount
+of OCaml shim code (viewable
 [here](https://github.com/bagnalla/zar/blob/main/python/zar/ocaml/zarpy.ml)),
 and the pythonlib library.
 
 ## Proofs of correctness
 
-The coin and die samplers are implemented as probabilistic programs
-and compiled to [interaction
-trees](https://github.com/DeepSpec/InteractionTrees) by the
-[Zar](https://github.com/bagnalla/zar) probabilistic programming
-system. See the file
-[zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for their
-implementations and proofs of correctness.
+The coin and die samplers are implemented as probabilistic programs in
+the [Zar](https://github.com/bagnalla/zar) system and compiled to
+[interaction trees](https://github.com/DeepSpec/InteractionTrees)
+implementing the samplers via fair coin-flipping schemes. See Section
+3 of the [paper](https://arxiv.org/abs/2211.06747) for details and the
+file [zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for
+their implementations and proofs of correctness.
 
 Correctness is two-fold. For biased coin with bias `p`, we prove:
 *
   [coin_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L57):
-  the probability of `true` according to the formal probabilistic
+  the probability of producing `true` according to the formal probabilistic
   semantics of the constructed interaction tree is equal to `p`, and
 
 *
@@ -111,7 +112,8 @@ equidistribution of its samples.
 
 ## Usage
 
-`seed()` initializes the PRNG.
+`seed()` initializes the PRNG via
+[Random.self_init](https://v2.ocaml.org/api/Random.html).
 
 ### Biased coin
 
