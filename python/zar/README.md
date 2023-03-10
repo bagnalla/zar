@@ -36,7 +36,7 @@ proof in Coq) to execute `a1` with probability exactly equal to `p`
 
 ```python
 from zarpy import build_coin, flip
-build_coin(n, d) # Build and cache coin with bias p = n/d
+build_coin((n, d)) # Build and cache coin with bias p = n/d
 if flip(): # Generate a Boolean value with Pr(True) = p 
   execute a1
 else:
@@ -60,9 +60,17 @@ but this method suffers from modulo biasq when `n` is not a power of
 article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
 for more information on modulo bias). This package provides a uniform
 sampler that is guaranteed for any integer `0 < n` to generate samples
-from `[0,n)` with probability `1/n` of each. Although the python
-function `random.randint` is ostensibly free from modulo bias, our
-implementation comes with *formal proof* of correctness.
+from `[0,n)` with probability `1/n` of each:
+
+```python
+from zarpy import build_die, roll
+build_die(n)
+x = roll()
+```
+
+Although the python function `random.randint` is ostensibly free from
+modulo bias, our implementation provides a *formal proof of
+correctness*.
 
 The samplers provided by this package have been implemented and
 verified in Coq and extracted to OCaml and bundled into Python package
@@ -82,16 +90,15 @@ system. See the file
 [zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for their
 implementations and proofs of correctness.
 
-The correctness proofs are two-fold. For example, for biased coin with
-bias `p`, we prove:
+Correctness is two-fold. For biased coin with bias `p`, we prove:
 
 *
-  [coin_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L43):
+  [coin_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L57):
   the probability of `true` according to a formal weakest
   pre-expectation semantics on interaction trees is equal to `p`, and
 
 *
-  [coin_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L60):
+  [coin_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L75):
   when the source of random bits is uniformly distributed, for any
   sequence of coin flips the proportion of `true` samples converges to
   `p` as the number of samples goes to +∞.
@@ -99,9 +106,9 @@ bias `p`, we prove:
 See [the paper] for a more detailed explanation.
 
 Similarly, the theorem
-[die_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L80)
+[die_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L136)
 proves semantic correctness of the n-sided die, and
-[die_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L124)
+[die_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L161)
 equidistribution of its samples.
 
 ## Usage
@@ -110,7 +117,7 @@ equidistribution of its samples.
 
 ### Biased coin
 
-`build_coin(num, denom)` builds and caches a coin with `Pr(True) =
+`build_coin((num, denom))` builds and caches a coin with `Pr(True) =
 num/denom` where `num` is a nonnegative integer and `denom` is a
 positive integer.
 
