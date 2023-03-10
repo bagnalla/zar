@@ -1,7 +1,5 @@
 # Zarpy: formally verified biased coin and n-sided die.
 
-`import zarpy` to use the package.
-
 See the [paper](https://arxiv.org/abs/2211.06747) (to appear in
 PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
@@ -26,7 +24,7 @@ where `p` is a float in the range `[0,1]` and `random()` produces a
 random float in the range `[0,1)`. While good enough for many
 applications, this approach is not always correct due to float
 roundoff error. We can only expect `a1` to be executed with
-probability `p + ϵ` for some small error term ϵ, technically
+probability `p + ϵ` for some small error term `ϵ`, technically
 invalidating any correctness guarantees of our overall system that
 depend on the correctness of its probabilistic choices.
 
