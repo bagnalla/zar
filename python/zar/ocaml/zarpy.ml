@@ -43,7 +43,7 @@ let qmake n d =
   else 
     { qnum = z_of_int n; qden = positive_of_int d }
 
-let cached_coin : ((__, bool) itree) ref = ref (coin_die_samplers.coin_sampler (qmake 0 0))
+let cached_coin : ((__, bool) itree) ref = ref (coin_die_samplers.coin_sampler (qmake 0 1))
 
 let flip_coin () : bool =
   run !cached_coin

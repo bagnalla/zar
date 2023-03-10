@@ -13,4 +13,4 @@ dll.caml_startup(argv)
 
 # We export the names explicitly otherwise mypy gets confused and
 # generates spurious errors
-from zarpy import seed, build, single, many, many_entropy
+from zarpy import seed, build_coin, flip, flip_n, build_die, roll, roll_n
