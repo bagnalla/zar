@@ -133,15 +133,6 @@ Qed.
 Definition die_itree (n : nat) : itree boolE nat :=
   ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty).
 
-Lemma sum_positive (l : list eR) :
-  List.Exists (fun x => 0 < x) l ->
-  0 < sum l.
-Proof.
-  induction l; intro Hex; inv Hex; simpl.
-  - apply eRlt_0_plus_l; auto.
-  - apply eRlt_0_plus_r; auto.
-Qed.
-
 Theorem die_itree_correct (n m : nat) :
   (m < n)%nat ->
   itwp (fun x : nat => if Nat.eqb x m then 1 else 0) (die_itree n) = 1 / INeR n.
