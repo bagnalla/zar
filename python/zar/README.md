@@ -7,12 +7,11 @@ PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
 ### Probabilistic choice
 
-A common operation in randomized algorithms is *probabilistic choice*:
-for some `p ∈ [0,1]`, execute action `a1` with probability `p` or `a2`
-with probability `1-p` (i.e., flip a biased coin to determine the path
-of execution). A quick-and-dirty method for performing probabilistic
-choice is as follows:
-
+A basic operation in randomized algorithms is *probabilistic choice*:
+for some `p ∈ [0,1]`, execute action `a1` with probability `p` or
+action `a2` with probability `1-p` (i.e., flip a biased coin to
+determine the path of execution). A common method for performing
+probabilistic choice is as follows:
 ```python
 if random() < p:
   execute a1
@@ -31,7 +30,6 @@ depend on the correctness of its probabilistic choices.
 Zarpy provides an alternative that is guaranteed (by formal proof in
 Coq) to execute `a1` with probability exactly equal to `p` (where `n`
 and `d` are integers such that `p = n/d`):
-
 ```python
 from zarpy import build_coin, flip
 build_coin((n, d)) # Build and cache coin with bias p = n/d
@@ -47,7 +45,6 @@ Another common operation is randomly drawing from a finite collection
 of values with equal (uniform) probabilities. An old trick for drawing
 an integer uniformly from the range `[0, n)` is to generate a random
 integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
-
 ```python
 x = rand() % n # Assign x random value from [0,n)
 ```
@@ -59,7 +56,6 @@ article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-t
 for more information on modulo bias). Zarpy provides a uniform sampler
 that is guaranteed for any integer `0 < n` to generate samples from
 `[0,n)` with probability `1/n` of each:
-
 ```python
 from zarpy import build_die, roll
 build_die(n)
@@ -89,7 +85,6 @@ system. See the file
 implementations and proofs of correctness.
 
 Correctness is two-fold. For biased coin with bias `p`, we prove:
-
 *
   [coin_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L57):
   the probability of `true` according to the formal probabilistic
