@@ -9,7 +9,7 @@ PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
 ### Probabilistic choice
 
-A common operation in randomized algorithms is probabilistic choice:
+A common operation in randomized algorithms is *probabilistic choice*:
 for some `p ∈ [0,1]`, execute action `a1` with probability `p` or `a2`
 with probability `1-p` (i.e., flip a biased coin to determine the path
 of execution). A quick-and-dirty method for performing probabilistic
@@ -94,8 +94,8 @@ Correctness is two-fold. For biased coin with bias `p`, we prove:
 
 *
   [coin_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L57):
-  the probability of `true` according to a formal weakest
-  pre-expectation semantics on interaction trees is equal to `p`, and
+  the probability of `true` according to the formal probabilistic
+  semantics of the constructed interaction tree is equal to `p`, and
 
 *
   [coin_samples_equidistributed](https://github.com/bagnalla/zar/blob/main/zarpy.v#L75):
@@ -118,18 +118,17 @@ equidistribution of its samples.
 ### Biased coin
 
 `build_coin((num, denom))` builds and caches a coin with `Pr(True) =
-num/denom` where `num` is a nonnegative integer and `denom` is a
-positive integer.
+num/denom` for nonnegative integer `num` and positive integer `denom`.
 
 `flip()` produces a single Boolean sample by flipping the cached coin.
 
-`flip_n(n)` produces n Boolean samples by flipping the cached coin.
+`flip_n(n)` produces `n` Boolean samples by flipping the cached coin.
 
 ### N-sided die
 
-`build_die(n)` builds and caches an n-sided die that generates
-integers uniformly at random from the range `[0,n)`.
+`build_die(n)` builds and caches an n-sided die with `Pr(m) = 1/n` for
+integer `m` where `0 <= m < n`.
 
 `roll()` produces a single sample by rolling the cached die.
 
-`roll_n(n)` produces n samples by rolling the cached die.
+`roll_n(n)` produces `n` integer samples by rolling the cached die.
