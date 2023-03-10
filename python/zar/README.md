@@ -28,8 +28,8 @@ invalidating any correctness guarantees of our overall system that
 depend on the correctness of its probabilistic choices.
 
 Zarpy provides an alternative that is guaranteed (by formal proof in
-Coq) to execute `a1` with probability exactly equal to `p` (where `n`
-and `d` are integers such that `p = n/d`):
+Coq) to execute `a1` with probability `p` (where `n` and `d` are
+integers such that `p = n/d`):
 ```python
 from zarpy import build_coin, flip
 build_coin((n, d)) # Build and cache coin with bias p = n/d
@@ -41,14 +41,13 @@ else:
 
 ### Uniform sampling
 
-Another common operation is randomly drawing from a finite collection
-of values with equal (uniform) probabilities. An old trick for drawing
-an integer uniformly from the range `[0, n)` is to generate a random
-integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
+Another common operation is to randomly draw from a finite collection
+of values with equal (uniform) probability of each. An old trick for
+drawing an integer uniformly from the range `[0, n)` is to generate a
+random integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
 ```python
 x = rand() % n # Assign x random value from [0,n)
 ```
-
 but this method suffers from modulo bias when `n` is not a power of 2,
 causing some values to occur with higher probability than others (see,
 e.g., [this
@@ -62,15 +61,17 @@ build_die(n)
 x = roll()
 ```
 
-Although the python function `random.randint` is ostensibly free from
-modulo bias, our implementation provides a *formal proof of
-correctness*.
+Although the Python function `random.randint` is ostensibly free from
+modulo bias, our implementation guarantees so by a *formal proof of
+correctness* in Coq.
+
+## Trusted Computing Base
 
 The samplers provided by Zarpy have been implemented and verified in
 Coq and extracted to OCaml and bundled into Python package via
-pythonlib. Validity of the correctness proofs is thus dependent on
-correctness of Coq's extraction mechanism, a small amount of OCaml
-shim code (viewable
+[pythonlib](https://github.com/janestreet/pythonlib). Validity of the
+correctness proofs is thus dependent on the correctness of Coq's
+extraction mechanism, a small amount of OCaml shim code (viewable
 [here](https://github.com/bagnalla/zar/blob/main/python/zar/ocaml/zarpy.ml)),
 and the pythonlib library.
 
