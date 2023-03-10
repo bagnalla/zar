@@ -20,7 +20,7 @@ From zar Require Import
   tree
 .
 
-Create HintDb cotwp.
+Create HintDb cocwp.
 
 Definition cotree_loop_F {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
   (f : A -> cotree bool (unit + A))

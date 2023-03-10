@@ -40,7 +40,7 @@ Qed.
 
 (** The probability of assigning `true` to the output variable is
     equal to p. *)
-Theorem coin_correct (out : string) (p : Q) :
+Lemma coin_correct (out : string) (p : Q) :
   (p <= 1)%Q ->
   cwp (coin out p) (fun s => if as_bool (s out) then 1 else 0) empty = Q2eR p.
 Proof.
@@ -50,18 +50,34 @@ Proof.
   rewrite String.eqb_refl; simpl; eRauto.
 Qed.
 
+Definition coin_itree (p : Q) : itree boolE bool :=
+  ITree.map (fun s => as_bool (s "b")) (cpGCL_to_itree (coin "b" p) empty).
+
+(** Uses cotwp_map in cocwp_facts.v. *)
+Theorem coin_itree_correct (p : Q) :
+  (0 <= p <= 1)%Q ->
+  itwp (fun b : bool => if b then 1 else 0) (coin_itree p) = Q2eR p.
+Proof.
+  intros [H0 H1].
+  unfold coin_itree; rewrite itwp_map.
+  unfold compose; rewrite <- cwp_itwp.
+  - apply coin_correct; auto.
+  - apply wf_coin; auto.
+  - unfold wlp; simpl; unfold const; eRauto.
+Qed.
+
 Section coin_equidistribution.
-  Context (env : SamplingEnvironment) (P : St -> bool) (samples : nat -> St).
-  Context (out : string) (p : Q) (Hp : (0 <= p <= 1)%Q).
+  Context (env : SamplingEnvironment) (samples : nat -> bool).
+  Context (p : Q) (Hp : (0 <= p <= 1)%Q).
   Hypothesis bitstreams_samples :
-    forall i, iproduces (eq (samples i)) (env.(bitstreams) i)
-           (cpGCL_to_itree (coin out p) empty).
+    forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (coin_itree p).
 
   Theorem coin_samples_equidistributed :
-    converges (freq (is_true ∘ P) ∘ prefix samples)
-      (cwp (coin out p) (fun s => if P s then 1 else 0) empty).
+    converges (freq is_true ∘ prefix samples)
+      (itwp (fun b : bool => if b then 1 else 0) (coin_itree p)).
   Proof.
-    eapply cpGCL_samples_equidistributed; eauto; apply wf_coin; auto.
+    eapply itree_samples_equidistributed; eauto.
+    destruct env; auto.
   Qed.
 End coin_equidistribution.
 
@@ -77,7 +93,7 @@ Proof. intro Hlt; repeat constructor; auto. Qed.
 
 (** The probability of assigning any m < n to the output variable is
     equal to 1/n. *)
-Theorem die_correct (out : string) (n m : nat) :
+Lemma die_correct (out : string) (n m : nat) :
   (m < n)%nat ->
   cwp (die out n) (fun s => if Nat.eqb (as_nat (s out)) m then 1 else 0) empty =
     1 / INeR n.
@@ -114,36 +130,65 @@ Proof.
   - rewrite IHn; eRauto; lia.
 Qed.
 
+Definition die_itree (n : nat) : itree boolE nat :=
+  ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty).
+
+Lemma sum_positive (l : list eR) :
+  List.Exists (fun x => 0 < x) l ->
+  0 < sum l.
+Proof.
+  induction l; intro Hex; inv Hex; simpl.
+  - apply eRlt_0_plus_l; auto.
+  - apply eRlt_0_plus_r; auto.
+Qed.
+
+Theorem die_itree_correct (n m : nat) :
+  (m < n)%nat ->
+  itwp (fun x : nat => if Nat.eqb x m then 1 else 0) (die_itree n) = 1 / INeR n.
+Proof.
+  intro Hlt.
+  unfold die_itree; rewrite itwp_map.
+  unfold compose; rewrite <- cwp_itwp.
+  - apply die_correct; auto.
+  - apply wf_die; auto; lia.
+  - unfold wlp; simpl; unfold const.
+    apply sum_positive.
+    apply List.Exists_exists.
+    exists (1 / INeR n); split.
+    + set (f := fun _ : nat => 1 / INeR n).
+      replace (1 / INeR n) with (f O); auto.
+      apply List.in_map, in_range; lia.
+    + apply eRlt_0_eRdiv; eRauto.
+Qed.
+
 Section die_equidistribution.
-  Context (env : SamplingEnvironment) (P : St -> bool) (samples : nat -> St).
-  Context (out : string) (n : nat) (Hn : (0 < n)%nat).
+  Context (env : SamplingEnvironment) (P : nat -> bool) (samples : nat -> nat).
+  Context (n : nat) (Hn : (0 < n)%nat).
   Hypothesis bitstreams_samples :
-    forall i, iproduces (eq (samples i)) (env.(bitstreams) i)
-           (cpGCL_to_itree (die out n) empty).
+    forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (die_itree n).
 
   Theorem die_samples_equidistributed :
     converges (freq (is_true ∘ P) ∘ prefix samples)
-      (cwp (die out n) (fun s => if P s then 1 else 0) empty).
+      (itwp (fun x => if P x then 1 else 0) (die_itree n)).
   Proof.
-    eapply cpGCL_samples_equidistributed; eauto; apply wf_die; auto.
+    eapply itree_samples_equidistributed; eauto.
+    destruct env; auto.
   Qed.
 End die_equidistribution.
+
+Corollary die_eq_n_converges (env : SamplingEnvironment) (samples : nat -> nat) (n m : nat) :
+  (forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (die_itree n)) ->
+  (m < n)%nat ->
+  converges (freq (is_true ∘ eqb m) ∘ prefix samples)
+    (itwp (fun x => if eqb m x then 1 else 0) (die_itree n)).
+Proof.
+  intros Hsamples Hlt.
+  eapply die_samples_equidistributed; eauto.
+Qed.
 
 (** Extraction. *)
 
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
-
-(* Definition coin_sampler (p : Q) : itree boolE bool := *)
-(*   ITree.map (fun s => as_bool (s "b")) (cpGCL_to_itree (coin "b" p) empty). *)
-
-(* Definition die_sampler (n : nat) : itree boolE nat := *)
-(*   ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty). *)
-
-(* Definition samplers : Samplers := *)
-(*   {| coin_sampler := *)
-(*       ITree.map (fun s => as_bool (s "b")) (cpGCL_to_itree (coin "b" p) empty) *)
-(*    ; die_sampler := *)
-(*       ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty) |}. *)
 
 Definition coin_die_samplers : Samplers :=
   mkSamplers

@@ -496,3 +496,70 @@ Fixpoint fin_itree_of_itree {A} (n : nat) (t : itree boolE A) : fin_itree A :=
                                 (fin_itree_of_itree n' (k false))
            end
   end.
+
+Lemma icotree_ret {A} (t : itree boolE A) (x : A) :
+  observe t = RetF x ->
+  icotree t = coleaf x.
+Proof.
+  intro Ht.
+  rewrite unf_eq; simpl.
+  rewrite Ht; auto.
+Qed.
+
+Lemma icotree_tau {A} (t t' : itree boolE A) :
+  observe t = TauF t' ->
+  icotree t = cotau (icotree t').
+Proof.
+  intro Ht.
+  rewrite unf_eq; simpl.
+  rewrite Ht; auto.
+Qed.
+
+Lemma icotree_vis {A} (t : itree boolE A) k :
+  observe t = VisF GetBool k ->
+  icotree t = conode (icotree ∘ k).
+Proof.
+  intro Ht.
+  rewrite unf_eq; simpl.
+  rewrite Ht; auto.
+Qed.  
+
+Lemma icotree_map {A B} (f : A -> B) (t : itree boolE A) :
+  icotree (ITree.map f t) = cotree_map f (icotree t).
+Proof.
+  apply cotree_ext.
+  revert t; cofix CH; intro t.
+  destruct (observe t) eqn:Ht.
+  - rewrite icotree_ret with (x:=r); auto.    
+    remember (cotree_map f (coleaf r)) as x.
+    rewrite unf_eq; simpl; compute.
+    rewrite 2!_observe_observe.
+    rewrite Ht; simpl.
+    rewrite Heqx.
+    rewrite cotree_map_leaf; constructor.
+  - rewrite icotree_tau with (t':=t0); auto.
+    remember (cotree_map f (cotau (icotree t0))) as x.
+    rewrite unf_eq; simpl; compute.
+    rewrite 2!_observe_observe.
+    rewrite Ht; simpl.
+    rewrite Heqx.
+    rewrite cotree_map_tau; constructor.
+    apply CH.
+  - destruct e.
+    rewrite icotree_vis with (k:=k); auto.
+    remember (cotree_map f (conode (icotree ∘ k))) as x.
+    rewrite unf_eq.
+    simpl; compute.
+    rewrite 2!_observe_observe.
+    rewrite Ht; simpl.
+    rewrite Heqx.
+    rewrite cotree_map_node; constructor.
+    intro b; apply CH.
+Qed.
+
+Lemma itwp_map {A B} (f : A -> B) (g : B -> eR) (t : itree boolE A) :
+  itwp g (ITree.map f t) = itwp (g ∘ f) t.
+Proof.
+  unfold itwp, compose.
+  rewrite icotree_map; apply cotwp_map.
+Qed.
