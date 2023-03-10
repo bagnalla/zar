@@ -1,4 +1,4 @@
-# Zar: formally verified biased coin and n-sided die.
+# Zarpy: formally verified biased coin and n-sided die.
 
 `import zarpy` to use the package.
 
