@@ -5,7 +5,7 @@
 See the [paper](https://arxiv.org/abs/2211.06747) (to appear in
 PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
-## Why use this package?
+## Why use Zarpy?
 
 ### Probabilistic choice
 
@@ -30,9 +30,9 @@ roundoff error. We can only expect `a1` to execute with probability `p
 correctness guarantees of our overall system that depend on the
 correctness of its probabilistic choices.
 
-This package provides an alternative that is guaranteed (by formal
-proof in Coq) to execute `a1` with probability exactly equal to `p`
-(where `n` and `d` are integers such that `p = n/d`):
+Zarpy provides an alternative that is guaranteed (by formal proof in
+Coq) to execute `a1` with probability exactly equal to `p` (where `n`
+and `d` are integers such that `p = n/d`):
 
 ```python
 from zarpy import build_coin, flip
@@ -54,13 +54,13 @@ integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
 x = rand() % n # Assign x random value from [0,n)
 ```
 
-but this method suffers from modulo biasq when `n` is not a power of
-2, causing some values to occur with higher probability than others
-(see, e.g., [this
+but this method suffers from modulo bias when `n` is not a power of 2,
+causing some values to occur with higher probability than others (see,
+e.g., [this
 article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
-for more information on modulo bias). This package provides a uniform
-sampler that is guaranteed for any integer `0 < n` to generate samples
-from `[0,n)` with probability `1/n` of each:
+for more information on modulo bias). Zarpy provides a uniform sampler
+that is guaranteed for any integer `0 < n` to generate samples from
+`[0,n)` with probability `1/n` of each:
 
 ```python
 from zarpy import build_die, roll
@@ -72,9 +72,9 @@ Although the python function `random.randint` is ostensibly free from
 modulo bias, our implementation provides a *formal proof of
 correctness*.
 
-The samplers provided by this package have been implemented and
-verified in Coq and extracted to OCaml and bundled into Python package
-via pythonlib. Validity of the correctness proofs is thus dependent on
+The samplers provided by Zarpy have been implemented and verified in
+Coq and extracted to OCaml and bundled into Python package via
+pythonlib. Validity of the correctness proofs is thus dependent on
 correctness of Coq's extraction mechanism, a small amount of OCaml
 shim code (viewable
 [here](https://github.com/bagnalla/zar/blob/main/python/zar/ocaml/zarpy.ml)),
