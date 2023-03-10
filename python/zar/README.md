@@ -24,10 +24,10 @@ else:
 
 where `p` is a float in the range `[0,1]` and `random()` produces a
 random float in the range `[0,1)`. While good enough for many
-applications, this approach is technically not always correct due to
-float roundoff error. I.e., `a1` can only be expected to execute with
-probability `p + ϵ` for some small error term ϵ, invalidating any
-correctness guarantees of your overall system that depend on the
+applications, this approach is not always correct due to float
+roundoff error. We can only expect `a1` to execute with probability `p
++ ϵ` for some small error term ϵ, technically invalidating any
+correctness guarantees of our overall system that depend on the
 correctness of its probabilistic choices.
 
 This package provides an alternative that is guaranteed (by formal
