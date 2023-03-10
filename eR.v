@@ -2425,3 +2425,12 @@ Proof.
     rewrite eRinv_l; auto.
     rewrite eRmult_comm; eRauto.
 Qed.
+
+Lemma sum_positive (l : list eR) :
+  List.Exists (fun x => 0 < x) l ->
+  0 < sum l.
+Proof.
+  induction l; intro Hex; inv Hex; simpl.
+  - apply eRlt_0_plus_l; auto.
+  - apply eRlt_0_plus_r; auto.
+Qed.
