@@ -166,20 +166,20 @@ End itree_cotree_eq.
   Hint Resolve itree_cotree_eq__mono : paco.
 
 (** Translating CF trees to itrees. *)
-Fixpoint to_itree_open (t : tree) : itree boolE (unit + St) :=
+Fixpoint to_itree_open {A} (t : tree A) : itree boolE (unit + A) :=
   match t with
   | Leaf x => ret (inr x)
-  | Fail => ret (inl tt)
+  | Fail _ => ret (inl tt)
   | Choice _ k => Vis GetBool (to_itree_open ∘ k)
   | Fix st G g k =>
       ITree.iter (fun s => if G s then
-                             y <- to_itree_open (g s) ;;
-                             match y with
-                             | inl tt => ret (inr (inl tt))
-                             | inr s' => ret (inl s')
-                             end
-                           else
-                             ITree.map inr (to_itree_open (k s))) st
+                          y <- to_itree_open (g s) ;;
+                          match y with
+                          | inl tt => ret (inr (inl tt))
+                          | inr s' => ret (inl s')
+                          end
+                        else
+                          ITree.map inr (to_itree_open (k s))) st
   end.
 
 (* (** Should be equivalent to the above. *) *)
@@ -207,7 +207,7 @@ Definition tie_itree {A : Type} {E : Type -> Type} (t : itree E (unit + A))
   : itree E A :=
   ITree.iter (const t) tt.
 
-Definition to_itree : tree -> itree boolE St :=
+Definition to_itree {A} : tree A -> itree boolE A :=
   tie_itree ∘ to_itree_open.
 
 (* Had to generalize a bit to an arbitrary relation R in order to use
@@ -305,7 +305,7 @@ Proof.
     constructor; intro b; specialize (H3 b); dupaco; right; apply CH; auto.
 Qed.
 
-Lemma to_itree_open_to_cotree_open (t : tree) :
+Lemma to_itree_open_to_cotree_open {A} (t : tree A) :
   itree_cotree_eq (to_itree_open t) (to_cotree_open t).
 Proof.
   induction t; simpl.
@@ -319,7 +319,7 @@ Proof.
     + apply itree_cotree_eq_map; eauto.
 Qed.
 
-Theorem to_itree_to_cotree (t : tree) :
+Theorem to_itree_to_cotree {A} (t : tree A) :
   itree_cotree_eq (to_itree t) (to_cotree t).
 Proof.
   unfold to_itree, to_cotree, compose, tie_itree, tie_cotree.
@@ -393,7 +393,7 @@ Proof.
   erewrite itree_cotree_icotree_eq; eauto; reflexivity.
 Qed.
 
-Definition cpGCL_to_tree (c : cpGCL) : St -> tree :=
+Definition cpGCL_to_tree (c : cpGCL) : St -> tree St :=
   opt ∘ debias ∘ elim_choices ∘ compile c.
 
 Definition cpGCL_to_itree_open (c : cpGCL) : St -> itree boolE (unit + St) :=
@@ -418,7 +418,7 @@ Proof.
   rewrite cwp_tcwp; auto.
 Qed.
 
-Lemma tcwp_itwp t f :
+Lemma tcwp_itwp {A} (t : tree A) f :
   wf_tree t ->
   tree_unbiased t ->
   0 < twlp t (const 1) ->
@@ -441,7 +441,7 @@ Proof.
     symmetry; apply eRplus_eq_minus.
     { eRauto. }
     replace false with (negb true) by reflexivity.
-    replace (const 1) with (fun s => 1 - @const eR St 0 s).
+    replace (@const eR A 1) with (fun s => 1 - @const eR A 0 s).
     2: { ext s; eRauto. }
     eapply twp_twlp_sum; auto.
     intro; eRauto.

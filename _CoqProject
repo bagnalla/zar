@@ -13,6 +13,7 @@ cwp.v
 cwp_tcwp.v
 debias.v
 eR.v
+findist.v
 gaussian.v
 geometric_series.v
 equidistribution.v

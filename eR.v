@@ -2434,3 +2434,51 @@ Proof.
   - apply eRlt_0_plus_l; auto.
   - apply eRlt_0_plus_r; auto.
 Qed.
+
+Lemma INeR_Qnum_Qden_Q2R p :
+  Qred p = p ->
+  (0 <= p)%Q ->
+  INeR (Z.to_nat (Qnum p)) / INeR (Pos.to_nat (Qden p)) = Q2eR p.
+Proof.
+  intros Hp Hle.
+  unfold Q2eR, eRdiv, INeR, eRmult, eRinv. simpl.
+  destruct (R.R_eq_dec (INR (Pos.to_nat (Qden p))) 0).
+  { exfalso.
+    assert (0 < INR (Pos.to_nat (Qden p)))%R.
+    { replace 0%R with (INR 0) by reflexivity.
+      apply lt_INR, Pos2Nat.is_pos. }
+    lra. }
+  apply eR_eq; unfold Q2R; f_equal.
+  - rewrite INR_IZR_INZ.
+    rewrite Z2Nat.id.
+    + repeat f_equal.
+      unfold Qminmax.Qmax, GenericMinMax.gmax.
+      destruct (0 ?= p) eqn:Hp0; auto.
+      * apply Qeq_alt in Hp0.
+        rewrite <- Hp.
+        replace 0%Q with (Qred 0%Q) by reflexivity.
+        apply Qred_complete; symmetry; auto.
+      * apply Qgt_alt in Hp0.
+        exfalso; eapply Qlt_not_le; eauto.
+    + apply Qnum_nonnegative; auto.
+  - f_equal.
+    rewrite INR_IZR_INZ.
+    rewrite positive_nat_Z.
+    repeat f_equal.
+    unfold Qminmax.Qmax, GenericMinMax.gmax.
+    destruct (0 ?= p) eqn:Hp0; auto.
+    + apply Qeq_alt in Hp0.
+      rewrite <- Hp.
+      replace 0%Q with (Qred 0%Q) by reflexivity.
+      apply Qred_complete; symmetry; auto.
+    + apply Qgt_alt in Hp0.
+      exfalso; eapply Qlt_not_le; eauto.
+Qed.
+
+Lemma sum_eq_0 l : 
+  Forall (eq 0) l ->
+  sum l = 0.
+Proof.
+  induction 1; simpl; auto.
+  rewrite IHForall; subst; eRauto.
+Qed.

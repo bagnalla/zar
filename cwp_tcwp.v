@@ -37,7 +37,7 @@ Proof.
   - simpl; destruct (b st); auto.
   - simpl; rewrite 2!H; auto.
   - rewrite compile_uniform, twp__tree_bind, no_fail'_twp; simpl.
-    2: { constructor; intro s; try constructor; apply no_fail_btree_to_tree. }
+    2: { constructor; intros []; try constructor; apply no_fail_btree_to_tree. }
     set (g := fun n => twp_ fl (compile (c n) st) f).
     replace (fun s : St => twp_ fl (compile (c (as_nat (s ϵ))) st) f)
       with (fun s => g (as_nat (s ϵ))).
@@ -82,7 +82,7 @@ Proof.
     rewrite twlp__tree_bind.
     rewrite <- uniform_tree_twp_twlp; eauto.
     + rewrite no_fail'_twp.
-      2: { constructor; intro s; try constructor; apply no_fail_btree_to_tree. }
+      2: { constructor; intros []; try constructor; apply no_fail_btree_to_tree. }
       set (g := fun n => twlp_ fl (compile (c n) st) f).
       replace (fun s : St => twlp_ fl (compile (c (as_nat (s ϵ))) st) f)
         with (fun s => g (as_nat (s ϵ))).

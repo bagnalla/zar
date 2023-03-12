@@ -406,3 +406,99 @@ Qed.
 Lemma eqb_refl {A} `{EqType A} (a : A) :
   eqb a a = true.
 Proof. destruct (eqb_spec a a); subst; congruence. Qed.
+
+Definition is_inl {A B} (x : A + B) : bool :=
+  match x with
+  | inl _ => true
+  | inr _ => false
+  end.
+
+Definition is_inr {A B} (x : A + B) : bool :=
+  match x with
+  | inl _ => false
+  | inr _ => true
+  end.
+
+Lemma countb_list_or {A} (P Q : A -> bool) (l : list A) :
+  (forall x, P x = true -> Q x = false) ->
+  countb_list (fun x => P x || Q x) l = (countb_list P l + countb_list Q l)%nat.
+Proof.
+  induction l; simpl; intro H; auto.
+  rewrite IHl; auto.
+  destruct (P a) eqn:HP, (Q a) eqn:HQ; auto.
+  apply H in HP; congruence.
+Qed.
+
+Lemma not_in_countb_list_S n l :
+  ~ In n l ->
+  countb_list (fun i : nat => i <? S n) l =
+    countb_list (fun i : nat => i <? n) l.
+Proof.
+  intro Hnotin.
+  replace (fun i : nat => i <? S n) with
+    (fun i => Nat.ltb i n || Nat.eqb n i).
+  { rewrite countb_list_or.
+    - rewrite not_in_countb_list; auto; lia.
+    - intros m H; simpl.
+      destruct (Nat.ltb_spec m n); try congruence.
+      destruct (Nat.eqb_spec n m); subst; try lia. }
+  ext i; simpl.
+  destruct (Nat.ltb_spec i n); simpl.
+  - destruct (Nat.ltb_spec i (S n)); simpl; auto; lia.
+  - destruct (Nat.eqb_spec n i); subst.
+    + destruct (Nat.ltb_spec i (S i)); lia.
+    + destruct (Nat.ltb_spec i (S n)); lia.
+Qed.
+
+Lemma in_rev_range_lt n i :
+  In i (rev_range n) ->
+  (i < n)%nat.
+Proof.
+  revert i; induction n; simpl; intros i Hi; try contradiction.
+  destruct Hi as [?|Hi]; subst; try lia.
+  apply IHn in Hi; lia.
+Qed.
+
+Corollary in_rev_range_n n :
+  ~ In n (rev_range n).
+Proof. intro HC; apply in_rev_range_lt in HC; lia. Qed.
+
+Lemma countb_list_rev_range n d :
+  (n < d)%nat ->
+  countb_list (Nat.eqb n) (rev_range d) = S O.
+Proof.
+  revert n; induction d; intros n Hle; simpl; try lia.
+  destruct (Nat.eqb_spec n d); subst.
+  - rewrite not_in_countb_list; try lia.
+    apply in_rev_range_n.
+  - apply IHd; lia.
+Qed.
+
+Lemma countb_list_rev_range_lt n d :
+  (n <= d)%nat ->
+  countb_list (fun i : nat => i <? n) (rev_range d) = n.
+Proof.
+  revert n; induction d; intros n Hle; simpl; try lia.
+  destruct (Nat.eqb_spec n (S d)); subst.
+  - specialize (IHd d (Nat.le_refl d)).
+    rewrite not_in_countb_list_S.
+    + rewrite IHd.
+      destruct (Nat.ltb_spec d (S d)); lia.
+    + rewrite rev_range_spec.
+      intro HC.
+      apply in_rev in HC.
+      apply in_range in HC. lia.
+  - destruct (Nat.ltb_spec d n); try lia.
+    rewrite IHd; lia.
+Qed.
+
+Lemma countb_list_range_lt (i n : nat) :
+  (i < n)%nat ->
+  countb_list (Nat.eqb i) (range n) = 1%nat.
+Proof.
+  revert i n; induction n; intro j; simpl; try lia.
+  rewrite countb_list_app; simpl.
+  destruct (Nat.eqb_spec i n); subst; try lia.
+  rewrite not_in_countb_list; try lia.
+  intro HC; apply in_range in HC; lia.
+Qed.

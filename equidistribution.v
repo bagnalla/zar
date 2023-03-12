@@ -264,8 +264,8 @@ Section itree_equidistribution.
   Qed.
 End itree_equidistribution.
 
-Lemma itree_cotree_eq_iproduces_produces (P : St -> Prop)
-  (it : itree boolE St) (ct : cotree bool St) (bs : Stream bool) :
+Lemma itree_cotree_eq_iproduces_produces {A} (P : A -> Prop)
+  (it : itree boolE A) (ct : cotree bool A) (bs : Stream bool) :
   itree_cotree_eq it ct ->
   iproduces P bs it ->
   produces P bs ct.
@@ -455,7 +455,7 @@ Proof.
     + apply eRlt_0_plus_l; auto.
 Qed.
 
-Lemma produces_to_cotree_0_lt_cowlp (P : St -> Prop) (bs : Stream bool) (t : tree) :
+Lemma produces_to_cotree_0_lt_cowlp {A} (P : A -> Prop) (bs : Stream bool) (t : tree A) :
   produces P bs (to_cotree t) ->
   0 < cowlp (const 1) (to_cotree_open t).
 Proof.
@@ -466,10 +466,10 @@ Qed.
 
 (** CF tree equidistribution theorem. *)
 Section tree_equidistribution.
-  Context (env : SamplingEnvironment) (t : tree) (P : St -> bool).
+  Context (A : Type) (env : SamplingEnvironment) (t : tree A) (P : A -> bool).
   Hypothesis unbiased_t : tree_unbiased t.
 
-  Variable samples : nat -> St.
+  Variable samples : nat -> A.
   Hypothesis bitstreams_samples :
     forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (to_itree t).
 
