@@ -35,31 +35,36 @@ Definition expectation {A} : Type := A -> eR.
 (** [f] is a bounded expectation (bounded above by constant [b]). *)
 Definition bounded {A : Type} (f : A -> eR) (b : eR) := forall x, f x <= b.
 
-Fixpoint loop_approx
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) (n : nat) : St -> eR :=
+Fixpoint loop_approx {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) (n : nat) : A -> eR :=
   match n with
   | O => fun st => 0
   | S n' => fun st => if e st then g (loop_approx e g f n') st else f st
   end.
 
-Fixpoint dec_loop_approx
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) (n : nat) : St -> eR :=
+Fixpoint dec_loop_approx {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) (n : nat) : A -> eR :=
   match n with
   | O => fun st => 1
   | S n' => fun st => if e st then g (dec_loop_approx e g f n') st else f st
   end.
 
+(* (* The continuous loop automorphism. *) *)
+(* Definition loop_F {A} (e : St -> bool) (g : (St -> A) -> St -> A) (f : St -> A) *)
+(*   : (St -> A) -> St -> A := *)
+(*   fun k s => if e s then g k s else f s. *)
+
 (* The continuous loop automorphism. *)
-Definition loop_F {A} (e : St -> bool) (g : (St -> A) -> St -> A) (f : St -> A)
-  : (St -> A) -> St -> A :=
+Definition loop_F {A B} (e : A -> bool) (g : (A -> B) -> A -> B) (f : A -> B)
+  : (A -> B) -> A -> B :=
   fun k s => if e s then g k s else f s.
 
-Definition loop_approx'
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) (n : nat) : St -> eR :=
+Definition loop_approx' {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) (n : nat) : A -> eR :=
   iter_n (loop_F e g f) (const 0) n.
 
-Definition loop_approx''
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) (n : nat) : St -> eR :=
+Definition loop_approx'' {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) (n : nat) : A -> eR :=
   iter_n (loop_F e g f) (fun s => if e s then 0 else f s) n.
 
 Definition dec_loop_approx'
@@ -76,7 +81,7 @@ Proof.
 Qed.
 #[global] Hint Resolve monotone_loop_F : cwp.
 
-Lemma monotone_loop_F' {A} `{OType A} e F f f' g g' :
+Lemma monotone_loop_F' {A B} `{OType A} (e : B -> bool) F f f' g g' :
   monotone F ->
   f ⊑ f' ->
   g ⊑ g' ->
@@ -89,8 +94,8 @@ Proof.
   - apply Hf.
 Qed.
 
-Lemma loop_approx_loop_approx'
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) :
+Lemma loop_approx_loop_approx' {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) :
   loop_approx e g f = loop_approx' e g f.
 Proof.
   unfold loop_approx', loop_F.
@@ -109,8 +114,8 @@ Proof.
   rewrite IHn; auto.
 Qed.
 
-Corollary loop_approx_iter_n_loop_F
-  (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) :
+Corollary loop_approx_iter_n_loop_F {A}
+  (e : A -> bool) (g : (A -> eR) -> A -> eR) (f : A -> eR) :
   loop_approx e g f = iter_n (loop_F e g f) (const 0).
 Proof. apply loop_approx_loop_approx'. Qed.
 
@@ -441,7 +446,7 @@ Proof.
   apply apply_infimum, Hg; auto.
 Qed.
 
-Lemma loop_approx_monotone e g :
+Lemma loop_approx_monotone {A} (e : A -> bool) g :
   monotone g ->
   monotone (loop_approx e g).
 Proof.
@@ -452,7 +457,7 @@ Proof.
   - destr; eRauto; apply Hg; auto.
 Qed.
 
-Lemma dec_loop_approx_monotone e g :
+Lemma dec_loop_approx_monotone {A} (e : A -> bool) g :
   monotone g ->
   monotone (dec_loop_approx e g).
 Proof.
@@ -463,7 +468,7 @@ Proof.
   - destr; eRauto; apply Hg; auto.
 Qed.
 
-Lemma loop_approx_continuous e g i s ch :
+Lemma loop_approx_continuous {A} (e : A -> bool) g i s ch :
   chain ch ->
   monotone g ->
   (forall ch s, chain ch -> g (sup ch) s = sup (fun i => g (ch i) s)) ->
@@ -484,7 +489,7 @@ Proof.
     + apply sup_apply_eR.
 Qed.
 
-Lemma dec_loop_approx_continuous e g i s ch :
+Lemma dec_loop_approx_continuous {A} (e : A -> bool) g i s ch :
   dec_chain ch ->
   monotone g ->
   (forall ch s, dec_chain ch -> g (inf ch) s = inf (fun i => g (ch i) s)) ->

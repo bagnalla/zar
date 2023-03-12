@@ -18,10 +18,10 @@ Local Open Scope eR_scope.
 
 Create HintDb twp.
 
-Fixpoint twp_ (fl : bool) (t : tree) (f : St -> eR) : eR :=
+Fixpoint twp_ {A} (fl : bool) (t : tree A) (f : A -> eR) : eR :=
   match t with
   | Leaf x => f x
-  | Fail => if fl then 1 else 0
+  | Fail _ => if fl then 1 else 0
   | Choice q k =>
       Q2eR q * twp_ fl (k true) f + (1 - Q2eR q) * twp_ fl (k false) f
   | Fix st G g k =>
@@ -30,14 +30,14 @@ Fixpoint twp_ (fl : bool) (t : tree) (f : St -> eR) : eR :=
       iter (loop_F G twp_g (twp_k f)) (const 0) st
   end.
 
-Definition twp : tree -> (St -> eR) -> eR := twp_ false.
-Definition twpfail : tree -> (St -> eR) -> eR := twp_ true.
-Definition tfail (t : tree) : eR := twpfail t (const 0).
+Definition twp {A} : tree A -> (A -> eR) -> eR := twp_ false.
+Definition twpfail {A} : tree A -> (A -> eR) -> eR := twp_ true.
+Definition tfail {A} (t : tree A) : eR := twpfail t (const 0).
 
-Fixpoint twlp_ (fl : bool) (t : tree) (f : St -> eR) : eR :=
+Fixpoint twlp_ {A} (fl : bool) (t : tree A) (f : A -> eR) : eR :=
   match t with
   | Leaf x => f x
-  | Fail => if fl then 1 else 0
+  | Fail _ => if fl then 1 else 0
   | Choice q k =>
       Q2eR q * twlp_ fl (k true) f + (1 - Q2eR q) * twlp_ fl (k false) f
   | Fix st G g k =>
@@ -46,9 +46,9 @@ Fixpoint twlp_ (fl : bool) (t : tree) (f : St -> eR) : eR :=
       dec_iter (loop_F G twlp_g (twlp_k f)) (const 1) st
   end.
 
-Definition twlp : tree -> (St -> eR) -> eR := twlp_ false.
-Definition twlpfail : tree -> (St -> eR) -> eR := twlp_ true.
-Definition tfail_or_diverge (t : tree) : eR := twlpfail t (const 0).
+Definition twlp {A} : tree A -> (A -> eR) -> eR := twlp_ false.
+Definition twlpfail {A} : tree A -> (A -> eR) -> eR := twlp_ true.
+Definition tfail_or_diverge {A} (t : tree A) : eR := twlpfail t (const 0).
 
-Definition tcwp (t : tree) (f : St -> eR) : eR :=
+Definition tcwp {A} (t : tree A) (f : A -> eR) : eR :=
   twp t f / twlp t (const 1).

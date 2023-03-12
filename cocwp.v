@@ -22,9 +22,9 @@ From zar Require Import
 
 Create HintDb cocwp.
 
-Definition cotree_loop_F {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
-  (f : A -> cotree bool (unit + A))
-  : (A -> cotree bool (unit + A)) -> A -> cotree bool (unit + A) :=
+Definition cotree_loop_F {A B} (e : A -> bool) (g : A -> cotree bool (unit + A))
+  (f : A -> cotree bool (unit + B))
+  : (A -> cotree bool (unit + B)) -> A -> cotree bool (unit + B) :=
   fun k x => if e x then
             cotree_bind (g x) (fun y => match y with
                                      | inl _ => coleaf (inl tt)
@@ -34,15 +34,15 @@ Definition cotree_loop_F {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
             f x.
 
 (** Used for building cotrees corresponding to fix nodes in CF trees. *)
-Definition cotree_loop_approx {A} (x : A) (e : A -> bool)
+Definition cotree_loop_approx {A B} (x : A) (e : A -> bool)
   (g : A -> cotree bool (unit + A))
-  (f : A -> cotree bool (unit + A)) (n : nat)
-  : cotree bool (unit + A) :=
+  (f : A -> cotree bool (unit + B)) (n : nat)
+  : cotree bool (unit + B) :=
   iter_n (cotree_loop_F e g f) (const cobot) n x.
 
 (** Designed to match the itree construction. *)
-Definition cotree_loop {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
-  (f : A -> cotree bool (unit + A)) (x : A) : cotree bool (unit + A) :=
+Definition cotree_loop {A B} (e : A -> bool) (g : A -> cotree bool (unit + A))
+  (f : A -> cotree bool (unit + B)) (x : A) : cotree bool (unit + B) :=
   cotree_iter (fun y => if e y then
                        cotree_bind (g y) (fun lr => match lr with
                                                  | inl _ => coleaf (inr (inl tt))
@@ -51,10 +51,10 @@ Definition cotree_loop {A} (e : A -> bool) (g : A -> cotree bool (unit + A))
                      else cotree_map inr (f y)) x.
 
 (** Old version (most proofs below are wrt this one). *)
-Fixpoint to_cotree'' (t : tree) : cotree bool (unit + St) :=
+Fixpoint to_cotree'' {A} (t : tree A) : cotree bool (unit + A) :=
   match t with
   | Leaf s => coleaf (inr s)
-  | Fail => coleaf (inl tt)
+  | Fail _ => coleaf (inl tt)
   | Choice _ k => conode (to_cotree'' ∘ k)
   | Fix st G g k => sup (cotree_loop_approx st G (to_cotree'' ∘ g) (to_cotree'' ∘ k))
   end.
@@ -62,10 +62,10 @@ Fixpoint to_cotree'' (t : tree) : cotree bool (unit + St) :=
 (** cotree_iter version (matches itree construction exactly. Would
     prefer to only use this version but the above one was defined
     first. Could probably remove it and fix the proofs fairly easily. *)
-Fixpoint to_cotree_open (t : tree) : cotree bool (unit + St) :=
+Fixpoint to_cotree_open {A} (t : tree A) : cotree bool (unit + A) :=
   match t with
   | Leaf s => coleaf (inr s)
-  | Fail => coleaf (inl tt)
+  | Fail _ => coleaf (inl tt)
   | Choice _ k => conode (to_cotree_open ∘ k)
   | Fix st G g k => cotree_loop G (to_cotree_open ∘ g) (to_cotree_open ∘ k) st
   end.
@@ -98,7 +98,7 @@ Definition iid_F' {A} (a : cotree bool (unit + A)) : cotree bool A -> cotree boo
 Definition tie_cotree_iid {A} (t : cotree bool (unit + A)) : cotree bool A :=
   iter (iid_F t) cobot.
 
-Definition to_cotree : tree -> cotree bool St := tie_cotree ∘ to_cotree_open.
+Definition to_cotree {A} : tree A -> cotree bool A := tie_cotree ∘ to_cotree_open.
 
 (** iid_chain_
     a0 = coleaf (inl tt)

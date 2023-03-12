@@ -81,12 +81,14 @@ and the pythonlib library.
 The coin and die samplers are implemented as probabilistic programs in
 the [Zar](https://github.com/bagnalla/zar) system and compiled to
 [interaction trees](https://github.com/DeepSpec/InteractionTrees)
-implementing the samplers via fair coin-flipping schemes. See Section
-3 of the [paper](https://arxiv.org/abs/2211.06747) for details and the
-file [zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for
-their implementations and proofs of correctness.
+implementing them via reduction to sequences of fair coin flips. See
+Section 3 of the [paper](https://arxiv.org/abs/2211.06747) for details
+and the file
+[zarpy.v](https://github.com/bagnalla/zar/blob/main/zarpy.v) for their
+implementations and proofs of correctness.
 
 Correctness is two-fold. For biased coin with bias `p`, we prove:
+
 *
   [coin_itree_correct](https://github.com/bagnalla/zar/blob/main/zarpy.v#L57):
   the probability of producing `true` according to the formal probabilistic

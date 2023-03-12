@@ -13,17 +13,17 @@ Import ITreeNotations.
 Local Open Scope itree_scope.
 
 From zar Require Import
-  compile cotree cocwp cpo cwp equidistribution eR misc itree order tactics tree.
+  compile cotree cocwp cpo cwp equidistribution eR findist itree misc
+  order tactics tree.
 
 Record Samplers : Type :=
   mkSamplers 
     { coin_sampler : Q -> itree boolE bool
-    ; die_sampler : nat -> itree boolE nat }.
+    ; die_sampler : nat -> itree boolE nat
+    ; findist_sampler : list nat -> itree boolE nat }.
 
-From zar Require Import cpGCL.
+From zar Require Import cpGCL prelude.
 Local Open Scope cpGCL_scope.
-
-Require Import prelude.
 
 (** Biased coin. *)
 
@@ -90,6 +90,8 @@ Lemma wf_die (out : string) (n : nat) :
   (0 < n)%nat ->
   wf_cpGCL (die out n).
 Proof. intro Hlt; repeat constructor; auto. Qed.
+
+From zar Require Import tcwp cwp_tcwp uniform.
 
 (** The probability of assigning any m < n to the output variable is
     equal to 1/n. *)
@@ -167,7 +169,8 @@ Section die_equidistribution.
   Qed.
 End die_equidistribution.
 
-Corollary die_eq_n_converges (env : SamplingEnvironment) (samples : nat -> nat) (n m : nat) :
+Corollary die_eq_n_converges
+  (env : SamplingEnvironment) (samples : nat -> nat) (n m : nat) :
   (forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (die_itree n)) ->
   (m < n)%nat ->
   converges (freq (is_true ∘ eqb m) ∘ prefix samples)
@@ -177,13 +180,20 @@ Proof.
   eapply die_samples_equidistributed; eauto.
 Qed.
 
+(** Finite distributions *)
+
+
+
 (** Extraction. *)
 
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 
 Definition coin_die_samplers : Samplers :=
   mkSamplers
-    (fun p => ITree.map (fun s => as_bool (s "b")) (cpGCL_to_itree (coin "b" p) empty))
-    (fun n => ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty)).
+    (fun p => ITree.map (fun s => as_bool (s "b"))
+             (cpGCL_to_itree (coin "b" p) empty))
+    (fun n => ITree.map (fun s => as_nat (s "n"))
+             (cpGCL_to_itree (die "n" n) empty))
+    findist_itree.
 
 Extraction "extract/zarpy/samplers.ml" coin_die_samplers.

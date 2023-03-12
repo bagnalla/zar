@@ -8,6 +8,7 @@ From Coq Require Import
   Lra
   Equivalence
   Reals
+  List
 .
 
 Local Open Scope equiv_scope.
@@ -34,9 +35,9 @@ From zar Require Import
 Local Open Scope eR_scope.
 Local Open Scope order_scope.
 
-Lemma chain_cotree_loop_approx {A} (x : A) (e : A -> bool)
+Lemma chain_cotree_loop_approx {A B} (x : A) (e : A -> bool)
   (g : A -> cotree bool (unit + A))
-  (f : A -> cotree bool (unit + A)) :
+  (f : A -> cotree bool (unit + B)) :
   chain (cotree_loop_approx x e g f).
 Proof.
   unfold cotree_loop_approx, cotree_loop_F.
@@ -49,12 +50,13 @@ Proof.
 Qed.
 
 (** Example of Proper_co followed by induction on atree. *)
-Lemma cotree_bind_map_sum t g :
+Lemma cotree_bind_map_sum {A B}
+  (t : cotree bool (unit + A)) (g : B -> cotree bool (unit + A)) :
   cotree_bind (cotree_map inr t)
-    (fun lr : St + (unit + St) => match lr with
-                               | inl j => cotau (g j)
-                               | inr x => coleaf x
-                               end) = t.
+    (fun lr : B + (unit + A) => match lr with
+                             | inl j => cotau (g j)
+                             | inr x => coleaf x
+                             end) = t.
 Proof.
   apply cotree_ext, equ_cotree_eq.
   replace t with (co inj t) by apply co_inj_t.
@@ -79,7 +81,7 @@ Proof.
     apply cotree_eq_equ; constructor; intro b; apply equ_cotree_eq, H.
 Qed.
 
-Lemma to_cotree_open_to_cotree'' (t : tree) :
+Lemma to_cotree_open_to_cotree'' {A} (t : tree A) :
   to_cotree_open t = to_cotree'' t.
 Proof.
   induction t; simpl; auto.
@@ -90,10 +92,10 @@ Proof.
     2: { apply chain_directed, chain_iter_n'.
          - unfold cotree_loop_F; intro st; destruct (b st); constructor.
          - apply monotone_cotree_iter_F. }
-    apply eq_equ; f_equal; ext i.
+    apply eq_equ; f_equal; ext j.
     unfold cotree_loop_approx.
     apply cotree_ext, equ_cotree_eq.
-    revert s.
+    revert i.
     apply equ_arrow.
     apply iter_n_eq.
     + intros f g Hfg.
@@ -423,7 +425,7 @@ Proof.
 Qed.
 
 (** twp_ coincides with cotwp. *)
-Theorem twp_cotwp (fl : bool) (t : tree) (f : St -> eR) :
+Theorem twp_cotwp {A} (fl : bool) (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   twp_ fl t f = cotwp (cotuple (const (if fl then 1 else 0)) f) (to_cotree'' t).
 Proof.
@@ -436,29 +438,30 @@ Proof.
     rewrite cotwp_node, <- eRplus_combine_fract, eRplus_comm; f_equal.
     + rewrite eRminus_1_2; apply eRmult_half_div_2.
     + apply eRmult_half_div_2.
-  - unfold iter; rewrite sup_apply_eR; apply equ_eR.
+  - existT_inv.
+    unfold iter; rewrite sup_apply_eR; apply equ_eR.
     apply equ_eR; rewrite continuous_sup_eR.
     2: { apply chain_directed, chain_cotree_loop_approx. }
     2: { apply continuous_cotwp. }
-    f_equal; ext i.
+    f_equal; ext j.
     unfold compose, cotree_loop_approx, loop_F, cotree_loop_F.
-    revert s; induction i; intro s; simpl.
+    revert i; induction j; intro s; simpl.
     + unfold const; rewrite cotwp_bot; reflexivity.
     + destruct (b s); auto.
       rewrite cotwp_bind, H; auto.
       f_equal; ext s'; destruct s'.
       * simpl; unfold compose; rewrite cotwp_leaf; reflexivity.
       * unfold compose; simpl.
-        rewrite IHi, cotwp_tau; auto.
+        rewrite IHj, cotwp_tau; auto.
 Qed.
 
-Corollary twp_cowp (t : tree) (f : St -> eR) :
+Corollary twp_cowp {A} (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   twp t f = cowp f (to_cotree_open t).
 Proof. rewrite to_cotree_open_to_cotree''; apply twp_cotwp. Qed.
 
 (** twlp coincides with cowlp. *)
-Theorem twlp_cotwlp (fl : bool) (t : tree) (f : St -> eR) :
+Theorem twlp_cotwlp {A} (fl : bool) (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   bounded f 1 ->
   twlp_ fl t f = cotwlp (cotuple (const (if fl then 1 else 0)) f) (to_cotree'' t).
@@ -479,9 +482,10 @@ Proof.
     apply equ_eR; rewrite cocontinuous_sup_eR.
     2: { apply chain_directed, chain_cotree_loop_approx. }
     2: { apply cocontinuous_cotwlp; intros []; destruct fl; eRauto. }
-    f_equal; ext i.
+    f_equal; ext j.
     unfold compose, cotree_loop_approx, loop_F, cotree_loop_F.
-    revert s; induction i; intro s; simpl.
+    existT_inv.
+    revert i; induction j; intro s; simpl.
     + unfold const; rewrite cotwlp_bot; reflexivity.
     + destruct (b s); auto.
       rewrite cotwlp_bind, H; auto.
@@ -489,7 +493,7 @@ Proof.
       * simpl; unfold compose; rewrite cotwlp_leaf; auto.
         intros []; destruct fl; eRauto.
       * unfold compose; simpl.
-        rewrite IHi, cotwlp_tau; auto.
+        rewrite IHj, cotwlp_tau; auto.
         intros []; destruct fl; eRauto.
       * intro st.
         apply leq_eRle.
@@ -501,14 +505,14 @@ Proof.
       * intros []; destruct fl; eRauto.
 Qed.
 
-Corollary twlp_cowlp (t : tree) (f : St -> eR) :
+Corollary twlp_cowlp {A} (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   bounded f 1 ->
   twlp t f = cowlp f (to_cotree_open t).
 Proof. intros; rewrite to_cotree_open_to_cotree''; apply twlp_cotwlp; auto. Qed.
 
 (** tcwp coincides with cocwp. *)
-Theorem tcwp_cotcwp (t : tree) (f : St -> eR) :
+Theorem tcwp_cotcwp {A} (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   tcwp t f = cocwp f (to_cotree_open t).
 Proof.
@@ -996,7 +1000,7 @@ Proof.
   intros [[]|s]; simpl; eRauto.
 Qed.
 
-Theorem cotwp_tie_cotree_to_cotree_open_tcwp (t : tree) (f : St -> eR) :
+Theorem cotwp_tie_cotree_to_cotree_open_tcwp {A} (t : tree A) (f : A -> eR) :
   tree_unbiased t ->
   tfail t < 1 ->
   cotwp f (tie_cotree (to_cotree_open t)) = tcwp t f.
