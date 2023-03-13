@@ -245,22 +245,6 @@ Proof. intro Hs; wf; apply wf_gaussian; auto. Qed.
 
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 
-(* Definition sampler : itree boolE bool := *)
-(*   ITree.map (fun s => as_bool (s "")) (cpGCL_to_itree (bernoulli_exponential "" (9#10)) empty). *)
-(* Extraction "extract/exponential/exponential.ml" sampler. *)
-
-(* Definition sampler (s t : nat) : itree boolE Z := *)
-(*   ITree.map (fun s => as_int (s "")) (cpGCL_to_itree (laplace "" s t) empty). *)
-(* Extraction "extract/laplace/laplace.ml" sampler. *)
-
-Definition sampler (mu : Z) (sigma : Q) : itree boolE Z :=
-  ITree.map (fun s => as_int (s "")) (cpGCL_to_itree (gauss "" mu sigma) empty).
-Extraction "extract/gaussian/sampler.ml" sampler.
-
-(* Definition sampler (gamma : Q) : itree boolE bool := *)
-(*   ITree.map (fun s => as_bool (s "")) (cpGCL_to_itree (bernoulli_exponential "" (const gamma)) empty). *)
-(* Extraction "extract/bernoulli_exponential/sampler.ml" sampler. *)
-
-(* Definition sampler (s t : nat) : itree boolE Z := *)
-(*   ITree.map (fun s => as_int (s "")) (cpGCL_to_itree (laplace "" s t) empty). *)
-(* Extraction "extract/laplace/sampler.ml" sampler. *)
+(* Definition sampler (mu : Z) (sigma : Q) : itree boolE Z := *)
+(*   ITree.map (fun s => as_int (s "")) (cpGCL_to_itree (gauss "" mu sigma) empty). *)
+(* Extraction "extract/gaussian/sampler.ml" sampler. *)

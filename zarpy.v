@@ -3,7 +3,7 @@
 Set Implicit Arguments.
 Set Contextual Implicit.
 
-From Coq Require Import Streams Basics QArith String Lia Lqa.
+From Coq Require Import Streams Basics QArith String Lia Lqa List.
 Local Open Scope program_scope.
 Local Open Scope string_scope.
 
@@ -97,7 +97,7 @@ From zar Require Import tcwp cwp_tcwp uniform.
     equal to 1/n. *)
 Lemma die_correct (out : string) (n m : nat) :
   (m < n)%nat ->
-  cwp (die out n) (fun s => if Nat.eqb (as_nat (s out)) m then 1 else 0) empty =
+  cwp (die out n) (fun s => if eqb (as_nat (s out)) m then 1 else 0) empty =
     1 / INeR n.
 Proof.
   intro Hn.
@@ -137,7 +137,7 @@ Definition die_itree (n : nat) : itree boolE nat :=
 
 Theorem die_itree_correct (n m : nat) :
   (m < n)%nat ->
-  itwp (fun x : nat => if Nat.eqb x m then 1 else 0) (die_itree n) = 1 / INeR n.
+  itwp (fun x : nat => if eqb x m then 1 else 0) (die_itree n) = 1 / INeR n.
 Proof.
   intro Hlt.
   unfold die_itree; rewrite itwp_map.
@@ -180,9 +180,26 @@ Proof.
   eapply die_samples_equidistributed; eauto.
 Qed.
 
-(** Finite distributions *)
+(** Finite distribution. *)
 
-
+Theorem findist_itree_correct (weights : list nat) (n : nat) :
+  (n < length weights)%nat ->
+  itwp (fun x : nat => if eqb x n then 1 else 0) (findist_itree weights) =
+    INeR (nth n weights O) / INeR n.
+Proof.
+  intro Hlt.
+  unfold findist_itree.
+  rewrite <- tcwp_itwp.
+  - apply findist_itree_correct; auto.
+  - unfold findist_tree.
+    constructor.
+    + intros ?; eauto with tree.
+    + intros []; constructor.
+  - constructor.
+    + intros ?; apply tree_unbiased_btree_to_tree.
+    + intros []; constructor.
+  - rewrite twlp_const_1_findist_tree; eRauto.
+Qed.
 
 (** Extraction. *)
 

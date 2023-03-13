@@ -9,6 +9,7 @@ From Coq Require Import
   Equivalence
   Reals
   List
+  ClassicalChoice
 .
 
 Local Open Scope equiv_scope.
@@ -883,6 +884,148 @@ Proof.
   f_equal; rewrite iid_chain_iter_n; reflexivity.
 Qed.
 
+(* CoInductive no_leaves {I A} : cotree I A -> Prop := *)
+(* | no_leaves_bot : no_leaves cobot *)
+(* | no_leaves_tau : forall t, no_leaves t -> no_leaves (cotau t) *)
+(* | no_leaves_node : forall k, *)
+(*     (forall i, no_leaves (k i)) -> *)
+(*     no_leaves (conode k). *)
+
+Lemma not_cotree_all_cotree_some_not {A} P (t : cotree bool A) :
+  ~ cotree_all P t ->
+  cotree_some (not ∘ P) t.
+Admitted.
+
+Require Import axioms.
+
+Lemma cofail_1_no_leaves {A} (t : cotree bool (unit + A)) :
+  cofail t = 1 ->
+  cotree_all (is_true ∘ is_inl) t.
+Proof.
+  intro Ht.
+  contra HC.
+  apply not_cotree_all_cotree_some_not in HC.
+  apply co_elim in HC; eauto with cotree order.
+  destruct HC as [i HC].
+  unfold compose in HC.
+  simpl in HC; unfold flip in HC.
+  revert HC Ht.
+  revert t.
+  induction i; intros t HC Ht; simpl in *.
+  { inv HC. }
+  unfold cofail, cowpfail in Ht.
+  destruct t.
+  - inv HC.
+  - destruct s.
+    + unfold atree_some in HC; simpl in HC; congruence.
+    + rewrite cotwp_leaf in Ht; inv Ht; lra.
+  - rewrite cotwp_tau in Ht.
+    eapply IHi; eauto.
+  - rewrite cotwp_node in Ht.
+    unfold atree_some in HC.
+    simpl in HC.
+    destruct HC as [b HC].
+    unfold compose in HC.
+    apply IHi in HC; auto.
+Admitted.
+
+(* Lemma kfg {A} P (t : cotree bool A) : *)
+(*   (forall a, atree_cotree_le a t -> atree_all P a) <-> cotree_all P t. *)
+(* Admitted. *)
+
+(* Lemma kdfg {A} (t : cotree bool (unit + A)) : *)
+(*   cotree_all (is_true ∘ is_inl) t -> *)
+(*   cotree_all (const False) (tie_cotree_iid t). *)
+(* Proof. *)
+(*   intro Ht. *)
+(*   rewrite tie_cotree_iid_tie_cotree. *)
+(*   unfold tie_cotree. *)
+
+(*   apply kfg. *)
+(*   intro a; revert t Ht; induction a; intros t Ht Hle. *)
+(*   - constructor. *)
+(*   - inv Hle. *)
+(*     rewrite cotree_iter_unfold in H. *)
+(*     unfold const in H. *)
+(*     destruct t. *)
+(*     + rewrite cotree_bind_bot in H; inv H. *)
+(*     + rewrite cotree_bind_leaf in H. *)
+(*       destruct s; inv H. *)
+(*       apply cotree_all_elim_leaf in Ht; inv Ht. *)
+(*     + rewrite cotree_bind_tau in H; inv H. *)
+(*     + rewrite cotree_bind_node in H; inv H. *)
+(*   - inv Hle. *)
+(*     rewrite cotree_iter_unfold in H0. *)
+(*     unfold const in H0. *)
+(*     destruct t. *)
+(*     + rewrite cotree_bind_bot in H0; inv H0. *)
+(*     + rewrite cotree_bind_leaf in H0. *)
+(*       destruct s. *)
+(*       * inv H0. *)
+(*         unfold atree_all; simpl; unfold id. *)
+(*         eapply IHa. *)
+(*         eauto. *)
+(*         destruct u; auto. *)
+(*       * inv H0. *)
+(*     + rewrite cotree_bind_tau in H0. *)
+(*       inv H0. *)
+(*       unfold atree_all; simpl; unfold id. *)
+(*       apply cotree_all_elim_tau in Ht. *)
+(*       eapply IHa; eauto. *)
+(*       unfold const. *)
+(*       rewrite cotree_iter_unfold. *)
+      
+      
+  
+(*   apply coop_intro; eauto with cotree order. *)
+(*   intro i. *)
+(*   simpl; unfold flip. *)
+(*   revert t Ht. *)
+(*   induction i; intros t Ht; simpl. *)
+(*   { constructor. } *)
+(*   rewrite cotree_iter_unfold. *)
+(*   unfold const. *)
+(*   destruct t. *)
+(*   - rewrite cotree_bind_bot; constructor. *)
+(*   - destruct s. *)
+(*     + rewrite cotree_bind_leaf. *)
+(*       unfold atree_all; simpl. *)
+(*       unfold id. *)
+(*       destruct u. *)
+(*       apply IHi; auto. *)
+(*     + apply cotree_all_elim_leaf in Ht; inv Ht. *)
+(*   - (* apply cotree_all_elim_tau in Ht. *) *)
+(*     (* apply IHi in Ht. *) *)
+(*     rewrite cotree_bind_tau. *)
+(*     unfold atree_all; simpl; unfold id. *)
+    
+  
+
+(* (** TODO: get rid of precondition by case analysis? When cofail t = 0, *) *)
+(* (*     both sides degenerate to 0. *) *)
+(* Theorem cotwp_tie_cotree_iid {A} (t : cotree bool (unit + A)) (f : A -> eR) : *)
+(*   cotwp f (tie_cotree_iid t) = cowp f t / (1 - cofail t). *)
+(* Proof. *)
+(*   destruct (classic (cofail t < 1)) as [Hlt|HC]. *)
+(*   - unfold tie_cotree_iid. *)
+(*     unfold cotree_iter. *)
+(*     unfold iter. *)
+(*     rewrite continuous_sup_eR; auto with cocwp. *)
+(*     2: { apply chain_directed, chain_iter_n'. *)
+(*          - constructor. *)
+(*          - apply continuous_monotone, continuous_iid_F. } *)
+(*     etransitivity. *)
+(*     2: { apply geometric_series_sup; eRauto. } *)
+(*     f_equal; ext i. *)
+(*     unfold compose. *)
+(*     apply cotwp_iter_n_geometric_series. *)
+(*   - assert (Ht: cofail t = 1). *)
+(*     { admit. } *)
+(*     clear HC. *)
+(*     (* TODO: [cofail t = 1] implies the structural property that t *) *)
+(* (*     contains no leaves, thus tie_cotree_iid t contains no leaves, so *) *)
+(* (*     cotwp on the LHS is 0 and cowp on the right is 0. *) *)
+
 Theorem cotwp_tie_cotree_iid {A} (t : cotree bool (unit + A)) (f : A -> eR) :
   cofail t < 1 -> cotwp f (tie_cotree_iid t) = cowp f t / (1 - cofail t).
 Proof.
@@ -899,7 +1042,7 @@ Proof.
   f_equal; ext i.
   unfold compose.
   apply cotwp_iter_n_geometric_series.
-Qed.  
+Qed.
 
 Lemma btwp_bounded {A} (f : A -> eR) t ub :
   bounded f ub ->

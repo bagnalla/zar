@@ -1215,6 +1215,7 @@ Proof.
   - constructor; auto.
 Qed.
 
+(** Don't need wlp version because [uniform_tree_twp_twlp]. *)
 Lemma twp_uniform_tree_sum (n : nat) (f : nat -> eR) :
   (0 < n)%nat ->
   twp (uniform_tree n) f = sum (map (fun i => f i / INeR n) (range n)).
