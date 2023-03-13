@@ -418,6 +418,19 @@ Proof.
   rewrite cwp_tcwp; auto.
 Qed.
 
+(* Lemma tcwp_itwp {A} (t : tree A) f : *)
+(*   wf_tree t -> *)
+(*   tree_unbiased t -> *)
+(*   tcwp t f = itwp f (to_itree t). *)
+(* Proof. *)
+(*   intros Hwf Gub. *)
+(*   erewrite itwp_cotwp. *)
+(*   2: { apply to_itree_to_cotree. } *)
+(*   unfold to_cotree, compose. *)
+(*   rewrite <- cocwp_cotwp_tie_cotree; auto. *)
+(*   apply tcwp_cotcwp. *)
+(* Qed. *)
+
 Lemma tcwp_itwp {A} (t : tree A) f :
   wf_tree t ->
   tree_unbiased t ->
@@ -425,6 +438,7 @@ Lemma tcwp_itwp {A} (t : tree A) f :
   tcwp t f = itwp f (to_itree t).
 Proof.
   intros Hwf Hub Hlt.
+  unfold to_itree.
   erewrite itwp_cotwp.
   2: { apply to_itree_to_cotree. }
   unfold to_cotree, compose.
@@ -432,7 +446,7 @@ Proof.
   rewrite twlp_fail; auto.
   rewrite <- tie_cotree_iid_tie_cotree.
   rewrite cotwp_tie_cotree_iid_wlp.
-  2: { rewrite <- twlp_cowlp; auto; intro; eRauto. }
+  2: { rewrite <- twlp_cowlp; auto. intro; eRauto. }
   f_equal.
   - apply twp_cowp; auto.
   - rewrite <- twlp_cowlp; auto.
