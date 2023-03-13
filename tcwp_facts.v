@@ -496,3 +496,31 @@ Proof.
   - apply twp_strict.
   - rewrite twp__plus; f_equal; auto.
 Qed.
+
+Lemma no_fail_twlp {A} (t : tree A) :
+  no_fail' t ->
+  tfail t = 0.
+Proof.
+  unfold tfail, twpfail, const.
+  induction t; intro Hnf; simpl; auto.
+  - inv Hnf.
+  - inv Hnf; rewrite 2!H; eRauto.
+  - inv Hnf; existT_inv.
+    unfold iter.
+    apply ext.
+    rewrite sup_apply.
+    apply sup_const'.
+    apply eq_equ.
+    ext j; unfold const.
+    revert i.
+    induction j; simpl; auto; intro i.
+    unfold cwp.loop_F.
+    destruct (b i); auto.
+    unfold cwp.loop_F in *.
+    replace (iter_n
+               (fun (k : I -> eR) (s : I) =>
+                  if b s then twp_ true (t s) k else twp_ true (t0 s) (fun _ : A => 0)) 
+               (fun _ : I => 0) j) with (@const eR I 0).
+    2: { ext k; auto.  }
+    apply H; auto.
+Qed.
