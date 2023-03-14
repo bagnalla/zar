@@ -14,7 +14,7 @@ opam install coq-itree
 make -j4
 ```
 
-* [zarpy](https://pypi.org/project/zarpy/) pip package (see [python/zar/test/test.py](python/zar/test/test.py) for an example
+* [Zarpy](https://pypi.org/project/zarpy/) Python3 package (see [python/zar/test/test.py](python/zar/test/test.py) for an example
 of using it after installation):
 ```
 opam install pythonlib ppx_import ppx_deriving
@@ -22,11 +22,6 @@ cd python/zar/ocaml
 dune build zar.so
 cd ..
 make install
-```
-
-Or:
-```
-pip install zarpy
 ```
 
 * Extracted sampler analysis scripts (e.g., [analyze.py](extract/geometric/analyze.py)):
@@ -74,6 +69,6 @@ pip install numpy matplotlib scipy
 
 [optimal-approximate-sampling/](optimal-approximate-sampling/) contains a clone of [https://github.com/probcomp/optimal-approximate-sampling](https://github.com/probcomp/optimal-approximate-sampling) modified to track entropy usage.
 
-[python/zar/](python/zar/) contains the [zarpy](https://pypi.org/project/zarpy/) pip package source.
+[python/zar/](python/zar/) contains the [Zarpy](https://pypi.org/project/zarpy/) Python3 package source.
 
-[python/tf/](python/tf/) contains the TensorFlow 2 project, with [batch_gen.py](python/tf/batch_gen.py) implementing a sampling-without-replacement generator on top of the [zarpy](https://pypi.org/project/zarpy/) sampler package.
+[python/tf/](python/tf/) contains the TensorFlow 2 project, with [batch_gen.py](python/tf/batch_gen.py) implementing a sampling-without-replacement generator on top of the [Zarpy](https://pypi.org/project/zarpy/) sampler package.
