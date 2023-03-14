@@ -19,7 +19,7 @@ of using it after installation):
 ```
 opam install pythonlib ppx_import ppx_deriving
 cd python/zar/ocaml
-dune build zar.so
+dune build zarpy.so
 cd ..
 make install
 ```
