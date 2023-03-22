@@ -228,6 +228,11 @@ Proof.
     specialize (IHn (drop (2^n) l)); lia.
 Qed.
 
+Lemma sub_sub_le (a b : nat) :
+  (b <= a)%nat ->
+  (a - (a - b) = b)%nat.
+Proof. lia. Qed.
+
 Lemma findist_itree_correct (weights : list nat) (n : nat) :
   Exists (fun w => (0 < w)%nat) weights ->
   (n < length weights)%nat ->
@@ -290,15 +295,36 @@ Proof.
   { unfold c; apply not_infty_INeR. }
   assert (Hcbnz: c - b <> 0).
   { unfold b, c.
-    admit. }
+    apply eRlt_neq', eRlt_pos, lt_INeR.
+    replace (fun x : unit + nat => is_inl (sum_map id (bin_index weights) x))
+      with (@cotuple unit nat _ (const true) (const false)).
+    2: { ext x; destruct x; reflexivity. }
+    unfold list_btree.
+    rewrite rev_length, range_length.
+    generalize (is_power_of_2_next_pow_2 (list_sum weights)).
+    intros [k Hk]; rewrite <- Hk.
+    rewrite Nat.log2_pow2; try lia.
+    rewrite list_btree_aux_countb'.
+    { rewrite rev_length, range_length.
+      assert (0 < list_sum weights)%nat.
+      { apply exists_pos_list_sum; auto. }
+      assert (0 < 2^k)%nat.
+      { apply pow_positive; lia. }
+      lia. }
+    rewrite rev_length, range_length, Hk.
+    apply next_pow_2_ub. }
   replace 1 with (c / c) by eRauto.
   replace (c / c - b / c) with ((c - b) / c).
   2: { rewrite eRdiv_minus_distr; auto. }
-  rewrite eRdiv_cancel_r; auto.
-  f_equal.
-  - unfold a.
-    f_equal.
+  rewrite eRdiv_cancel_r; auto; f_equal.
+  - unfold a; f_equal.
     rewrite countb_list_rev.
+    (* revert Hlt. *)
+    (* clear Hcnz Hcninfty Hcbnz. *)
+    (* clear a b c. *)
+    (* revert n. *)
+    (* induction weights; simpl; intros n Hn; try lia. *)
+    
     admit.
   - unfold c, b.
     rewrite minus_INeR.
@@ -312,8 +338,16 @@ Proof.
     replace (fun x : unit + nat => is_inl (sum_map id (bin_index weights) x)) with
       (@cotuple unit nat _ (const true) (const false)).
     2: { ext s; destruct s; auto. }
-    admit.
-
+    unfold list_btree.
+    rewrite rev_length, range_length.
+    generalize (is_power_of_2_next_pow_2 (list_sum weights)).
+    intros [k Hk]; rewrite <- Hk.
+    rewrite Nat.log2_pow2; try lia.
+    rewrite list_btree_aux_countb'.
+    { rewrite rev_length, range_length.
+      apply sub_sub_le; rewrite Hk; apply next_pow_2_ub. }
+    rewrite rev_length, range_length.
+    rewrite Hk; apply next_pow_2_ub.
 Admitted.
 
 (* (** Extraction. *) *)

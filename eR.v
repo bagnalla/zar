@@ -2482,3 +2482,14 @@ Proof.
   induction 1; simpl; auto.
   rewrite IHForall; subst; eRauto.
 Qed.
+
+Lemma eRlt_pos (a b : eR) :
+  a < b ->
+  0 < b - a.
+Proof.
+  unfold eRminus; intro Hlt.
+  destruct b as [b|].
+  - destruct a as [a|]; inv Hlt.
+    destr; try lra; constructor; lra.
+  - destruct a as [a|]; inv Hlt; constructor.
+Qed.
