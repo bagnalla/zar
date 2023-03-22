@@ -59,22 +59,6 @@ Fixpoint btree_to_tree {A} (t : btree A) : tree A :=
       Choice (1#2) (fun b => if b then btree_to_tree t1 else btree_to_tree t2)
   end.
 
-(* Definition bernoulli_btree_to_tree : btree (unit + bool) -> tree (unit + bool) := *)
-(*   btree_to_tree. *)
-
-(* Definition uniform_btree_to_tree : btree (unit + nat) -> tree St := *)
-(*   btree_to_tree (cotuple (const (vint 0)) vnat). *)
-
-(* Lemma twp_btree_to_tree {A} (f : A -> eR) (t : btree (unit + A)) : *)
-(*   twp (btree_to_tree t) (cotuple (const 0) f) = *)
-(*     btree_infer (cotuple (const 0) f) t. *)
-(* Proof. *)
-(*   unfold twp; revert f; induction t; intro f; simpl. *)
-(*   - destruct a; constructor. *)
-(*   - rewrite IHt1, IHt2; f_equal; f_equal. *)
-(*     rewrite Q2eR_one_half, eRminus_1_2; reflexivity. *)
-(* Qed. *)
-
 Lemma twp_btree_to_tree {A} (f : A -> eR) (t : btree A) :
   twp (btree_to_tree t) f = btree_infer f t.
 Proof.
@@ -82,16 +66,6 @@ Proof.
   rewrite IHt1, IHt2; f_equal; f_equal.
   rewrite Q2eR_one_half, eRminus_1_2; reflexivity.
 Qed.
-
-(* Lemma twp_bernoulli_btree_to_tree' {A} r (t : btree (unit + A)) : *)
-(*   twp (btree_to_tree t) (cotuple (const r) (const 0)) = *)
-(*     btree_infer (cotuple (const r) (const 0)) t. *)
-(* Proof. *)
-(*   unfold twp; revert r; induction t; intro r; simpl. *)
-(*   - destruct a; constructor. *)
-(*   - rewrite IHt1, IHt2; f_equal; f_equal. *)
-(*     rewrite Q2eR_one_half, eRminus_1_2; reflexivity. *)
-(* Qed. *)
 
 Lemma tree_unbiased_btree_to_tree {A} (t : btree A) :
   tree_unbiased (btree_to_tree t).
@@ -124,27 +98,6 @@ Fixpoint list_btree_aux {A} (l : list A) (n : nat) : btree (unit + A) :=
 
 Definition list_btree {A} (l : list A) : btree (unit + A) :=
   list_btree_aux l (log2 (next_pow_2 (length l))).
-
-(* Fixpoint btree_eq {A} `{EqType A} (l r : btree A) : bool := *)
-(*   match (l, r) with *)
-(*   | (BLeaf x, BLeaf y) => eqb x y *)
-(*   | (BNode ll lr, BNode rl rr) => btree_eq ll rl && btree_eq lr rr *)
-(*   | _ => false *)
-(*   end. *)
-
-(* Lemma btree_eq_spec {A} `{EqType A} (l r : btree A) : *)
-(*   reflect (l = r) (btree_eq l r). *)
-(* Proof. *)
-(*   revert r; induction l; intros r. *)
-(*   - destruct r; simpl. *)
-(*     + destruct (eqb_spec a a0); subst; constructor; auto; congruence. *)
-(*     + constructor; congruence. *)
-(*   - destruct r; simpl. *)
-(*     + constructor; congruence. *)
-(*     + destruct (IHl1 r1); subst; simpl. *)
-(*       * destruct (IHl2 r2); subst; simpl; constructor; auto; congruence. *)
-(*       * constructor; congruence. *)
-(* Qed. *)
 
 (** Eliminate unnecessary fails. *)
 Fixpoint reduce_btree {A} (t : btree (unit + A)) : btree (unit + A) :=
@@ -505,8 +458,7 @@ Proof.
                           | inl _ => false
                           | inr i => i <? n
                           end) then 1 else 0).
-  { (* rewrite btree_infer_btree_opt. *)
-    rewrite perfect_btree_infer.
+  { rewrite perfect_btree_infer.
     - replace (fun x : unit + nat => match x with
                                 | inl _ => false
                                 | inr i => i <? n
@@ -642,7 +594,6 @@ Lemma btree_infer_bernoulli_btree_const_1 n d :
     INeR d / INeR (next_pow_2 d).
 Proof.
   unfold bernoulli_btree.
-  (* rewrite btree_infer_btree_opt. *)
   rewrite reduce_btree'_infer.
   rewrite btree_infer_fmap_bool.
   apply btree_infer_uniform_btree_const_1.
@@ -1109,30 +1060,6 @@ Proof.
   intros []; auto.
 Qed.
 
-(* Lemma twp_bernoulli_btree_to_tree_vbool t f : *)
-(*   twp_ false (uniform_btree_to_tree t) *)
-(*     (fun s => match s ϵ with *)
-(*               | vbool b => f b *)
-(*               | _ => 0 *)
-(*               end) = 0. *)
-(* Proof. *)
-(*   revert f; induction t; intros f; simpl. *)
-(*   { destruct a as [[]|a]; simpl; auto. } *)
-(*   rewrite IHt1, IHt2; eRauto. *)
-(* Qed. *)
-
-(* Lemma twp_bernoulli_btree_to_tree_vrat t f : *)
-(*   twp_ false (uniform_btree_to_tree t) *)
-(*     (fun s => match s ϵ with *)
-(*               | vrat b => f b *)
-(*               | _ => 0 *)
-(*               end) = 0. *)
-(* Proof. *)
-(*   revert f; induction t; intros f; simpl. *)
-(*   { destruct a as [[]|a]; simpl; auto. } *)
-(*   rewrite IHt1, IHt2; eRauto. *)
-(* Qed. *)
-
 Lemma btree_infer_bounded {A} (t : btree A) f ub :
   bounded f ub ->
   btree_infer f t <= ub.
@@ -1312,4 +1239,93 @@ Proof.
     rewrite countb_list_range_lt; auto.
     rewrite INeR_1; eRauto.
   - apply in_range in Hi; auto.
+Qed.
+
+Lemma btree_some_reduce_btree' {A} `{EqType A} P (t : btree A) :
+  btree_some P t ->
+  btree_some P (reduce_btree' t).
+Proof.
+  induction t; intro Ht; simpl; auto; inv Ht.
+  - destruct (reduce_btree' t1) eqn:Ht1.
+    + destruct (reduce_btree' t2) eqn:Ht2.
+      * destr; auto; constructor; auto.
+      * constructor; auto.
+    + constructor; auto.
+  - destruct (reduce_btree' t1) eqn:Ht1.
+    + destruct (reduce_btree' t2) eqn:Ht2.
+      * destruct (eqb_spec a a0); subst; auto.
+        apply btree_some_node_r; auto.
+      * apply btree_some_node_r; auto.
+    + apply btree_some_node_r; auto.
+Qed.
+
+Lemma btree_some_btree_map {A B} (P : B -> Prop) (f : A -> B) (t : btree A) :
+  btree_some (P ∘ f) t ->
+  btree_some P (btree_map f t).
+Proof.
+  induction t; intro Hsome; simpl; inv Hsome; solve [constructor; auto].
+Qed.
+
+Lemma btree_some_is_inr_list_btree_aux {A} (l : list A) (n : nat) :
+  l <> nil ->
+  btree_some (fun x : unit + A => is_true (is_inr x)) (list_btree_aux l n).
+Proof.
+  revert l; induction n; intros l Hl; simpl; destruct l; try congruence.
+  - constructor; auto.
+  - constructor.
+    apply IHn.
+    apply take_not_nil; auto.
+    apply pow_positive; lia.
+Qed.
+
+Lemma btree_some_is_inr_list_btree {A} (l : list A) :
+  l <> nil ->
+  btree_some (fun x : unit + A => is_true (is_inr x)) (list_btree l).
+Proof. apply btree_some_is_inr_list_btree_aux; auto. Qed.
+
+Lemma congruent_btree_map {A B} (f : A -> B) (t1 t2 : btree A) :
+  congruent t1 t2 ->
+  congruent (btree_map f t1) (btree_map f t2).
+Proof. induction 1; simpl; constructor; auto. Qed.
+
+Lemma perfect_btree_map {A B} (f : A -> B) (t : btree A) :
+  perfect t ->
+  perfect (btree_map f t).
+Proof.
+  induction t; intro Ht; simpl; inv Ht; constructor; auto.
+  apply congruent_btree_map; auto.
+Qed.
+
+Lemma countb_btree_map {A B} (f : B -> bool) (g : A -> B) (t : btree A) :
+  countb f (btree_map g t) = countb (f ∘ g) t.
+Proof. unfold compose; induction t; simpl; auto. Qed.
+
+Lemma countb_true_list_btree_aux_pow_2 {A} (l : list A) (k : nat) :
+  countb (const true) (list_btree_aux l k) = (2 ^ k)%nat.
+Proof.
+  revert l; induction k; intro l; simpl.
+  { destruct l; auto. }
+  rewrite 2!IHk; lia.
+Qed.
+
+Lemma countb_length_list_btree {A} (l : list A) :
+  countb (const true) (list_btree l) = next_pow_2 (length l).
+Proof.
+  unfold list_btree.
+  simpl.
+  generalize (is_power_of_2_next_pow_2 (length l)).
+  intros [k Hk].
+  rewrite <- Hk.
+  rewrite Nat.log2_pow2; try lia.
+  apply countb_true_list_btree_aux_pow_2.
+Qed.
+
+Lemma countb_list_btree_aux_le_pow_2 {A} P (l : list A) n :
+  (countb P (list_btree_aux l n) <= 2^n)%nat.
+Proof.
+  revert l; induction n; intro l; simpl.
+  - destruct l; simpl; destr; lia.
+  - rewrite Nat.add_0_r.
+    pose proof (IHn (take (2^n) l)).
+    specialize (IHn (drop (2^n) l)); lia.
 Qed.

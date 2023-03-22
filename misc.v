@@ -502,3 +502,63 @@ Proof.
   rewrite not_in_countb_list; try lia.
   intro HC; apply in_range in HC; lia.
 Qed.
+
+Lemma map_repeat {A B} (f : A -> B) (a : A) (n : nat) :
+  map f (repeat a n) = repeat (f a) n.
+Proof. induction n; simpl; auto; rewrite IHn; auto. Qed.
+
+Lemma map_id {A} (l : list A) :
+  map id l = l.
+Proof. induction l; simpl; f_equal; auto. Qed.
+
+Lemma countb_list_map {A B} (l : list A) (f : A -> B) (P : B -> bool) :
+  countb_list P (List.map f l) = countb_list (P ∘ f) l.
+Proof. induction l; simpl; auto. Qed.
+
+Lemma countb_list_repeat {A} (a : A) (n : nat) (P : A -> bool) :
+  countb_list P (repeat a n) = if P a then n else O.
+Proof. induction n; simpl; destr; auto. Qed.
+
+Lemma countb_list_false {A} (l : list A) :
+  countb_list (fun _ => false) l = O.
+Proof. induction l; auto. Qed.
+
+Lemma take_not_nil {A} (l : list A) (n : nat) :
+  l <> nil ->
+  (0 < n)%nat ->
+  ~ take n l = [].
+Proof.
+  revert l; induction n; intros l Hl Hn; simpl; try lia.
+  destruct l; congruence.
+Qed.
+
+Lemma rev_range_not_nil (n : nat) :
+  (0 < n)%nat ->
+  rev_range n <> [].
+Proof.
+  induction n; simpl; intros Hlt HC; auto; try lia; congruence.
+Qed.
+
+Lemma exists_pos_list_sum l :
+  Exists (fun w : nat => (0 < w)%nat) l ->
+  (0 < list_sum l)%nat.
+Proof.
+  induction l; intro Hex; inv Hex; simpl; try lia.
+  apply Nat.lt_lt_add_l; auto.
+Qed.
+
+Lemma repeat_eq_nil {A} (a : A) (n : nat) :
+  repeat a n = [] ->
+  n = O.
+Proof. induction n; intro H; auto; inv H. Qed.
+
+Lemma countb_list_rev {A} (f : A -> bool) (l : list A) :
+  countb_list f (rev l) = countb_list f l.
+Proof.
+  induction l; simpl; auto; rewrite countb_list_app; simpl; lia.
+Qed.
+
+Lemma sub_sub_le (a b : nat) :
+  (b <= a)%nat ->
+  (a - (a - b) = b)%nat.
+Proof. lia. Qed.
