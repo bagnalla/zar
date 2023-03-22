@@ -1864,6 +1864,15 @@ Proof. apply eR_eq; reflexivity. Qed.
 Lemma plus_INeR : forall n m:nat, INeR (n + m) = INeR n + INeR m.
 Proof. intros n m; apply eR_eq, plus_INR. Qed.
 
+Lemma minus_INeR (n m : nat) :
+  (m <= n)%nat ->
+  INeR n - INeR m = INeR (n - m)%nat.
+Proof.
+  intro Hle; unfold eRminus; simpl; destr.
+  - apply eR_eq; rewrite minus_INR; auto.
+  - exfalso; apply n0; apply le_INR; auto.
+Qed.
+
 Lemma INeR_eq : forall n m:nat, INeR n = INeR m -> n = m.
 Proof. intros n m Heq; inv Heq; apply INR_eq; auto. Qed.
 
