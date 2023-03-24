@@ -161,7 +161,7 @@ integer `m` where `0 <= m < n`.
 
 `Findist.build weights` builds and caches a sampler from list of
 nonnegative integer weights `weights` (where `0 < weightsᵢ` for some
-`i`) with `Pr(i) = `weightsᵢ / ∑ⱼweightsⱼ`` for integer `0 <= i <
+`i`) with `Pr(i) = weightsᵢ / ∑ⱼweightsⱼ` for integer `0 <= i <
 |weights|`.
 
 `Findist.sample ()` produces a single sample from the cached sampler.
