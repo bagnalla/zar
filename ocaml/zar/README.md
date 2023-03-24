@@ -30,7 +30,7 @@ integers such that `p = n/d`):
 ```ocaml
 open Zar
 Coin.build n d;; (* Build and cache coin with bias p = n/d *)
-if Coin.flip () (* Generate a Boolean value with Pr(True) = p *)
+if Coin.flip () (* Flip the coin *)
   then a1 else a2
 ```
 
@@ -48,12 +48,12 @@ causing some values to occur with higher probability than others (see,
 e.g., [this
 article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
 for more information on modulo bias). Zar provides a uniform sampler
-that is guaranteed for any integer `0 < n` to generate samples from
+that is guaranteed for any integer `0 < n` to generate samples from the range
 `[0,n)` with probability `1/n` each:
 ```ocaml
 open Zar
-Die.build n
-let k = Die.roll ()
+Die.build n (* Build and cache n-sided die *)
+let k = Die.roll () (* Roll the die *)
 ```
 
 Although the OCaml function `Random.int` is ostensibly free from
@@ -71,8 +71,8 @@ probability `weightsₖ / ∑ⱼweightsⱼ` (the corresponding weight of `k`
 normalized by the sum of all weights):
 ```ocaml
 open Zar
-Findist.build weights
-let k = Findist.sample ()
+Findist.build weights (* Build and cache findist sampler *)
+let k = Findist.sample () (* Draw a sample *)
 ```
 
 For example, `Findist.build [1; 3; 2]` builds a sampler that draws integers from the set `{0, 1, 2}` with `Pr(0) = 1/6`, `Pr(1) = 1/2`, and `Pr(2) = 1/3`.
