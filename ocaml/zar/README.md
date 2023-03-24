@@ -30,7 +30,7 @@ integers such that `p = n/d`):
 ```ocaml
 open Zar
 Coin.build n d;; (* Build and cache coin with bias p = n/d *)
-if Coin.flip () # Generate a Boolean value with Pr(True) = p 
+if Coin.flip () (* Generate a Boolean value with Pr(True) = p *)
   then a1 else a2
 ```
 
