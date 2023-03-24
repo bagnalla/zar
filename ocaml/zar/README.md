@@ -40,8 +40,8 @@ Another common operation is to randomly draw from a finite collection
 of values with equal (uniform) probability of each. An old trick for
 drawing an integer uniformly from the range `[0, n)` is to generate a
 random integer from `[0, RAND_MAX]` and take the modulus wrt. `n`:
-```c
-k = rand() % n # Assign k random value from [0,n)
+```C
+k = rand() // n # Assign k random value from [0,n)
 ```
 but this method suffers from modulo bias when `n` is not a power of 2,
 causing some values to occur with higher probability than others (see,
@@ -74,6 +74,8 @@ open Zar
 Findist.build weights
 let k = Findist.sample ()
 ```
+
+For example, `Findist.build [1; 3; 2]` builds a sampler that draws integers from the set `{0, 1, 2}` with `Pr(0) = 1/6`, `Pr(1) = 1/2`, and `Pr(2) = 1/3`.
 
 ## Trusted Computing Base
 
