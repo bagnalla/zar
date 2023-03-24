@@ -222,7 +222,7 @@ Proof.
 Qed.
 
 Lemma List_forall_neq_range (n : nat) :
-  List.Forall (fun x : nat => ~ is_true (x =? n)%nat) (range n).
+  List.Forall (fun x : nat => ~ is_true (n =? x)%nat) (range n).
 Proof.
   apply List.Forall_impl with (P := fun x => (x < n)%nat).
   - intros m Hlt Heq.

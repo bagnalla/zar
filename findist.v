@@ -157,10 +157,10 @@ Lemma length_flatten_weights (l : list nat) :
   length (flatten_weights l) = list_sum l.
 Proof. apply length_flatten_weights_aux. Qed.
 
-Lemma findist_itree_correct (weights : list nat) (n : nat) :
+Lemma findist_tree_correct (weights : list nat) (n : nat) :
   Exists (fun w => (0 < w)%nat) weights ->
   (n < length weights)%nat ->
-  tcwp (findist_tree weights) (fun x : nat => if eqb x n then 1 else 0) =
+  tcwp (findist_tree weights) (fun x : nat => if eqb n x then 1 else 0) =
     INeR (nth n weights O) / INeR (list_sum weights).
 Proof.
   intros Hex Hlt.
@@ -187,9 +187,10 @@ Proof.
              then 0
              else
                twp (cotuple (fun _ : unit => Leaf 0%nat) (Leaf (A:=nat)) s)
-                 (fun x : nat => if (x =? n)%nat then 1 else 0)) with
+                 (fun x : nat => if (n =? x)%nat then 1 else 0)) with
     (fun s => if is_inr s && Nat.eqb (@proj_inr unit nat s O) n then 1 else 0).
-  2: { ext s; destruct s; simpl; auto. }
+  2: { ext s; destruct s; simpl; auto.
+       rewrite Nat.eqb_sym; auto. }
   rewrite 2!perfect_btree_infer.
   2: { apply perfect_list_btree. }
   2: { apply perfect_list_btree. }
