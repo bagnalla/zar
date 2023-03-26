@@ -1876,6 +1876,19 @@ Qed.
 Lemma INeR_eq : forall n m:nat, INeR n = INeR m -> n = m.
 Proof. intros n m Heq; inv Heq; apply INR_eq; auto. Qed.
 
+Lemma IZR_0_le (z : Z) :
+  (0 <= z)%Z ->
+  (0 <= IZR z)%R.
+Proof. intro Hz; apply IZR_le in Hz; lra. Qed.
+
+Definition IZeR (n : Z) : eR := er (IZR (Z.max Z0 n)) (IZR_0_le _ (Z.le_max_l _ _)).
+
+Lemma IZeR_0 : IZeR 0 = 0.
+Proof. apply eR_eq; reflexivity. Qed.
+
+Lemma IZeR_1 : IZeR 1 = 1.
+Proof. apply eR_eq; reflexivity. Qed.
+
 Lemma eRmult_eRdiv_assoc a b c :
   a * (b / c) = (a * b) / c.
 Proof. unfold eRdiv; rewrite eRmult_assoc; reflexivity. Qed.
@@ -2020,6 +2033,31 @@ Lemma lt_INeR n m :
   (n < m)%nat ->
   INeR n < INeR m.
 Proof. intro Hlt; constructor; apply lt_INR; auto. Qed.
+
+Lemma lt_IZeR n m :
+  (0 < m)%Z ->
+  (n < m)%Z ->
+  IZeR n < IZeR m.
+Proof.
+  intros Hm Hnm; constructor.
+  destruct (Z.leb_spec 0 n).
+  - rewrite Z.max_r; auto.
+    rewrite Z.max_r; try lia.
+    apply IZR_lt; auto.
+  - rewrite Z.max_l; try lia.
+    destruct (Z.ltb_spec 0 m); try lia.
+    rewrite Z.max_r; try lia.
+    apply IZR_lt; auto.
+Qed.
+
+Lemma IZeR_positive (n : Z) :
+  (0 < n)%Z ->
+  0 < IZeR n.
+Proof.
+  intro Hn.
+  replace eR0 with (IZeR 0) by apply IZeR_0.
+  apply lt_IZeR; auto.
+Qed.
 
 Corollary sup_shift_eR f g :
   chain f ->

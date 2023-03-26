@@ -1,4 +1,4 @@
-(** * Zarpy package constructions and proofs. *)
+(** * Zar OCaml package constructions and proofs. *)
 
 Set Implicit Arguments.
 Set Contextual Implicit.
@@ -13,45 +13,22 @@ Import ITreeNotations.
 Local Open Scope itree_scope.
 
 From zar Require Import
-  compile cotree cocwp cpo cwp equidistribution eR findist itree misc
-  order tactics tree.
+  cotree cocwp cpo equidistribution eR findist itree misc order tactics
+  tree tcwp uniform_Z.
 
 Record Samplers : Type :=
   mkSamplers 
     { coin_sampler : Q -> itree boolE bool
-    ; die_sampler : nat -> itree boolE nat
-    ; findist_sampler : list nat -> itree boolE nat }.
+    ; die_sampler : Z -> itree boolE Z
+    ; findist_sampler : list Z -> itree boolE Z }.
 
 From zar Require Import cpGCL prelude.
 Local Open Scope cpGCL_scope.
 
 (** Biased coin. *)
 
-Definition coin (out : string) (p : Q) : cpGCL :=
-  CChoice (const p) (fun b => if b then out <-- true else out <-- false).
-
-Lemma wf_coin (out : string) (p : Q) :
-  (0 <= p <= 1)%Q ->
-  wf_cpGCL (coin out p).
-Proof.
-  intros [H0 H1]; constructor; intro; auto.
-  destruct b; constructor.
-Qed.
-
-(** The probability of assigning `true` to the output variable is
-    equal to p. *)
-Lemma coin_correct (out : string) (p : Q) :
-  (p <= 1)%Q ->
-  cwp (coin out p) (fun s => if as_bool (s out) then 1 else 0) empty = Q2eR p.
-Proof.
-  intro Hp.
-  unfold cwp, coin, wp, wlp, const; simpl; eRauto.
-  unfold upd; simpl.
-  rewrite String.eqb_refl; simpl; eRauto.
-Qed.
-
 Definition coin_itree (p : Q) : itree boolE bool :=
-  ITree.map (fun s => as_bool (s "b")) (cpGCL_to_itree (coin "b" p) empty).
+  to_itree (bernoulli_tree (Qred p)).
 
 (** Uses cotwp_map in cocwp_facts.v. *)
 Theorem coin_itree_correct (p : Q) :
@@ -59,16 +36,22 @@ Theorem coin_itree_correct (p : Q) :
   itwp (fun b : bool => if b then 1 else 0) (coin_itree p) = Q2eR p.
 Proof.
   intros [H0 H1].
-  unfold coin_itree; rewrite itwp_map.
-  unfold compose; rewrite <- cwp_itwp.
-  - apply coin_correct; auto.
-  - apply wf_coin; auto.
-  - unfold wlp; simpl; unfold const; eRauto.
+  unfold coin_itree.
+  rewrite <- tcwp_itwp.
+  - unfold tcwp.
+    rewrite twlp_const_1_bernoulli_tree; eRauto.
+    replace (Q2eR p) with (Q2eR (Qred p)).
+    2: { apply Proper_Q2eR, Qred_correct. }
+    apply bernoulli_tree_twp_p.
+    + apply Qred_complete, Qred_correct.
+    + rewrite Qred_correct; lra.
+  - apply wf_tree_bernoulli_tree.
+  - apply tree_unbiased_bernoulli_tree.
+  - rewrite twlp_const_1_bernoulli_tree; eRauto.
 Qed.
 
 Section coin_equidistribution.
-  Context (env : SamplingEnvironment) (samples : nat -> bool).
-  Context (p : Q) (Hp : (0 <= p <= 1)%Q).
+  Context (env : SamplingEnvironment) (samples : nat -> bool) (p : Q).
   Hypothesis bitstreams_samples :
     forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (coin_itree p).
 
@@ -94,80 +77,30 @@ Qed.
 
 (** N-sided die *)
 
-Definition die (out : string) (n : nat) : cpGCL :=
-  CUniform (const n) (fun m => out <-- m).
+Definition die_itree (n : Z) : itree boolE Z :=
+  to_itree (uniform_tree n).
 
-Lemma wf_die (out : string) (n : nat) :
-  (0 < n)%nat ->
-  wf_cpGCL (die out n).
-Proof. intro Hlt; repeat constructor; auto. Qed.
-
-From zar Require Import tcwp cwp_tcwp uniform.
-
-(** The probability of assigning any m < n to the output variable is
-    equal to 1/n. *)
-Lemma die_correct (out : string) (n m : nat) :
-  (m < n)%nat ->
-  cwp (die out n) (fun s => if eqb m (as_nat (s out)) then 1 else 0) empty =
-    1 / INeR n.
+Theorem die_itree_correct (n m : Z) :
+  (0 <= m < n)%Z ->
+  itwp (fun x : Z => if eqb m x then 1 else 0) (die_itree n) = 1 / IZeR n.
 Proof.
-  intro Hn.
-  unfold cwp, die, wp, wlp, const; simpl; eRauto.
-  unfold upd; simpl.  
-  rewrite String.eqb_refl; simpl.
-  assert (H: sum (List.map (fun _ : nat => 1 / INeR n) (range n)) = 1).
-  { rewrite sum_map_const with (c := 1 / INeR n).
-    - rewrite range_length.
-      unfold eRdiv.
-      eRauto.
-      rewrite eRinv_r; eRauto.
-      destruct n.
-      + inv Hn.
-      + apply not_0_INeR; lia.
-    - apply List.Forall_impl with (P := const True); auto.
-      apply Forall_const_true. }
-  rewrite H; clear H.
-  eRauto.
-  unfold eRdiv.
-  rewrite sum_map_scalar_r.
-  f_equal.
-  induction n; simpl.
-  { inv Hn. }
-  rewrite List.map_app; simpl.
-  rewrite sum_app; simpl; eRauto.
-  destruct (Nat.eqb_spec m n); subst.
-  - rewrite sum_map_count.
-    rewrite Forall_not_in_countb_list_0.
-    + rewrite INeR_0; eRauto.
-    + apply List_forall_neq_range.
-  - rewrite IHn; eRauto; lia.
-Qed.
-
-Definition die_itree (n : nat) : itree boolE nat :=
-  ITree.map (fun s => as_nat (s "n")) (cpGCL_to_itree (die "n" n) empty).
-
-Theorem die_itree_correct (n m : nat) :
-  (m < n)%nat ->
-  itwp (fun x : nat => if eqb m x then 1 else 0) (die_itree n) = 1 / INeR n.
-Proof.
-  intro Hlt.
-  unfold die_itree; rewrite itwp_map.
-  unfold compose; rewrite <- cwp_itwp.
-  - apply die_correct; auto.
-  - apply wf_die; auto; lia.
-  - unfold wlp; simpl; unfold const.
-    apply sum_positive.
-    apply List.Exists_exists.
-    exists (1 / INeR n); split.
-    + set (f := fun _ : nat => 1 / INeR n).
-      replace (1 / INeR n) with (f O); auto.
-      apply List.in_map, in_range; lia.
-    + apply eRlt_0_eRdiv; eRauto.
+  intros [H0 H1].
+  unfold die_itree.
+  rewrite <- tcwp_itwp.
+  - unfold tcwp.
+    rewrite twlp_const_1_uniform_tree; eRauto.
+    replace (fun x : Z => if eqb m x then 1 else 0) with
+      (fun x : Z => if eqb x m then 1 else 0).
+    2: { ext z; rewrite Z.eqb_sym; auto. }
+    apply twp_uniform_tree; lia.
+  - apply wf_tree_uniform_tree.
+  - apply tree_unbiased_uniform_tree.
+  - rewrite twlp_const_1_uniform_tree; eRauto.
 Qed.
 
 Section die_equidistribution.
-  Context (env : SamplingEnvironment) (P : nat -> bool) (samples : nat -> nat).
-  Context (n : nat) (Hn : (0 < n)%nat).
+  Context (env : SamplingEnvironment)
+    (P : Z -> bool) (samples : nat -> Z) (n : Z).
   Hypothesis bitstreams_samples :
     forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (die_itree n).
 
@@ -175,16 +108,15 @@ Section die_equidistribution.
     converges (freq (is_true ∘ P) ∘ prefix samples)
       (itwp (fun x => if P x then 1 else 0) (die_itree n)).
   Proof.
-    eapply itree_samples_equidistributed; eauto.
-    destruct env; auto.
+    eapply itree_samples_equidistributed; eauto; destruct env; auto.
   Qed.
 End die_equidistribution.
 
 Corollary die_eq_n_converges
-  (env : SamplingEnvironment) (samples : nat -> nat) (n m : nat) :
+  (env : SamplingEnvironment) (samples : nat -> Z) (n m : Z) :
   (forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (die_itree n)) ->
-  (m < n)%nat ->
-  converges (freq (is_true ∘ eqb m) ∘ prefix samples) (1 / INeR n).
+  (0 <= m < n)%Z ->
+  converges (freq (is_true ∘ eqb m) ∘ prefix samples) (1 / IZeR n).
 Proof.
   intros Hsamples Hlt.
   erewrite <- die_itree_correct; eauto.
@@ -193,13 +125,15 @@ Qed.
 
 (** Finite distribution. *)
 
-Theorem findist_itree_correct (weights : list nat) (n : nat) :
-  Exists (fun w => (0 < w)%nat) weights ->
-  (n < length weights)%nat ->
-  itwp (fun x : nat => if eqb n x then 1 else 0) (findist_itree weights) =
-    INeR (nth n weights O) / INeR (list_sum weights).
+Theorem findist_itree_correct (weights : list Z) (n : Z) :
+  (0 <= n)%Z ->
+  Forall (fun x => 0 <= x)%Z weights ->
+  Exists (fun w => (0 < w)%Z) weights ->
+  (Z.to_nat n < length weights)%nat ->
+  itwp (fun x : Z => if eqb n x then 1 else 0) (findist_itree weights) =
+    IZeR (nth (Z.to_nat n) weights Z0) / IZeR (list_sum_Z weights).
 Proof.
-  intros Hex Hlt.
+  intros Hn Hall Hex Hlt.
   unfold findist_itree.
   rewrite <- tcwp_itwp.
   - apply findist_tree_correct; auto.
@@ -214,8 +148,8 @@ Proof.
 Qed.
 
 Section findist_equidistribution.
-  Context (env : SamplingEnvironment) (P : nat -> bool) (samples : nat -> nat).
-  Context (weights : list nat) (Hweights : Exists (fun w => (0 < w)%nat) weights).
+  Context (env : SamplingEnvironment)
+    (P : Z -> bool) (samples : nat -> Z) (weights : list Z).
   Hypothesis bitstreams_samples :
     forall i, iproduces (eq (samples i)) (env.(bitstreams) i)
            (findist_itree weights).
@@ -230,14 +164,16 @@ Section findist_equidistribution.
 End findist_equidistribution.
 
 Corollary findist_eq_n_converges
-  (env : SamplingEnvironment) (samples : nat -> nat) (weights : list nat) (n : nat) :
+  (env : SamplingEnvironment) (samples : nat -> Z) (weights : list Z) (n : Z) :
   (forall i, iproduces (eq (samples i)) (env.(bitstreams) i) (findist_itree weights)) ->
-  Exists (fun w => (0 < w)%nat) weights ->
-  (n < length weights)%nat ->
+  (0 <= n)%Z ->
+  Forall (fun x => 0 <= x)%Z weights ->
+  Exists (fun w => (0 < w)%Z) weights ->
+  (Z.to_nat n < length weights)%nat ->
   converges (freq (is_true ∘ eqb n) ∘ prefix samples)
-    (INeR (nth n weights O) / INeR (list_sum weights)).
+    (IZeR (nth (Z.to_nat n) weights Z0) / IZeR (list_sum_Z weights)).
 Proof.
-  intros Hsamples Hex Hlt.
+  intros Hn Hsamples Hall Hex Hlt.
   erewrite <- findist_itree_correct; eauto.
   eapply findist_samples_equidistributed; eauto.
 Qed.
@@ -247,11 +183,6 @@ Qed.
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 
 Definition coin_die_samplers : Samplers :=
-  mkSamplers
-    (fun p => ITree.map (fun s => as_bool (s "b"))
-             (cpGCL_to_itree (coin "b" p) empty))
-    (fun n => ITree.map (fun s => as_nat (s "n"))
-             (cpGCL_to_itree (die "n" n) empty))
-    findist_itree.
+  mkSamplers coin_itree die_itree findist_itree.
 
-Extraction "extract/ocamlzar/samplers.ml" coin_die_samplers.
+Extraction "ocaml/zar/lib/samplers.ml" coin_die_samplers.

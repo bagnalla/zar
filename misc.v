@@ -10,6 +10,7 @@ From Coq Require Import
   Lia
   RelationClasses
   Basics
+  ZArith
 .
 Import ListNotations.
 Local Open Scope program_scope.
@@ -335,12 +336,17 @@ Proof. destruct x, y; constructor; reflexivity. Qed.
 #[global]
   Instance EqType_bool : EqType bool :=
   {| eqb := Bool.eqb
-  ; eqb_spec := Bool.eqb_spec |}.
+   ; eqb_spec := Bool.eqb_spec |}.
 
 #[global]
   Instance EqType_nat : EqType nat :=
   {| eqb := Nat.eqb
-  ; eqb_spec := Nat.eqb_spec |}.
+   ; eqb_spec := Nat.eqb_spec |}.
+
+#[global]
+  Instance EqType_Z : EqType Z :=
+  {| eqb := Z.eqb
+   ; eqb_spec := Z.eqb_spec |}.
 
 #[global]
   Program Instance EqType_option {A} `{EqType A} : EqType (option A) :=

@@ -62,13 +62,7 @@ module Nat :
 
   val eqb : nat -> nat -> bool
 
-  val leb : nat -> nat -> bool
-
-  val ltb : nat -> nat -> bool
-
   val pow : nat -> nat -> nat
-
-  val eqb_spec : nat -> nat -> reflect
  end
 
 module Pos :
@@ -114,6 +108,8 @@ module Coq_Pos :
 
   val compare : positive -> positive -> comparison
 
+  val eqb : positive -> positive -> bool
+
   val ggcdn : nat -> positive -> positive -> positive * (positive * positive)
 
   val ggcd : positive -> positive -> positive * (positive * positive)
@@ -125,11 +121,25 @@ module Coq_Pos :
 
 module Z :
  sig
-  val mul : z -> z -> z
+  val double : z -> z
+
+  val succ_double : z -> z
+
+  val pred_double : z -> z
+
+  val pos_sub : positive -> positive -> z
+
+  val add : z -> z -> z
+
+  val succ : z -> z
 
   val compare : z -> z -> comparison
 
   val sgn : z -> z
+
+  val ltb : z -> z -> bool
+
+  val eqb : z -> z -> bool
 
   val abs : z -> z
 
@@ -138,19 +148,17 @@ module Z :
   val to_pos : z -> positive
 
   val ggcd : z -> z -> z * (z * z)
+
+  val eqb_spec : z -> z -> reflect
  end
 
-val zeq_bool : z -> z -> bool
+val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list
 
 val repeat : 'a1 -> nat -> 'a1 list
 
 type q = { qnum : z; qden : positive }
 
-val qeq_bool : q -> q -> bool
-
 val qred : q -> q
-
-val eqb0 : char list -> char list -> bool
 
 type 'm monad = { ret : (__ -> __ -> 'm); bind : (__ -> __ -> 'm -> (__ -> 'm) -> 'm) }
 
@@ -186,13 +194,11 @@ val cotuple : ('a1 -> 'a3) -> ('a2 -> 'a3) -> ('a1, 'a2) sum -> 'a3
 
 val sum_map : ('a1 -> 'a3) -> ('a2 -> 'a4) -> ('a1, 'a2) sum -> ('a3, 'a4) sum
 
-val rev_range : nat -> nat list
-
 val drop : nat -> 'a1 list -> 'a1 list
 
 val take : nat -> 'a1 list -> 'a1 list
 
-type 'a eqType = { eqb1 : ('a -> 'a -> bool); eqb_spec0 : ('a -> 'a -> reflect) }
+type 'a eqType = { eqb0 : ('a -> 'a -> bool); eqb_spec0 : ('a -> 'a -> reflect) }
 
 val unit_eqb_spec : unit -> unit -> reflect
 
@@ -200,7 +206,7 @@ val eqType_unit : unit eqType
 
 val eqType_bool : bool eqType
 
-val eqType_nat : nat eqType
+val eqType_Z : z eqType
 
 val eqType_sum_obligation_3 :
   'a1 eqType -> 'a2 eqType -> ('a1, 'a2) sum -> ('a1, 'a2) sum -> reflect
@@ -209,48 +215,21 @@ val eqType_sum : 'a1 eqType -> 'a2 eqType -> ('a1, 'a2) sum eqType
 
 val is_inl : ('a1, 'a2) sum -> bool
 
-type val0 =
-| Vbool of bool
-| Vnat of nat
-| Vint of z
-| Vrat of q
-
-type st = char list -> val0
-
-val empty : st
-
-val upd : char list -> val0 -> st -> st
-
-type expr = st -> val0
-
-val as_bool : val0 -> bool
-
-val as_nat : val0 -> nat
-
-type cpGCL =
-| CSkip
-| CAbort
-| CAssign of char list * expr
-| CSeq of cpGCL * cpGCL
-| CIte of (st -> bool) * cpGCL * cpGCL
-| CChoice of (st -> q) * (bool -> cpGCL)
-| CUniform of (st -> nat) * (nat -> cpGCL)
-| CWhile of (st -> bool) * cpGCL
-| CObserve of (st -> bool)
-
-val const_val : val0 -> expr
-
 type 'a tree =
 | Leaf of 'a
 | Fail
 | Choice of q * (bool -> 'a tree)
 | Fix of __ * (__ -> bool) * (__ -> __ tree) * (__ -> 'a tree)
 
-val tree_bind : 'a1 tree -> ('a1 -> 'a2 tree) -> 'a2 tree
-
 val is_power_of_2b : nat -> bool
 
 val next_pow_2 : nat -> nat
+
+val to_itree_open : 'a1 tree -> (__, (unit, 'a1) sum) itree
+
+val tie_itree : ('a2, (unit, 'a1) sum) itree -> ('a2, 'a1) itree
+
+val to_itree : 'a1 tree -> (__, 'a1) itree
 
 type 'a btree =
 | BLeaf of 'a
@@ -268,51 +247,39 @@ val reduce_btree : (unit, 'a1) sum btree -> (unit, 'a1) sum btree
 
 val reduce_btree' : 'a1 eqType -> 'a1 btree -> 'a1 btree
 
-val uniform_btree : nat -> (unit, nat) sum btree
+val rev_range_positive : positive -> z list
 
-val bernoulli_btree : nat -> nat -> (unit, bool) sum btree
+val rev_range_Z : z -> z list
 
-val bernoulli_tree_open : nat -> nat -> (unit, bool) sum tree
+val uniform_btree : z -> (unit, z) sum btree
+
+val bernoulli_btree : z -> z -> (unit, bool) sum btree
+
+val bernoulli_tree_open : z -> z -> (unit, bool) sum tree
 
 val bernoulli_tree : q -> bool tree
 
-val uniform_tree_open : nat -> (unit, nat) sum tree
+val uniform_tree_open : z -> (unit, z) sum tree
 
-val uniform_tree : nat -> nat tree
+val uniform_tree : z -> z tree
 
-val compile : cpGCL -> st -> st tree
+val flatten_weights_aux : z list -> z -> z list
 
-val debias : 'a1 tree -> 'a1 tree
+val flatten_weights : z list -> z list
 
-val elim_choices : 'a1 tree -> 'a1 tree
+val findist_btree : z list -> (unit, z) sum btree
 
-val opt : 'a1 tree -> 'a1 tree
+val findist_tree_open : z list -> (unit, z) sum tree
 
-val to_itree_open : 'a1 tree -> (__, (unit, 'a1) sum) itree
+val findist_tree : z list -> z tree
 
-val tie_itree : ('a2, (unit, 'a1) sum) itree -> ('a2, 'a1) itree
+val findist_itree : z list -> (__, z) itree
 
-val to_itree : 'a1 tree -> (__, 'a1) itree
+type samplers = { coin_sampler : (q -> (__, bool) itree); die_sampler : (z -> (__, z) itree);
+                  findist_sampler : (z list -> (__, z) itree) }
 
-val cpGCL_to_itree : cpGCL -> st -> (__, st) itree
+val coin_itree : q -> (__, bool) itree
 
-val flatten_weights_aux : nat list -> nat -> nat list
-
-val flatten_weights : nat list -> nat list
-
-val findist_btree : nat list -> (unit, nat) sum btree
-
-val findist_tree_open : nat list -> (unit, nat) sum tree
-
-val findist_tree : nat list -> nat tree
-
-val findist_itree : nat list -> (__, nat) itree
-
-type samplers = { coin_sampler : (q -> (__, bool) itree); die_sampler : (nat -> (__, nat) itree);
-                  findist_sampler : (nat list -> (__, nat) itree) }
-
-val coin : char list -> q -> cpGCL
-
-val die : char list -> nat -> cpGCL
+val die_itree : z -> (__, z) itree
 
 val coin_die_samplers : samplers

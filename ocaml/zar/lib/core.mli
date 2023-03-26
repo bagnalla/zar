@@ -2,10 +2,6 @@ open Samplers
 
 exception ZarError of string
 
-val nat_of_int : int -> nat
-
-val int_of_nat : nat -> int
-
 val positive_of_int : int -> positive
 
 val int_of_positive : positive -> int
