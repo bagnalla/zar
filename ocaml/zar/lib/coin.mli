@@ -1,3 +1,4 @@
+(** Biased coin. *)
 
 (** Build and cache coin. *)
 val build : int -> int -> unit

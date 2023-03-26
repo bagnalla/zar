@@ -1,3 +1,4 @@
+(** N-sided die. *)
 
 (** Build and cache die. *)
 val build : int -> unit
