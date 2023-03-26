@@ -5,7 +5,7 @@ PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
 ## Why use Zar?
 
-### Probabilistic choice
+### Probabilistic Choice
 
 A basic operation in randomized algorithms is *probabilistic choice*:
 for some `p ∈ [0,1]`, execute action `a1` with probability `p` or
@@ -34,7 +34,7 @@ if Coin.flip () (* Flip the coin *)
   then a1 else a2
 ```
 
-### Uniform sampling
+### Uniform Sampling
 
 Another common operation is to randomly draw from a finite collection
 of values with equal (uniform) probability of each. An old trick for
@@ -60,7 +60,7 @@ Although the OCaml function `Random.int` is ostensibly free from
 modulo bias, our implementation guarantees it by a *formal proof of
 correctness* in Coq.
 
-### Finite distributions
+### Finite Distributions
 
 The coin and die samplers are special cases of a more general
 construction for finite probability distributions that we provide
@@ -88,7 +88,7 @@ shim code (viewable
 and thoroughly tested with QCheck
 [here](https://github.com/bagnalla/zar/blob/main/ocaml/zar/test/zar.ml)),
 
-## Proofs of correctness
+## Proofs of Correctness
 
 The samplers are implemented as choice-fix (CF) trees (an intermediate
 representation used in the [Zar](https://github.com/bagnalla/zar)
@@ -139,7 +139,7 @@ the proportion of samples equal to `i` converges to `weightsᵢ /
 `Core.seed ()` initializes the PRNG (currently just calls
 [Random.self_init](https://v2.ocaml.org/api/Random.html)).
 
-### Biased coin
+### Biased Coin
 
 `Coin.build num denom` builds and caches a coin with `Pr(True) =
 num/denom` for nonnegative integer `num` and positive integer `denom`.
@@ -150,7 +150,7 @@ num/denom` for nonnegative integer `num` and positive integer `denom`.
 
 See [coin.mli](lib/coin.mli).
 
-### N-sided die
+### N-sided Die
 
 `Die.build n` builds and caches an n-sided die with `Pr(m) = 1/n` for
 integer `m` where `0 <= m < n`.
@@ -161,7 +161,7 @@ integer `m` where `0 <= m < n`.
 
 See [die.mli](lib/die.mli).
 
-### Finite distribution
+### Finite Distribution
 
 `Findist.build weights` builds and caches a sampler from list of
 nonnegative integer weights `weights` (where `0 < weightsᵢ` for some
@@ -173,3 +173,22 @@ nonnegative integer weights `weights` (where `0 < weightsᵢ` for some
 `Findist.samples n` produces n samples from the cached sampler.
 
 See [findist.mli](lib/findist.mli).
+
+## Performance and Limitations
+
+The implementations here are optimized for sampling performance at the
+expense of sampler build time. Thus, this library not be ideal if your
+use case involves frequent changes in the samplers' parameters (e.g.,
+the coin bias or the number of sides of the die). For example, in our
+experiments it takes ~0.22s to build a 100000-sided die and 1.83s to
+build a 500000-sided die, but only ~1.85s and ~2.19s respectively to
+generate one million samples from them.
+
+The size of the in-memory representation of a coin with bias `p = n /
+d` is proportional to `d` (after bringing the fraction to reduced
+form). The size of an `n`-sided die is proportional to `n`, and a
+finite distribution to the sum of its weights. The formal results we
+provide are partial in the sense that they only apply to samplers that
+execute without running out of memory. I.e., we do not provide any
+guarantees against stack overflow or out-of-memory errors when, e.g.,
+`n` is too large.
