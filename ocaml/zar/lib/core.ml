@@ -2,21 +2,6 @@ open Samplers
 
 exception ZarError of string
 
-let nat_of_int (i : int) : nat =
-  if i < 0 then
-    raise (ZarError ("nat_of_int: int must be nonnegative, got "
-                     ^ string_of_int i))
-  else
-    let rec go (j : int) (acc : nat) : nat =
-      if j <= 0 then acc else (go [@tailcall]) (j-1) (S acc)
-    in go i O
-
-let int_of_nat (n : nat) =
-  let rec go (acc : int) = function
-    | O -> acc
-    | S n' -> (go [@tailcall]) (acc + 1) n'
-  in go 0 n
-
 let positive_of_int (i : int) : positive =
   if i < 1 then
     raise (ZarError ("positive_of_int: int must be positive, got "

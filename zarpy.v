@@ -183,11 +183,12 @@ Qed.
 (** Finite distribution. *)
 
 Theorem findist_itree_correct (weights : list nat) (n : nat) :
+  Exists (fun w => (0 < w)%nat) weights ->
   (n < length weights)%nat ->
   itwp (fun x : nat => if eqb x n then 1 else 0) (findist_itree weights) =
-    INeR (nth n weights O) / INeR n.
+    INeR (nth n weights O) / INeR (list_sum weights).
 Proof.
-  intro Hlt.
+  intros Hex Hlt.
   unfold findist_itree.
   rewrite <- tcwp_itwp.
   - apply findist_itree_correct; auto.
