@@ -186,9 +186,9 @@ generate one million samples from them.
 
 The size of the in-memory representation of a coin with bias `p = n /
 d` is proportional to `d` (after bringing the fraction to reduced
-form). The size of an `n`-sided die is proportional to `n`, and a
-finite distribution to the sum of its weights. The formal results we
-provide are partial in the sense that they only apply to samplers that
-execute without running out of memory. I.e., we do not provide any
-guarantees against stack overflow or out-of-memory errors when, e.g.,
-`n` is too large.
+form). The size of an `n`-sided die is proportional to `n`, and the
+size of a finite distribution to the sum of its weights. The formal
+results we provide are partial in the sense that they only apply to
+samplers that execute without running out of memory. I.e., we do not
+provide any guarantees against stack overflow or out-of-memory errors
+when, e.g., `n` is too large.
