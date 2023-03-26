@@ -184,8 +184,8 @@ experiments it takes ~0.22s to build a 100000-sided die and 1.83s to
 build a 500000-sided die, but only ~1.85s and ~2.19s respectively to
 generate one million samples from them.
 
-The size of the in-memory representation of a coin with bias `p = n /
-d` is proportional to `d` (after bringing the fraction to reduced
+The size of the in-memory representation of a coin with bias `p = num /
+denom` is proportional to `denom` (after bringing the fraction to reduced
 form). The size of an `n`-sided die is proportional to `n`, and the
 size of a finite distribution to the sum of its weights. The formal
 results we provide are partial in the sense that they only apply to
