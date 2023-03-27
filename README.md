@@ -24,7 +24,7 @@ make install
 
 * Extracted sampler analysis scripts (e.g., [analyze.py](extract/geometric/analyze.py)):
 ```
-pip install numpy matplotlib scipy
+pip install numpy==1.24.2 scipy==1.10.1 tensorflow==2.11.0 optas==1.0.3
 ```
 
 ## Foundational
