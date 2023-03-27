@@ -1,7 +1,7 @@
 # Zar: formally verified sampling from discrete probability distributions.
 
-See the related [paper](https://arxiv.org/abs/2211.06747) (to appear in
-PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
+See the related [paper](https://arxiv.org/abs/2211.06747) (to appear
+in PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
 
 ## Why use Zar?
 
@@ -48,8 +48,8 @@ causing some values to occur with higher probability than others (see,
 e.g., [this
 article](https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/)
 for more information on modulo bias). Zar provides a uniform sampler
-that is guaranteed for any integer `0 < n` to generate samples from the range
-`[0,n)` with probability `1/n` each:
+that is guaranteed for any integer `0 < n` to generate samples from
+the range `[0,n)` with probability `1/n` each:
 ```ocaml
 open Zar
 Die.build n (* Build and cache n-sided die *)
@@ -75,7 +75,9 @@ Findist.build weights (* Build and cache findist sampler *)
 let k = Findist.sample () (* Draw a sample *)
 ```
 
-For example, `Findist.build [1; 3; 2]` builds a sampler that draws integers from the set `{0, 1, 2}` with `Pr(0) = 1/6`, `Pr(1) = 1/2`, and `Pr(2) = 1/3`.
+For example, `Findist.build [1; 3; 2]` builds a sampler that draws
+integers from the set `{0, 1, 2}` with `Pr(0) = 1/6`, `Pr(1) = 1/2`,
+and `Pr(2) = 1/3`.
 
 ## Trusted Computing Base
 
@@ -144,9 +146,11 @@ the proportion of samples equal to `i` converges to `weightsᵢ /
 `Coin.build num denom` builds and caches a coin with `Pr(True) =
 num/denom` for nonnegative integer `num` and positive integer `denom`.
 
-`Coin.flip ()` produces a single Boolean sample by flipping the cached coin.
+`Coin.flip ()` produces a single Boolean sample by flipping the cached
+coin.
 
-`Coin.flips n` produces `n` Boolean samples by flipping the cached coin.
+`Coin.flips n` produces `n` Boolean samples by flipping the cached
+coin.
 
 See [coin.mli](lib/coin.mli).
 
@@ -184,11 +188,11 @@ experiments it takes ~0.22s to build a 100000-sided die and 1.83s to
 build a 500000-sided die, but only ~1.85s and ~2.19s respectively to
 generate one million samples from them.
 
-The size of the in-memory representation of a coin with bias `p = num /
-denom` is proportional to `denom` (after bringing the fraction to reduced
-form). The size of an `n`-sided die is proportional to `n`, and the
-size of a finite distribution to the sum of its weights. The formal
-results we provide are partial in the sense that they only apply to
-samplers that execute without running out of memory. I.e., we do not
-provide any guarantees against stack overflow or out-of-memory errors
-when, e.g., `n` is too large.
+The size of the in-memory representation of a coin with bias `p = num
+/ denom` is proportional to `denom` (after bringing the fraction to
+reduced form). The size of an `n`-sided die is proportional to `n`,
+and the size of a finite distribution to the sum of its weights. The
+formal results we provide are partial in the sense that they only
+apply to samplers that execute without running out of memory. I.e., we
+do not provide any guarantees against stack overflow or out-of-memory
+errors when, e.g., `n` is too large.

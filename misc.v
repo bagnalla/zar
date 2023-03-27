@@ -326,7 +326,7 @@ Class EqType (A : Type) : Type :=
 
 Lemma unit_eqb_spec (x y : unit) :
   reflect (x = y) true.
-Proof. destruct x, y; constructor; reflexivity. Qed.
+Proof. destruct x, y; constructor; reflexivity. Defined.
 
 #[global]
   Program Instance EqType_unit : EqType unit :=
@@ -388,7 +388,7 @@ Next Obligation.
   destruct (eqb_spec a0 a); subst; simpl.
   - destruct (eqb_spec b0 b); subst; constructor; congruence.
   - constructor; congruence.
-Qed.
+Defined.
 
 #[global]
   Program Instance EqType_sum {A B : Type} `{EqType A} `{EqType B} : EqType (A + B) :=
@@ -407,7 +407,7 @@ Next Obligation.
   - destruct y.
     + constructor; congruence.
     + destruct (eqb_spec b b0); subst; constructor; congruence.
-Qed.
+Defined.
 
 Lemma eqb_refl {A} `{EqType A} (a : A) :
   eqb a a = true.

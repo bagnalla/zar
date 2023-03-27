@@ -20,6 +20,7 @@ equidistribution.v
 itree.v
 misc.v
 mu.v
+ocamlzar.v
 order.v
 pow_2.v
 prelude.v

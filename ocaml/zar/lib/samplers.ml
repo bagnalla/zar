@@ -47,7 +47,8 @@ let pred n = match n with
 | S u -> u
 
 module Coq__1 = struct
- (** val add : nat -> nat -> nat **)let rec add n m =
+ (** val add : nat -> nat -> nat **)
+ let rec add n m =
    match n with
    | O -> m
    | S p -> S (add p m)
@@ -59,9 +60,10 @@ include Coq__1
 let rec log2_iter k p q0 r =
   match k with
   | O -> p
-  | S k' -> (match r with
-             | O -> log2_iter k' (S p) (S q0) q0
-             | S r' -> log2_iter k' p (S q0) r')
+  | S k' ->
+    (match r with
+     | O -> log2_iter k' (S p) (S q0) q0
+     | S r' -> log2_iter k' p (S q0) r')
 
 (** val log2 : nat -> nat **)
 
@@ -106,7 +108,9 @@ let iff_reflect = function
 (** val eqb_spec : bool -> bool -> reflect **)
 
 let eqb_spec b b' =
-  if b then if b' then ReflectT else ReflectF else if b' then ReflectF else ReflectT
+  if b
+  then if b' then ReflectT else ReflectF
+  else if b' then ReflectF else ReflectT
 
 module Nat =
  struct
@@ -168,10 +172,11 @@ module Coq_Pos =
        | XI q0 -> XO (add_carry p q0)
        | XO q0 -> XI (add p q0)
        | XH -> XO (succ p))
-    | XO p -> (match y with
-               | XI q0 -> XI (add p q0)
-               | XO q0 -> XO (add p q0)
-               | XH -> XI p)
+    | XO p ->
+      (match y with
+       | XI q0 -> XI (add p q0)
+       | XO q0 -> XO (add p q0)
+       | XH -> XI p)
     | XH -> (match y with
              | XI q0 -> XO (succ q0)
              | XO q0 -> XI q0
@@ -191,10 +196,11 @@ module Coq_Pos =
        | XI q0 -> XO (add_carry p q0)
        | XO q0 -> XI (add p q0)
        | XH -> XO (succ p))
-    | XH -> (match y with
-             | XI q0 -> XI (succ q0)
-             | XO q0 -> XO (succ q0)
-             | XH -> XI XH)
+    | XH ->
+      (match y with
+       | XI q0 -> XI (succ q0)
+       | XO q0 -> XO (succ q0)
+       | XH -> XI XH)
 
   (** val pred_double : positive -> positive **)
 
@@ -321,7 +327,8 @@ module Coq_Pos =
              | XH -> true
              | _ -> false)
 
-  (** val ggcdn : nat -> positive -> positive -> positive * (positive * positive) **)
+  (** val ggcdn :
+      nat -> positive -> positive -> positive * (positive * positive) **)
 
   let rec ggcdn n a b =
     match n with
@@ -339,11 +346,15 @@ module Coq_Pos =
              | Gt ->
                let (g, p) = ggcdn n0 (sub a' b') b in
                let (ab, bb) = p in (g, ((add bb (XO ab)), bb)))
-          | XO b0 -> let (g, p) = ggcdn n0 a b0 in let (aa, bb) = p in (g, (aa, (XO bb)))
+          | XO b0 ->
+            let (g, p) = ggcdn n0 a b0 in
+            let (aa, bb) = p in (g, (aa, (XO bb)))
           | XH -> (XH, (a, XH)))
        | XO a0 ->
          (match b with
-          | XI _ -> let (g, p) = ggcdn n0 a0 b in let (aa, bb) = p in (g, ((XO aa), bb))
+          | XI _ ->
+            let (g, p) = ggcdn n0 a0 b in
+            let (aa, bb) = p in (g, ((XO aa), bb))
           | XO b0 -> let (g, p) = ggcdn n0 a0 b0 in ((XO g), p)
           | XH -> (XH, (a, XH)))
        | XH -> (XH, (XH, b)))
@@ -442,9 +453,10 @@ module Z =
     | Zpos x' -> (match y with
                   | Zpos y' -> Coq_Pos.compare x' y'
                   | _ -> Gt)
-    | Zneg x' -> (match y with
-                  | Zneg y' -> compOpp (Coq_Pos.compare x' y')
-                  | _ -> Lt)
+    | Zneg x' ->
+      (match y with
+       | Zneg y' -> compOpp (Coq_Pos.compare x' y')
+       | _ -> Lt)
 
   (** val sgn : z -> z **)
 
@@ -501,16 +513,20 @@ module Z =
       (match b with
        | Z0 -> ((abs a), ((sgn a), Z0))
        | Zpos b0 ->
-         let (g, p) = Coq_Pos.ggcd a0 b0 in let (aa, bb) = p in ((Zpos g), ((Zpos aa), (Zpos bb)))
+         let (g, p) = Coq_Pos.ggcd a0 b0 in
+         let (aa, bb) = p in ((Zpos g), ((Zpos aa), (Zpos bb)))
        | Zneg b0 ->
-         let (g, p) = Coq_Pos.ggcd a0 b0 in let (aa, bb) = p in ((Zpos g), ((Zpos aa), (Zneg bb))))
+         let (g, p) = Coq_Pos.ggcd a0 b0 in
+         let (aa, bb) = p in ((Zpos g), ((Zpos aa), (Zneg bb))))
     | Zneg a0 ->
       (match b with
        | Z0 -> ((abs a), ((sgn a), Z0))
        | Zpos b0 ->
-         let (g, p) = Coq_Pos.ggcd a0 b0 in let (aa, bb) = p in ((Zpos g), ((Zneg aa), (Zpos bb)))
+         let (g, p) = Coq_Pos.ggcd a0 b0 in
+         let (aa, bb) = p in ((Zpos g), ((Zneg aa), (Zpos bb)))
        | Zneg b0 ->
-         let (g, p) = Coq_Pos.ggcd a0 b0 in let (aa, bb) = p in ((Zpos g), ((Zneg aa), (Zneg bb))))
+         let (g, p) = Coq_Pos.ggcd a0 b0 in
+         let (aa, bb) = p in ((Zpos g), ((Zneg aa), (Zneg bb))))
 
   (** val eqb_spec : z -> z -> reflect **)
 
@@ -536,9 +552,11 @@ type q = { qnum : z; qden : positive }
 
 let qred q0 =
   let { qnum = q1; qden = q2 } = q0 in
-  let (r1, r2) = snd (Z.ggcd q1 (Zpos q2)) in { qnum = r1; qden = (Z.to_pos r2) }
+  let (r1, r2) = snd (Z.ggcd q1 (Zpos q2)) in
+  { qnum = r1; qden = (Z.to_pos r2) }
 
-type 'm monad = { ret : (__ -> __ -> 'm); bind : (__ -> __ -> 'm -> (__ -> 'm) -> 'm) }
+type 'm monad = { ret : (__ -> __ -> 'm);
+                  bind : (__ -> __ -> 'm -> (__ -> 'm) -> 'm) }
 
 (** val ret : 'a1 monad -> 'a2 -> 'a1 **)
 
@@ -566,7 +584,8 @@ let observe =
 
 module ITree =
  struct
-  (** val subst : ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a2) itree -> ('a1, 'a3) itree **)
+  (** val subst :
+      ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a2) itree -> ('a1, 'a3) itree **)
 
   let rec subst k u =
     match observe u with
@@ -574,12 +593,14 @@ module ITree =
     | TauF t -> lazy (Go (TauF (subst k t)))
     | VisF (e, h) -> lazy (Go (VisF (e, (fun x -> subst k (h x)))))
 
-  (** val bind : ('a1, 'a2) itree -> ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a3) itree **)
+  (** val bind :
+      ('a1, 'a2) itree -> ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a3) itree **)
 
   let bind u k =
     subst k u
 
-  (** val iter : ('a3 -> ('a1, ('a3, 'a2) sum) itree) -> 'a3 -> ('a1, 'a2) itree **)
+  (** val iter :
+      ('a3 -> ('a1, ('a3, 'a2) sum) itree) -> 'a3 -> ('a1, 'a2) itree **)
 
   let rec iter step i =
     bind (step i) (fun lr ->
@@ -604,7 +625,8 @@ let cotuple f g = function
 | Inl a -> f a
 | Inr b -> g b
 
-(** val sum_map : ('a1 -> 'a3) -> ('a2 -> 'a4) -> ('a1, 'a2) sum -> ('a3, 'a4) sum **)
+(** val sum_map :
+    ('a1 -> 'a3) -> ('a2 -> 'a4) -> ('a1, 'a2) sum -> ('a3, 'a4) sum **)
 
 let sum_map f g = function
 | Inl a -> Inl (f a)
@@ -630,7 +652,8 @@ let rec take n l =
              | [] -> []
              | x :: l' -> x :: (take n' l'))
 
-type 'a eqType = { eqb0 : ('a -> 'a -> bool); eqb_spec0 : ('a -> 'a -> reflect) }
+type 'a eqType = { eqb0 : ('a -> 'a -> bool);
+                   eqb_spec0 : ('a -> 'a -> reflect) }
 
 (** val unit_eqb_spec : unit -> unit -> reflect **)
 
@@ -699,14 +722,17 @@ let is_power_of_2b n =
 (** val next_pow_2 : nat -> nat **)
 
 let next_pow_2 n =
-  if Nat.eqb n O then S O else if is_power_of_2b n then n else Nat.pow (S (S O)) (S (log2 n))
+  if Nat.eqb n O
+  then S O
+  else if is_power_of_2b n then n else Nat.pow (S (S O)) (S (log2 n))
 
 (** val to_itree_open : 'a1 tree -> (__, (unit, 'a1) sum) itree **)
 
 let rec to_itree_open = function
 | Leaf x -> ret (Obj.magic monad_itree) (Inr x)
 | Fail -> ret (Obj.magic monad_itree) (Inl ())
-| Choice (_, k) -> lazy (Go (VisF (__, (compose to_itree_open (Obj.magic k)))))
+| Choice (_, k) ->
+  lazy (Go (VisF (__, (compose to_itree_open (Obj.magic k)))))
 | Fix (st, g, g0, k) ->
   ITree.iter (fun s ->
     if g s
@@ -771,9 +797,10 @@ let rec reduce_btree t = match t with
      (match s with
       | Inl _ ->
         (match r' with
-         | BLeaf s0 -> (match s0 with
-                        | Inl _ -> BLeaf (Inl ())
-                        | Inr _ -> BNode (l', r'))
+         | BLeaf s0 ->
+           (match s0 with
+            | Inl _ -> BLeaf (Inl ())
+            | Inr _ -> BNode (l', r'))
          | BNode (_, _) -> BNode (l', r'))
       | Inr _ -> BNode (l', r'))
    | BNode (_, _) -> BNode (l', r'))
@@ -797,9 +824,12 @@ let rec reduce_btree' h t = match t with
 let rec rev_range_positive = function
 | XI p' ->
   (Zpos
-    (Coq_Pos.mul (XO XH) p')) :: (app (map (Z.add (Zpos p')) (rev_range_positive p'))
+    (Coq_Pos.mul (XO XH) p')) :: (app
+                                   (map (Z.add (Zpos p'))
+                                     (rev_range_positive p'))
                                    (rev_range_positive p'))
-| XO p' -> app (map (Z.add (Zpos p')) (rev_range_positive p')) (rev_range_positive p')
+| XO p' ->
+  app (map (Z.add (Zpos p')) (rev_range_positive p')) (rev_range_positive p')
 | XH -> Z0 :: []
 
 (** val rev_range_Z : z -> z list **)
@@ -848,7 +878,8 @@ let uniform_tree n =
 let rec flatten_weights_aux weights acc =
   match weights with
   | [] -> []
-  | w :: ws -> app (repeat acc (Z.to_nat w)) (flatten_weights_aux ws (Z.succ acc))
+  | w :: ws ->
+    app (repeat acc (Z.to_nat w)) (flatten_weights_aux ws (Z.succ acc))
 
 (** val flatten_weights : z list -> z list **)
 
@@ -858,7 +889,8 @@ let flatten_weights weights =
 (** val findist_btree : z list -> (unit, z) sum btree **)
 
 let findist_btree weights =
-  reduce_btree' (eqType_sum eqType_unit eqType_Z) (list_btree (flatten_weights weights))
+  reduce_btree' (eqType_sum eqType_unit eqType_Z)
+    (list_btree (flatten_weights weights))
 
 (** val findist_tree_open : z list -> (unit, z) sum tree **)
 
@@ -877,7 +909,8 @@ let findist_tree weights =
 let findist_itree weights =
   to_itree (findist_tree weights)
 
-type samplers = { coin_sampler : (q -> (__, bool) itree); die_sampler : (z -> (__, z) itree);
+type samplers = { coin_sampler : (q -> (__, bool) itree);
+                  die_sampler : (z -> (__, z) itree);
                   findist_sampler : (z list -> (__, z) itree) }
 
 (** val coin_itree : q -> (__, bool) itree **)
@@ -893,4 +926,5 @@ let die_itree n =
 (** val coin_die_samplers : samplers **)
 
 let coin_die_samplers =
-  { coin_sampler = coin_itree; die_sampler = die_itree; findist_sampler = findist_itree }
+  { coin_sampler = coin_itree; die_sampler = die_itree; findist_sampler =
+    findist_itree }

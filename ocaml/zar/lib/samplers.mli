@@ -160,7 +160,8 @@ type q = { qnum : z; qden : positive }
 
 val qred : q -> q
 
-type 'm monad = { ret : (__ -> __ -> 'm); bind : (__ -> __ -> 'm -> (__ -> 'm) -> 'm) }
+type 'm monad = { ret : (__ -> __ -> 'm);
+                  bind : (__ -> __ -> 'm -> (__ -> 'm) -> 'm) }
 
 val ret : 'a1 monad -> 'a2 -> 'a1
 
@@ -179,7 +180,8 @@ val observe : ('a1, 'a2) itree -> ('a1, 'a2, ('a1, 'a2) itree) itreeF
 
 module ITree :
  sig
-  val subst : ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a2) itree -> ('a1, 'a3) itree
+  val subst :
+    ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a2) itree -> ('a1, 'a3) itree
 
   val bind : ('a1, 'a2) itree -> ('a2 -> ('a1, 'a3) itree) -> ('a1, 'a3) itree
 
@@ -198,7 +200,8 @@ val drop : nat -> 'a1 list -> 'a1 list
 
 val take : nat -> 'a1 list -> 'a1 list
 
-type 'a eqType = { eqb0 : ('a -> 'a -> bool); eqb_spec0 : ('a -> 'a -> reflect) }
+type 'a eqType = { eqb0 : ('a -> 'a -> bool);
+                   eqb_spec0 : ('a -> 'a -> reflect) }
 
 val unit_eqb_spec : unit -> unit -> reflect
 
@@ -275,7 +278,8 @@ val findist_tree : z list -> z tree
 
 val findist_itree : z list -> (__, z) itree
 
-type samplers = { coin_sampler : (q -> (__, bool) itree); die_sampler : (z -> (__, z) itree);
+type samplers = { coin_sampler : (q -> (__, bool) itree);
+                  die_sampler : (z -> (__, z) itree);
                   findist_sampler : (z list -> (__, z) itree) }
 
 val coin_itree : q -> (__, bool) itree

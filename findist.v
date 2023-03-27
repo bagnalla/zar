@@ -16,28 +16,6 @@ Local Open Scope itree_scope.
 From zar Require Import
   cotree cocwp cpo equidistribution eR itree misc order pow_2 prelude R
   tactics tcwp tcwp_facts tcwp_geometric tree uniform_Z.
-
-(* Inductive N : Set := *)
-(*   | N0 : N *)
-(*   | Npos : positive -> N. *)
-
-(* Inductive positive : Set := *)
-(*   | xI : positive -> positive *)
-(*   | xO : positive -> positive *)
-(*   | xH : positive. *)
-
-(* Fixpoint repeat_positive {A} (a : A) (p : positive) : list A := *)
-(*   match p with *)
-(*   | xH => [a] *)
-(*   | xO p' => repeat_positive a p' ++ repeat_positive a p' *)
-(*   | xI p' => a :: repeat_positive a p' ++ repeat_positive a p' *)
-(*   end. *)
-
-(* Definition repeat_N {A} (a : A) (n : N) : list A := *)
-(*   match n with *)
-(*   | N0 => [] *)
-(*   | Npos p => repeat_positive a p *)
-(*   end. *)
   
 Fixpoint flatten_weights_aux (weights : list Z) (acc : Z) : list Z :=
   match weights with
@@ -184,21 +162,6 @@ Qed.
 Definition findist_itree (weights : list Z) : itree boolE Z :=
   to_itree (findist_tree weights).
 
-(* Lemma repeat_positive_neq_nil {A} (a : A) (p : positive) : *)
-(*   repeat_positive a p <> []. *)
-(* Proof. *)
-(*   revert a; induction p; simpl; intros a HC; try congruence. *)
-(*   apply app_eq_nil in HC; destruct HC as [HC _]; congruence. *)
-(* Qed. *)
-
-(* Lemma repeat_N_eq_nil {A} (a : A) (n : N) : *)
-(*   repeat_N a n = [] -> *)
-(*   n = N0. *)
-(* Proof. *)
-(*   destruct n; simpl; auto; intro HC. *)
-(*   apply repeat_positive_neq_nil in HC; contradiction. *)
-(* Qed. *)
-
 Lemma exists_pos_flatten_weights_aux_neq_nil (l : list Z) (n : Z) :
   Exists (fun w : Z => (0 < w)%Z) l ->
   flatten_weights_aux l n <> [].
@@ -227,14 +190,6 @@ Definition proj_inr {A B} (x : A + B) (default : B) : B :=
   end.
 
 Definition list_sum_Z (l : list Z) := fold_right Z.add Z0 l.
-
-(* Lemma repeat_positive_length {A} (a : A) (p : positive) : *)
-(*   length (repeat_positive a p) = Pos.to_nat p. *)
-(* Proof. induction p; simpl; auto; rewrite app_length; lia. Qed. *)
-
-(* Lemma repeat_N_length {A} (a : A) (n : N) : *)
-(*   length (repeat_N a n) = N.to_nat n. *)
-(* Proof. destruct n; simpl; auto; apply repeat_positive_length. Qed. *)
 
 Lemma list_sum_Z_nonnegative l :
   Forall (fun x : Z => (0 <= x)%Z) l ->
