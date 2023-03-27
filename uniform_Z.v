@@ -85,17 +85,6 @@ Qed.
 #[global] Hint Resolve wf_tree'_btree_to_tree : tree.
 Import Lra.
 
-(* Fixpoint positive_btree (p : positive) : btree (unit + A) := *)
-(*   match p with *)
-(*   | xH => BLeaf xH *)
-(*   | xO p' => BNode (positive_btree p') (btree_map (Pos.mul 2) (positive_btree p')) *)
-(*   | xI p' => BNode (positive_btree p') (btree_map (Pos.mul 2) (positive_btree p')) *)
-
-(* Fixpoint z_btree (n : Z) : btree (unit + A) := *)
-(*   match n with *)
-(*   | Z0 => BLeaf (inl tt) *)
-(*   | Zpos p =>  *)
-
 (* Instead of divide list, take and drop 2^n' from the list. *)
 Fixpoint list_btree_aux {A} (l : list A) (n : nat) : btree (unit + A) :=
   match n with
@@ -211,7 +200,7 @@ Qed.
 (*     (reduce_btree (list_btree (rev_range (Z.to_nat n)))). *)
 
 (** It turns out that Z.of_nat is very slow so the following
-    implementation is much more time-efficient. *)
+    implementation builds much more quickly than the above. *)
 Definition uniform_btree (n : Z) : btree (unit + Z) :=
   reduce_btree (list_btree (rev_range_Z n)).
 
@@ -482,15 +471,6 @@ Lemma Forall_impl' {A} (P Q : A -> Prop) (l : list A) :
 Proof.
   induction l; intros HPQ HP; inv HP; constructor; firstorder.
 Qed.
-
-(* Lemma rev_range_add (n m : nat) : *)
-(*   range (n + m) = range n ++ map (Nat.add n) (range m). *)
-(* Proof. *)
-(*   revert m; induction n; intro m; simpl. *)
-(*   { rewrite map_id; auto. } *)
-(*   rewrite IHn. *)
-(*   rewrite <- app_assoc. *)
-(*   rewrite <- app_assoc. *)
 
 Lemma rev_range_add (n m : nat) :
   rev_range (n + m) = map (Nat.add m) (rev_range n) ++ rev_range m.
@@ -838,46 +818,6 @@ Proof.
   apply btree_infer_uniform_btree_const_1.
 Qed.
 
-(* Lemma INeR_Qnum_Qden_Q2R p : *)
-(*   Qred p = p -> *)
-(*   (0 <= p)%Q -> *)
-(*   INeR (Z.to_nat (Qnum p)) / INeR (Pos.to_nat (Qden p)) = Q2eR p. *)
-(* Proof. *)
-(*   intros Hp Hle. *)
-(*   unfold Q2eR, eRdiv, INeR, eRmult, eRinv. simpl. *)
-(*   destruct (R.R_eq_dec (INR (Pos.to_nat (Qden p))) 0). *)
-(*   { exfalso. *)
-(*     assert (0 < INR (Pos.to_nat (Qden p)))%R. *)
-(*     { replace 0%R with (INR 0) by reflexivity. *)
-(*       apply lt_INR, Pos2Nat.is_pos. } *)
-(*     lra. } *)
-(*   apply eR_eq; unfold Q2R; f_equal. *)
-(*   - rewrite INR_IZR_INZ. *)
-(*     rewrite Z2Nat.id. *)
-(*     + repeat f_equal. *)
-(*       unfold Qminmax.Qmax, GenericMinMax.gmax. *)
-(*       destruct (0 ?= p) eqn:Hp0; auto. *)
-(*       * apply Qeq_alt in Hp0. *)
-(*         rewrite <- Hp. *)
-(*         replace 0%Q with (Qred 0%Q) by reflexivity. *)
-(*         apply Qred_complete; symmetry; auto. *)
-(*       * apply Qgt_alt in Hp0. *)
-(*         exfalso; eapply Qlt_not_le; eauto. *)
-(*     + apply Qnum_nonnegative; auto. *)
-(*   - f_equal. *)
-(*     rewrite INR_IZR_INZ. *)
-(*     rewrite positive_nat_Z. *)
-(*     repeat f_equal. *)
-(*     unfold Qminmax.Qmax, GenericMinMax.gmax. *)
-(*     destruct (0 ?= p) eqn:Hp0; auto. *)
-(*     + apply Qeq_alt in Hp0. *)
-(*       rewrite <- Hp. *)
-(*       replace 0%Q with (Qred 0%Q) by reflexivity. *)
-(*       apply Qred_complete; symmetry; auto. *)
-(*     + apply Qgt_alt in Hp0. *)
-(*       exfalso; eapply Qlt_not_le; eauto. *)
-(* Qed. *)
-
 Lemma simple_btree_to_tree {A} (t : btree A) :
   simple (btree_to_tree t).
 Proof. induction t; constructor; intros []; auto. Qed.
@@ -1179,45 +1119,12 @@ Proof.
     ext s; unfold const; eRauto.
 Qed.
 
-(* Corollary bernoulli_tree_twp_p_compl (p : Q) : *)
-(*   Qred p = p -> *)
-(*   (0 <= p <= 1)%Q -> *)
-(*   twp (bernoulli_tree p) (fun b => if b then 0 else 1) = 1 - Q2eR p. *)
-(* Proof. *)
-(*   intros Hp Hp'. *)
-(*   apply eRplus_eq_minus. *)
-(*   { intro HC; inv HC. } *)
-(*   rewrite <- no_fail'_twp with (fl := true). *)
-(*   2: { constructor; intros []; try constructor; apply no_fail_btree_to_tree. } *)
-(*   rewrite bernoulli_tree_twp_twlp. *)
-(*   2: { intro; destr; eRauto. } *)
-(*   rewrite twlp_twp_complement. *)
-(*   2: { constructor; intro. *)
-(*        - apply wf_tree_btree_to_tree. *)
-(*        - destruct s; constructor. } *)
-(*   2: { intro s; destr; eRauto. } *)
-(*   rewrite eRplus_minus_assoc. *)
-(*   2: { eRauto. } *)
-(*   2: { apply twp__bounded. *)
-(*        - constructor; intro. *)
-(*          + apply wf_tree_btree_to_tree. *)
-(*          + destruct s; constructor. *)
-(*        - intro; destr; eRauto. } *)
-(*   rewrite fold_twp. *)
-(*   replace (fun s : bool => 1 - (if s then 0 else 1)) with *)
-(*     (fun b : bool => if b then 1 else 0). *)
-(*   2: { ext b; destruct b; eRauto. } *)
-(*   rewrite bernoulli_tree_twp_p; auto. *)
-(*   rewrite <- eRplus_minus_assoc; eRauto. *)
-(* Qed. *)
-
 Theorem twp_uniform_tree (n i : Z) :
   (0 < n)%Z ->
   (0 <= i < n)%Z ->
   twp (uniform_tree n) (fun n => if eqb n i then 1 else 0) = 1 / IZeR n.
 Proof.
-  intros Hn Hi.
-  unfold uniform_tree.
+  intros Hn Hi.  unfold uniform_tree.
   rewrite twp_fix_iid; eauto with tree eR.
   { unfold uniform_tree_open.
     replace (fun s : unit + Z =>
@@ -1350,24 +1257,6 @@ Proof.
     apply eRplus_lt_compat; eauto with eR.
 Qed.
 
-(* Lemma btree_infer_list_btree_aux {A} (l : list A) n : *)
-(*   (O < length l)%nat -> *)
-(*   btree_infer (cotuple (const 1) (const 0)) (list_btree_aux l n) < 1. *)
-(* Proof. *)
-(*   intro Hl; apply btree_some_0_btree_infer_lt_1. *)
-(*   { intros [[]|a]; eRauto. } *)
-(*   apply btree_some_impl with (P := cotuple (const False) (const True)). *)
-(*   { intros [[]|a] []; reflexivity. } *)
-(*   revert l Hl. *)
-(*   induction n; intros l Hl; simpl. *)
-(*   { destruct l; simpl in *; try lia. *)
-(*     constructor. simpl. apply I. } *)
-(*   constructor; apply IHn. *)
-(*   rewrite take_length_min. *)
-(*   apply Nat.min_case; auto. *)
-(*   apply pow_positive; lia. *)
-(* Qed. *)
-
 Lemma reduce_btree_all {A} (t : btree (unit + A)) P :
   btree_all (cotuple (const True) P) t ->
   btree_all (cotuple (const True) P) (reduce_btree t).
@@ -1385,105 +1274,6 @@ Proof.
     + constructor; auto.
   - constructor; auto.
 Qed.
-
-(* (** Don't need wlp version because [uniform_tree_twp_twlp]. *) *)
-(* Lemma twp_uniform_tree_sum (n : nat) (f : nat -> eR) : *)
-(*   (0 < n)%nat -> *)
-(*   twp (uniform_tree n) f = sum (map (fun i => f i / INeR n) (range n)). *)
-(* Proof. *)
-(*   intro Hn.   *)
-(*   replace f with *)
-(*     (fun k => sum (map (fun i => if Nat.eqb k i then f k else 0) (range n)) + *)
-(*              if n <=? k then f k else 0). *)
-(*   2: { clear Hn; ext k. *)
-(*        destruct (Nat.leb_spec0 n k). *)
-(*        - rewrite sum_eq_0; eRauto. *)
-(*          apply Forall_forall. *)
-(*          intros x Hx. *)
-(*          apply in_map_iff in Hx. *)
-(*          destruct Hx as [i [Hx Hin]]. *)
-(*          apply in_range in Hin. *)
-(*          destruct (Nat.eqb_spec k i); subst; try lia; auto. *)
-(*        - rewrite eRplus_0_r. *)
-(*          apply not_le in n0. *)
-(*          apply Nat.le_succ_l in n0. *)
-(*          induction n; simpl. *)
-(*          { lia. } *)
-(*          rewrite map_app, sum_app; simpl; rewrite eRplus_0_r. *)
-(*          destruct (Nat.eqb_spec k n); subst. *)
-(*          * rewrite sum_eq_0; eRauto. *)
-(*            apply Forall_forall; intros x Hx. *)
-(*            apply in_map_iff in Hx; destruct Hx as [i [Hx Hin]]. *)
-(*            apply in_range in Hin. *)
-(*            destruct (Nat.eqb_spec n i); subst; auto; lia. *)
-(*          * rewrite eRplus_0_r; apply IHn; lia. } *)
-(*   unfold twp. *)
-(*   rewrite twp__plus. *)
-(*   replace (fun s => sum (map (fun i => if s =? i then f s else 0) (range n))) with *)
-(*     (fun s => sum (map (fun f => f s) *)
-(*                   (map (fun i s => if s =? i then f s else 0) (range n)))). *)
-(*   2: { ext s; rewrite map_map; reflexivity. } *)
-(*   rewrite twp_sum. *)
-(*   replace (twp_ false (uniform_tree n) *)
-(*              (fun s => if n <=? s then f s else 0)) with 0. *)
-(*   2: { unfold uniform_tree. *)
-(*        rewrite fold_twp. *)
-(*        rewrite twp_fix_iid; auto. *)
-(*        - *)
-(*          replace (fun s : unit + nat => *)
-(*                     if is_inl s *)
-(*                     then 0 *)
-(*                     else *)
-(*                       twp (cotuple (fun _ : unit => Leaf 0%nat) (Leaf (A:=nat)) s) *)
-(*                         (fun s0 : nat => if n <=? s0 then f s0 else 0)) with *)
-(*            (cotuple (@const eR unit 0) (fun s => if n <=? s then f s else 0)). *)
-(*          2: { ext s; destruct s; auto. } *)
-(*          rewrite tree_all_twp_0; eRauto. *)
-(*          + apply simple_btree_to_tree. *)
-(*          + unfold uniform_tree_open. simpl. *)
-(*            unfold uniform_btree. *)
-(*            set (P := fun m => (m < n)%nat). *)
-(*            apply tree_all_impl with *)
-(*              (P := fun s : unit + nat => match s with *)
-(*                                     | inl _ => True *)
-(*                                     | inr n => P n *)
-(*                                     end). *)
-(*            { intros [] Hs; simpl; auto. *)
-(*              unfold P in Hs. *)
-(*              apply leb_correct_conv in Hs; rewrite Hs; auto. } *)
-(*            apply btree_all_tree_all_btree_to_tree. *)
-(*            unfold P. *)
-(*            apply reduce_btree_all. *)
-(*            apply Forall_btree_all_list_btree_aux. *)
-(*            apply Forall_forall; intros x Hx. *)
-(*            apply in_rev_range_lt in Hx; auto. *)
-(*        - apply wf_tree_btree_to_tree. *)
-(*        - intros []; constructor. *)
-(*        - apply twp_uniform_tree_open_lt_1; auto. } *)
-(*   rewrite eRplus_0_r. *)
-(*   f_equal. *)
-(*   rewrite map_map. *)
-(*   apply map_ext_in. *)
-(*   intros i Hi. *)
-(*   replace (fun s : nat => if s =? i then f s else 0) with *)
-(*     (fun s : nat => f i * if s =? i then 1 else 0). *)
-(*   2: { ext s; destruct (Nat.eqb_spec s i); eRauto. } *)
-(*     replace (fun i0 : nat => if i =? i0 then f i else 0) with *)
-(*     (fun s : nat => f i * if i =? s then 1 else 0). *)
-(*   2: { ext s; destruct (Nat.eqb_spec i s); eRauto. } *)
-(*   rewrite twp_scalar. *)
-(*   rewrite twp_uniform_tree; auto. *)
-(*   - unfold eRdiv. *)
-(*     rewrite eRmult_1_l. *)
-(*     f_equal. *)
-(*     rewrite sum_map_scalar. *)
-(*     apply in_range in Hi. *)
-(*     destruct (Nat.leb_spec n i); try lia; eRauto. *)
-(*     rewrite sum_map_count. *)
-(*     rewrite countb_list_range_lt; auto. *)
-(*     rewrite INeR_1; eRauto. *)
-(*   - apply in_range in Hi; auto. *)
-(* Qed. *)
 
 Lemma btree_some_reduce_btree' {A} `{EqType A} P (t : btree A) :
   btree_some P t ->

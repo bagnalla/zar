@@ -10,8 +10,7 @@ open Zar.Samplers
 let gen_count = 10000
 
 (** Lower and upper bounds on randomly generated ints. Divide by two
-    to prevent overflow in 'double_z_of_int' and 'z_of_int_plus'
-    tests. *)
+    to prevent overflow in 'double_z_of_int' and 'z_of_int_plus' tests. *)
 let bound = Int.max_int / 2
 
 let tests = ref []
