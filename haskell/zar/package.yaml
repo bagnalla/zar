@@ -33,6 +33,11 @@ ghc-options:
 - -Wpartial-fields
 - -Wredundant-constraints
 
+internal-libraries:
+    zar-internal:
+      source-dirs: src-internal
+      exposed-modules: Samplers
+
 library:
   source-dirs: src
   exposed-modules:
@@ -41,6 +46,7 @@ library:
   - Die
   - Findist
   dependencies:
+  - zar-internal
   - pipes
   - mwc-random
 
@@ -66,5 +72,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - zar-internal
     - zar
     - QuickCheck

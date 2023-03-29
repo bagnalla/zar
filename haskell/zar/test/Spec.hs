@@ -1,6 +1,6 @@
 import Test.QuickCheck
 
-import Lib
+import Core
 import Samplers as S
 
 instance Eq S.Positive where
