@@ -61,7 +61,11 @@ Proof.
   - rewrite sum_map_count.
     rewrite Forall_not_in_countb_list_0.
     + rewrite INeR_0; eRauto.
-    + apply List_forall_neq_range.
+    + unfold compose.
+      eapply List.Forall_impl.
+      2: { apply List_forall_neq_range. }
+      simpl; intros a Ha HC; apply Ha.
+      rewrite Nat.eqb_sym; auto.
   - rewrite IHn; eRauto; lia.
 Qed.
 

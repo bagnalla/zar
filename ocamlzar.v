@@ -16,7 +16,7 @@ From zar Require Import
   cotree cocwp cpo equidistribution eR findist itree misc order tactics
   tree tcwp uniform_Z.
 
-Record Samplers : Type :=
+Record SamplerPackage : Type :=
   mkSamplers 
     { coin_sampler : Q -> itree boolE bool
     ; die_sampler : Z -> itree boolE Z
@@ -182,7 +182,11 @@ Qed.
 
 From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 
-Definition coin_die_samplers : Samplers :=
+Definition samplers : SamplerPackage :=
   mkSamplers coin_itree die_itree findist_itree.
 
-Extraction "ocaml/zar/lib/samplers.ml" coin_die_samplers.
+Extraction "ocaml/zar/lib/samplers.ml" samplers.
+
+From Coq Require Import ExtrHaskellBasic.
+Extraction Language Haskell.
+Extraction "haskell/zar/src/Samplers.hs" samplers.
