@@ -73,6 +73,19 @@ Definition uniform (bitstreams : nat -> Stream bool) : Prop :=
     cotree_pairwise_disjoint U ->
     converges (freq (in_Sigma01 U) ∘ prefix bitstreams) (measure U).
 
+(* Definition uniform' (bitstreams : nat -> Stream bool) : Prop := *)
+(*   forall U : list bool, *)
+(*     converges (freq (is_stream_prefix U) ∘ prefix bitstreams) *)
+(*       (1 / 2 ^ length U). *)
+
+(* This may not be true.. *)
+(* Lemma uniform'_uniform (bitstreams : nat -> Stream bool) : *)
+(*   uniform' bitstreams -> *)
+(*   uniform bitstreams. *)
+(* Proof. *)
+(*   unfold uniform', uniform. *)
+(*   intros Huniform U Hdisj eps Heps. *)  
+
 Inductive produces {A} (P : A -> Prop) : Stream bool -> cotree bool A -> Prop :=
 | produces_leaf : forall bs x, P x -> produces P bs (coleaf x)
 | produces_tau : forall bs t, produces P bs t -> produces P bs (cotau t)
