@@ -278,12 +278,12 @@ val findist_tree : z list -> z tree
 
 val findist_itree : z list -> (__, z) itree
 
-type samplers = { coin_sampler : (q -> (__, bool) itree);
-                  die_sampler : (z -> (__, z) itree);
-                  findist_sampler : (z list -> (__, z) itree) }
+type samplerPackage = { coin_sampler : (q -> (__, bool) itree);
+                        die_sampler : (z -> (__, z) itree);
+                        findist_sampler : (z list -> (__, z) itree) }
 
 val coin_itree : q -> (__, bool) itree
 
 val die_itree : z -> (__, z) itree
 
-val coin_die_samplers : samplers
+val samplers : samplerPackage

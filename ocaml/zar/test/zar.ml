@@ -38,8 +38,9 @@ let pos_gen =
                                  10, map (fun x -> XI x) (self (n - 1))])
 let z_gen =
   let open QCheck.Gen in
-  oneof [return Z0; map (fun x -> Zpos x) pos_gen;
-         map (fun x -> Zneg x) pos_gen]
+  frequency [1, return Z0;
+             100, map (fun x -> Zpos x) pos_gen;
+             100, map (fun x -> Zneg x) pos_gen]
 let arbitrary_z =
   let open QCheck.Iter in
   let shrink_positive = function

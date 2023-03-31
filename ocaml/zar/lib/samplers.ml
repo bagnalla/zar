@@ -909,9 +909,9 @@ let findist_tree weights =
 let findist_itree weights =
   to_itree (findist_tree weights)
 
-type samplers = { coin_sampler : (q -> (__, bool) itree);
-                  die_sampler : (z -> (__, z) itree);
-                  findist_sampler : (z list -> (__, z) itree) }
+type samplerPackage = { coin_sampler : (q -> (__, bool) itree);
+                        die_sampler : (z -> (__, z) itree);
+                        findist_sampler : (z list -> (__, z) itree) }
 
 (** val coin_itree : q -> (__, bool) itree **)
 
@@ -923,8 +923,8 @@ let coin_itree p =
 let die_itree n =
   to_itree (uniform_tree n)
 
-(** val coin_die_samplers : samplers **)
+(** val samplers : samplerPackage **)
 
-let coin_die_samplers =
+let samplers =
   { coin_sampler = coin_itree; die_sampler = die_itree; findist_sampler =
     findist_itree }

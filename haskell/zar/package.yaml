@@ -1,5 +1,5 @@
 name:                zar
-version:             0.1.0.0
+version:             0.9.0.0
 github:              "bagnalla/zar"
 license:             MIT
 author:              "Alexander Bagnall"
@@ -11,8 +11,8 @@ extra-source-files:
 - CHANGELOG.md
 
 # Metadata used when publishing your package
-# synopsis:            Formally verified sampling from discrete probability distributions.
-# category:            Random
+synopsis:            Formally verified sampling from discrete probability distributions.
+category:            Random
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
@@ -49,6 +49,7 @@ library:
   - zar-internal
   - pipes
   - mwc-random
+  - primitive
 
 executables:
   zar-exe:
