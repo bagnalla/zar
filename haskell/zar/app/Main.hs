@@ -27,8 +27,10 @@ main = do
 
   -- | Compose coin consumer with a Bool producer to obtain coin and
   -- generate a single sample.
-  gen <- MWC.createSystemRandom
-  let coin2 = bit_producer gen >-> C.coin_consumer 2 3
+  -- gen <- MWC.createSystemRandom
+  -- let coin2 = bit_producer gen >-> C.coin_consumer 2 3
+  bits <- default_bit_producer
+  let coin2 = bits >-> C.coin_consumer 2 3
   b2 <- runEffect coin2
   putStrLn $ "coin consumer: " ++ show b2
   
@@ -44,7 +46,10 @@ main = do
   
   -- | Compose die consumer with a Bool producer to obtain die and
   -- generate a single sample.
-  let die2 = bit_producer gen >-> D.die_consumer 200
+  bits2 <- default_bit_producer -- Need new bit producer because the
+                                -- first had its return type
+                                -- specialized to Bool.
+  let die2 = bits2 >-> D.die_consumer 200
   x2 <- runEffect die2
   putStrLn $ "die consumer: " ++ show x2
 
@@ -60,6 +65,6 @@ main = do
   
   -- | Compose findist consumer with a Bool producer to obtain findist
   -- and generate a single sample.
-  let findist2 = bit_producer gen >-> F.findist_consumer [1, 3, 2]
+  let findist2 = bits2 >-> F.findist_consumer [1, 3, 2]
   y2 <- runEffect findist2
   putStrLn $ "findist consumer: " ++ show y2

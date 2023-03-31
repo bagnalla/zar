@@ -1,4 +1,5 @@
-# Zar: formally verified sampling from discrete probability distributions.
+# Zar OCaml: formally verified sampling from discrete probability
+  distributions.
 
 See the related [paper](https://arxiv.org/abs/2211.06747) (to appear
 in PLDI'23) and [Github repository](https://github.com/bagnalla/zar).
@@ -20,13 +21,13 @@ where `p` is a float in the range `[0,1]` and `Random.float 1.0`
 produces a random float in the range `[0,1)`. While good enough for
 many applications, this approach is not always correct due to float
 roundoff error. We can only expect `a1` to be executed with
-probability `p + ϵ` for some small error term `ϵ`, technically
-invalidating any correctness guarantees of our overall system that
-depend on the correctness of its probabilistic choices.
+probability `p + ϵ` for some small error term `ϵ`, which technically
+invalidates any correctness guarantee of our overall system that
+depends on the correctness of its probabilistic choices.
 
-Zar provides an alternative that is guaranteed (by formal proof in
-Coq) to execute `a1` with probability `p` (where `n` and `d` are
-integers such that `p = n/d`):
+Zar provides an alternative that is formally proved (in Coq) to
+execute `a1` with probability `p` (where `n` and `d` are integers such
+that `p = n/d`):
 ```ocaml
 open Zar
 Coin.build n d;; (* Build and cache coin with bias p = n/d *)
