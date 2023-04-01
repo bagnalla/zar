@@ -185,7 +185,7 @@ From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 Definition samplers : SamplerPackage :=
   mkSamplers coin_itree die_itree findist_itree.
 
-Extraction "ocaml/zar/lib/samplers.ml" samplers.
+(* Extraction "ocaml/zar/lib/samplers.ml" samplers. *)
 
 From Coq Require Import ExtrHaskellBasic.
 Extraction Language Haskell.
