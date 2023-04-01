@@ -1,3 +1,0 @@
-(test
- (name zar)
- (libraries zar alcotest qcheck qcheck-alcotest))
