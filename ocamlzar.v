@@ -187,6 +187,6 @@ Definition samplers : SamplerPackage :=
 
 (* Extraction "ocaml/zar/lib/samplers.ml" samplers. *)
 
-From Coq Require Import ExtrHaskellBasic.
-Extraction Language Haskell.
-Extraction "haskell/zar/src/Samplers.hs" samplers.
+(* From Coq Require Import ExtrHaskellBasic. *)
+(* Extraction Language Haskell. *)
+(* Extraction "haskell/zar/src/Samplers.hs" samplers. *)
