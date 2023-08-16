@@ -139,7 +139,7 @@ Proof.
     + intros x Hx []; apply Hs; intro i; apply Hx.
 Qed.
 
-#[global]
+#[export]
   Instance monotone_btwp {A} (f : A -> eR) : Proper (leq ==> leq) (btwp f).
 Proof.
   apply monotone_fold.
@@ -148,7 +148,7 @@ Proof.
   - intros g g' Hg; simpl.
     apply eRle_div, eRplus_le_compat; apply Hg.
 Qed.
-#[global] Hint Resolve monotone_btwp : cocwp.
+#[export] Hint Resolve monotone_btwp : cocwp.
 
 Lemma fold_avg_bounded {A} (f : A -> eR) (t : atree bool A) :
   bounded f 1 ->
@@ -171,7 +171,7 @@ Proof.
   apply eRle_div, eRplus_le_compat; apply Hfg.
 Qed.
 
-#[global]
+#[export]
   Instance antimonotone_btwlp {A} (f : A -> eR) {Hf: bounded f 1}
   : Proper (leq ==> flip leq) (btwlp f).
 Proof.
@@ -180,17 +180,17 @@ Proof.
   - apply monotone_id.
   - apply monotone_avg.
 Qed.
-#[global] Hint Resolve antimonotone_btwlp : cocwp.
+#[export] Hint Resolve antimonotone_btwlp : cocwp.
 
 Corollary continuous_cotwp {A} (f : A -> eR) : continuous (cotwp f).
 Proof. apply continuous_co, monotone_btwp. Qed.
-#[global] Hint Resolve continuous_cotwp : cocwp.
+#[export] Hint Resolve continuous_cotwp : cocwp.
 
 Corollary cocontinuous_cotwlp {A} (f : A -> eR) :
   bounded f 1 ->
   cocontinuous (cotwlp f).
 Proof. intro Hf; apply cocontinuous_coop, antimonotone_btwlp; auto. Qed.
-#[global] Hint Resolve cocontinuous_cotwlp : cocwp.
+#[export] Hint Resolve cocontinuous_cotwlp : cocwp.
 
 Lemma wcontinuous_avg : wcontinuous (fun k : bool -> eR => (k false + k true) / 2).
 Proof.
@@ -262,9 +262,8 @@ Proof.
   { apply wcontinuous_avg. }
 Qed.
 
-(** An essential lemma about the co-semantics. Proof by using
-    co_compose to turn the LHS into a single comorphism, then
-    Proper_co to show equality of LHS and RHS. *)
+(** An essential lemma about the cotree semantics. Prove by fusing the
+    LHS, then applying Proper_co (inductive equivalence). *)
 Lemma cotwp_bind {A B} (f : B -> eR) (t : cotree bool A) (k : A -> cotree bool B) :
   cotwp f (cotree_bind t k) = cotwp (cotwp f ∘ k) t.
 Proof.

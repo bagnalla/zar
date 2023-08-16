@@ -55,7 +55,7 @@ Class aCPO (A B : Type) `{oA : OType A} `{oB : OType B}
   ; supremum_ideal : forall a : A, supremum a (incl ∘ ideal a)
   }.
 
-#[global] Hint Resolve chain_ideal : aCPO.
+#[export] Hint Resolve chain_ideal : aCPO.
 
 (** Any monotone function on a compact space is continuous. *)
 Lemma continuous_compact {A B} `{Compact A} `{OType B} (f : A -> B) :
@@ -71,7 +71,7 @@ Proof.
     destruct H0 as [i Hi]; subst.
     apply Hub.
 Qed.
-#[global] Hint Resolve continuous_compact : aCPO.
+#[export] Hint Resolve continuous_compact : aCPO.
 
 (** Any antimonotone function on a compact space is cocontinuous. *)
 Lemma cocontinuous_compact {A B} `{Compact A} `{OType B} (f : A -> B) :
@@ -87,7 +87,7 @@ Proof.
     destruct H0 as [i Hi]; subst.
     apply Hub.
 Qed.
-#[global] Hint Resolve cocontinuous_compact : aCPO.
+#[export] Hint Resolve cocontinuous_compact : aCPO.
 
 (** Shorthand for referring to the basis of an aCPO. *)
 Definition basis (A : Type) {B : Type} `{aCPO A B} : Type := B.
@@ -206,7 +206,7 @@ Section aCPO.
   Proof. intro Hmono; revert b; apply equ_arrow, coop_incl; auto. Qed.
 
   (** The co-version of any monotone basis function is monotone. *)
-  #[global]
+  #[export]
     Instance monotone_co {C} `{dCPO C}
     (f : basis A -> C) {_ : Proper (leq ==> leq) f}
     : Proper (leq ==> leq) (co f).
@@ -221,7 +221,7 @@ Section aCPO.
   Qed.
 
   (** The coop-version of any antimonotone basis function is antimonotone. *)
-  #[global]
+  #[export]
     Instance antimonotone_coop {C} `{ldCPO C}
     (f : basis A -> C) {_ : Proper (leq ==> flip leq) f}
     : Proper (leq ==> flip leq) (coop f).
@@ -723,12 +723,12 @@ Section aCPO.
   Qed.
 End aCPO.
 
-#[global] Hint Resolve directed_f_ideal : aCPO.
-#[global] Hint Resolve monotone_incl : aCPO.
-#[global] Hint Resolve monotone_co : aCPO.
-#[global] Hint Resolve continuous_co : aCPO.
-#[global] Hint Resolve antimonotone_coop : aCPO.
-#[global] Hint Resolve cocontinuous_coop : aCPO.
+#[export] Hint Resolve directed_f_ideal : aCPO.
+#[export] Hint Resolve monotone_incl : aCPO.
+#[export] Hint Resolve monotone_co : aCPO.
+#[export] Hint Resolve continuous_co : aCPO.
+#[export] Hint Resolve antimonotone_coop : aCPO.
+#[export] Hint Resolve cocontinuous_coop : aCPO.
 
 (** Fusion rule for comorphism composition. A comorphism can be
     extended by a continuous function at the front, resulting in a new

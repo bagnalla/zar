@@ -50,11 +50,11 @@ Inductive is_prefix {A : Type} : list A -> list A -> Prop :=
     is_prefix l1 l2 ->
     is_prefix (x :: l1) (x :: l2).
 
-#[global]
+#[export]
   Instance Reflexive_is_prefix {A : Type} : Reflexive (@is_prefix A).
 Proof. intro x; induction x; constructor; auto. Qed.
 
-#[global]
+#[export]
   Instance Transitive_is_prefix {A : Type} : Transitive (@is_prefix A).
 Proof.
   intros xs ys zs.
@@ -67,7 +67,7 @@ Proof.
       constructor; apply IHys; auto.
 Qed.
 
-#[global]
+#[export]
   Instance PreOrder_is_prefix {A : Type} : PreOrder (@is_prefix A).
 Proof. constructor. apply Reflexive_is_prefix. apply Transitive_is_prefix. Qed.
 
@@ -280,7 +280,7 @@ Definition shift {A} (f : nat -> A) (n : nat) : A :=
 Class Inhabited (A : Type) : Type :=
   { el : A }.
 
-#[global]
+#[export]
   Instance Inhabited_nat : Inhabited nat :=
   {| el := O |}.
 
@@ -328,27 +328,27 @@ Lemma unit_eqb_spec (x y : unit) :
   reflect (x = y) true.
 Proof. destruct x, y; constructor; reflexivity. Defined.
 
-#[global]
+#[export]
   Program Instance EqType_unit : EqType unit :=
   {| eqb := fun _ _ => true
    ; eqb_spec := unit_eqb_spec |}.
 
-#[global]
+#[export]
   Instance EqType_bool : EqType bool :=
   {| eqb := Bool.eqb
    ; eqb_spec := Bool.eqb_spec |}.
 
-#[global]
+#[export]
   Instance EqType_nat : EqType nat :=
   {| eqb := Nat.eqb
    ; eqb_spec := Nat.eqb_spec |}.
 
-#[global]
+#[export]
   Instance EqType_Z : EqType Z :=
   {| eqb := Z.eqb
    ; eqb_spec := Z.eqb_spec |}.
 
-#[global]
+#[export]
   Program Instance EqType_option {A} `{EqType A} : EqType (option A) :=
   {| eqb := fun o1 o2 => match (o1, o2) with
                       | (None, None) => true
@@ -368,7 +368,7 @@ Fixpoint list_eqb {A : Type} `{EqType A} (l1 l2 : list A) : bool :=
   | _ => false
   end.
 
-#[global]
+#[export]
   Program Instance EqType_list {A : Type} `{EqType A} : EqType (list A) :=
   {| eqb := list_eqb |}.
 Next Obligation.
@@ -379,7 +379,7 @@ Next Obligation.
   - constructor; congruence.
 Qed.
 
-#[global]
+#[export]
   Program Instance EqType_prod {A B : Type} `{EqType A} `{EqType B} : EqType (A * B) :=
   {| eqb := fun a b => let (a1, a2) := a in
                     let (b1, b2) := b in
@@ -390,7 +390,7 @@ Next Obligation.
   - constructor; congruence.
 Defined.
 
-#[global]
+#[export]
   Program Instance EqType_sum {A B : Type} `{EqType A} `{EqType B} : EqType (A + B) :=
   {| eqb := fun a b => match (a, b) with
                     | (inl x, inl y) => eqb x y

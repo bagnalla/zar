@@ -24,7 +24,7 @@ Definition empty : St := fun _ => vbool false.
 Definition upd (x : string) (v : val) (st : St) : St :=
   fun y => if String.eqb y x then v else st y.
 
-#[global]
+#[export]
   Instance Inhabited_St : Inhabited St :=
   {| el := empty |}.
 

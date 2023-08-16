@@ -2,9 +2,9 @@
 
 aCPO.v
 axioms.v
-compile.v
 cocwp.v
 cocwp_facts.v
+compile.v
 colist.v
 cotree.v
 cpGCL.v
@@ -12,11 +12,11 @@ cpo.v
 cwp.v
 cwp_tcwp.v
 debias.v
+equidistribution.v
 eR.v
 findist.v
 gaussian.v
 geometric_series.v
-equidistribution.v
 itree.v
 misc.v
 mu.v
@@ -27,9 +27,9 @@ prelude.v
 Q.v
 R.v
 tactics.v
-tree.v
 tcwp.v
 tcwp_facts.v
 tcwp_geometric.v
+tree.v
 uniform.v
 uniform_Z.v
