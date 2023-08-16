@@ -80,8 +80,8 @@ Lemma wf_tree'_btree_to_tree {A} (t : btree A) :
 Proof.
   induction t; constructor; simpl; try lra; auto; intros []; auto.
 Qed.
-#[global] Hint Resolve wf_tree_btree_to_tree : tree.
-#[global] Hint Resolve wf_tree'_btree_to_tree : tree.
+#[export] Hint Resolve wf_tree_btree_to_tree : tree.
+#[export] Hint Resolve wf_tree'_btree_to_tree : tree.
 Import Lra.
 
 (* Instead of divide list, take and drop 2^n' from the list. *)

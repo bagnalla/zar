@@ -102,12 +102,12 @@ Proof.
     + intros h h' Hh s; apply H; auto.
     + intro s; apply H0; auto.
 Qed.
-#[global] Hint Resolve monotone_twp : twp.
+#[export] Hint Resolve monotone_twp : twp.
 
 Corollary monotone_twp' {A B} fl (t : A -> tree B) :
   monotone (fun (f0 : B -> eR) (s0 : A) => twp_ fl (t s0) f0).
 Proof. intros f f' Hf s; apply monotone_twp; auto. Qed.
-#[global] Hint Resolve monotone_twp' : twp.
+#[export] Hint Resolve monotone_twp' : twp.
 
 Lemma twp_strict {A} (t : tree A) :
   twp_ false t (const 0) = 0.
@@ -188,12 +188,12 @@ Proof.
     + intros h h' Hh s; apply H; auto.
     + intro s; apply H0; auto.
 Qed.
-#[global] Hint Resolve monotone_twlp : twp.
+#[export] Hint Resolve monotone_twlp : twp.
 
 Corollary monotone_twlp' {A B} fl (t : A -> tree B) :
   monotone (fun (f0 : B -> eR) (s0 : A) => twlp_ fl (t s0) f0).
 Proof. intros f f' Hf s; apply monotone_twlp; auto. Qed.
-#[global] Hint Resolve monotone_twlp' : twp.
+#[export] Hint Resolve monotone_twlp' : twp.
 
 Lemma twlp_bounded {A} (fl : bool) (t : tree A) (f : A -> eR) :
   wf_tree t ->

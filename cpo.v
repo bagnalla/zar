@@ -104,35 +104,35 @@ Lemma dinf_spec {A} `{ldCPO A} (f : nat -> A) :
   downward_directed f -> infimum (inf f) f.
 Proof. intro Hf; unfold inf; destruct inf_prim; simpl; apply i, H0; auto. Qed.
 
-#[global]
+#[export]
   Instance CPO_dCPO {A} `{CPO A} : dCPO A.
 Proof. constructor; intros f Hf; apply H0. Qed.
-#[global] Hint Resolve CPO_dCPO : order.
+#[export] Hint Resolve CPO_dCPO : order.
 
-#[global]
+#[export]
   Instance lCPO_ldCPO {A} `{lCPO A} : ldCPO A.
 Proof. constructor; intros f Hf; apply H0. Qed.
-#[global] Hint Resolve lCPO_ldCPO : order.
+#[export] Hint Resolve lCPO_ldCPO : order.
 
 (** [Prop] has suprema and infima. *)
 
-#[global]
+#[export]
   Instance CPO_Prop : CPO Prop.
 Proof.
   constructor; intro f; exists (exists i, f i); split.
   - intros i Hi; exists i; auto.
   - intros ub Hub [i Hi]; eapply Hub; eauto.
 Qed.
-#[global] Hint Resolve CPO_Prop : order.
+#[export] Hint Resolve CPO_Prop : order.
 
-#[global]
+#[export]
   Instance lCPO_Prop : lCPO Prop.
 Proof.
   constructor; intros f; exists (forall i, f i); split.
   - intros i Hi; auto.
   - intros ub Hub x i; apply Hub; auto.
 Qed.
-#[global] Hint Resolve lCPO_Prop : order.
+#[export] Hint Resolve lCPO_Prop : order.
 
 Lemma ge_inf {A} `{lCPO A} (f : nat -> A) (a : A) (i : nat) :
   f i ⊑ a ->
@@ -160,7 +160,7 @@ Proof.
   etransitivity; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance ldCPO_arrow {A B} `{ldCPO B} : ldCPO (A -> B).
 Proof.
   constructor; intros f Hf.
@@ -178,7 +178,7 @@ Proof.
     apply Hf'; intro; apply Hlb.
 Qed.
 
-#[global]
+#[export]
   Instance lCPO_arrow {A B} `{lCPO B} : lCPO (A -> B).
 Proof.
   constructor; intros f.
@@ -188,7 +188,7 @@ Proof.
   - intros g Hg x; apply le_inf; intro i; apply Hg.
 Qed.
 
-#[global]
+#[export]
   Instance dCPO_arrow {A B} `{dCPO B} : dCPO (A -> B).
 Proof.
   constructor; intros f Hf.
@@ -206,7 +206,7 @@ Proof.
     apply Hf'; intro; apply Hub.
 Qed.
 
-#[global]
+#[export]
   Instance CPO_arrow {A B} `{CPO B} : CPO (A -> B).
 Proof.
   constructor; intros f.

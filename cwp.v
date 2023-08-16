@@ -79,7 +79,7 @@ Proof.
   unfold loop_F; intros Hg x y Hxy s;
     destruct (e s); try reflexivity; apply Hg; auto.
 Qed.
-#[global] Hint Resolve monotone_loop_F : cwp.
+#[export] Hint Resolve monotone_loop_F : cwp.
 
 Lemma monotone_loop_F' {A B} `{OType A} (e : B -> bool) F f f' g g' :
   monotone F ->
@@ -277,7 +277,7 @@ Proof.
     apply monotone_loop_F'; auto.
   - destruct (b0 st); eRauto.
 Qed.
-#[global] Hint Resolve monotone_wlp : cwp.
+#[export] Hint Resolve monotone_wlp : cwp.
 
 Lemma bounded_wlp (b : bool) (c : cpGCL) (f : St -> eR) :
   wf_cpGCL c ->
@@ -326,7 +326,7 @@ Proof.
   - specialize (Hf st); destruct (b0 st); eRauto.
     destruct b; eRauto.
 Qed.
-#[global] Hint Resolve bounded_wlp : cwp.
+#[export] Hint Resolve bounded_wlp : cwp.
 
 Lemma monotone_wp (fl : bool) (c : cpGCL) : monotone (wp_ fl c).
 Proof.
@@ -360,7 +360,7 @@ Proof.
     apply monotone_loop_F'; auto.
   - destruct (b st); eRauto.
 Qed.
-#[global] Hint Resolve monotone_wp : cwp.
+#[export] Hint Resolve monotone_wp : cwp.
 
 Lemma bounded_wpfail b c f ub :
   wf_cpGCL c ->
@@ -414,7 +414,7 @@ Proof.
   - specialize (Hf st); destruct (b0 st); eRauto.
     destruct b; eRauto.
 Qed.
-#[global] Hint Resolve bounded_wpfail : cwp.
+#[export] Hint Resolve bounded_wpfail : cwp.
 
 Lemma wcontinuous_loop_F (e : St -> bool) (g : (St -> eR) -> St -> eR) (f : St -> eR) :
   wcontinuous g ->

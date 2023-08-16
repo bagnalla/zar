@@ -100,11 +100,11 @@ Inductive atree_le {I A} : atree I A -> atree I A -> Prop :=
     (forall x, atree_le (f x) (g x)) ->
     atree_le (anode f) (anode g).
 
-#[global]
+#[export]
   Instance Reflexive_atree_le {I A} : Reflexive (@atree_le I A).
 Proof. intro t; induction t; constructor; auto. Qed.
 
-#[global]
+#[export]
   Instance Transitive_atree_le {I A} : Transitive (@atree_le I A).
 Proof.
   intro x; induction x; intros y z Hxy Hyz.
@@ -114,15 +114,15 @@ Proof.
   - inv Hxy; inv Hyz; constructor; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance PreOrder_atree_le {I A} : PreOrder (@atree_le I A).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_atree {I A} : OType (atree I A) :=
   { leq := atree_le }.
 
-#[global]
+#[export]
   Program
   Instance PType_atree {I A} : PType (atree I A) :=
   { bot := abot }.
@@ -195,11 +195,11 @@ CoInductive cotree_le {I A} : cotree I A -> cotree I A -> Prop :=
     (forall x, cotree_le (f x) (g x)) ->
     cotree_le (conode f) (conode g).
 
-#[global]
+#[export]
   Instance Reflexive_cotree_le {I A} : Reflexive (@cotree_le I A).
 Proof. cofix CH; intros []; constructor; eauto. Qed.
 
-#[global]
+#[export]
   Instance Transitive_cotree_le {I A} : Transitive (@cotree_le I A).
 Proof.
   unfold Transitive.
@@ -211,29 +211,29 @@ Proof.
   - inv Hyz; constructor; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance PreOrder_cotree_le {I A} : PreOrder (@cotree_le I A).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_cotree {I A} : OType (cotree I A) :=
   { leq := cotree_le }.
 
-#[global]
+#[export]
   Program
   Instance PType_cotree {I A} : PType (cotree I A) :=
   { bot := cobot }.
 Next Obligation. constructor. Qed.
 
-#[global]
+#[export]
   Instance monotone_cotau {I A} : Proper (leq ==> leq) (@cotau I A).
 Proof. intros a b Hab; constructor; auto. Qed.
-#[global] Hint Resolve monotone_cotau : cotree.
+#[export] Hint Resolve monotone_cotau : cotree.
 
-#[global]
+#[export]
   Instance monotone_conode {I A} : Proper (leq ==> leq) (@conode I A).
 Proof. intros a b Hab; constructor; auto. Qed.
-#[global] Hint Resolve monotone_conode : cotree.
+#[export] Hint Resolve monotone_conode : cotree.
 
 Lemma continuous_cotau {I A} :
   continuous (@cotau I A).
@@ -245,7 +245,7 @@ Proof.
     constructor; apply Hs.
     intro i; specialize (Hx i); inv Hx; auto.
 Qed.
-#[global] Hint Resolve continuous_cotau : cotree.
+#[export] Hint Resolve continuous_cotau : cotree.
 
 Lemma continuous_conode {I A} :
   continuous (@conode I A).
@@ -257,7 +257,7 @@ Proof.
     constructor; apply Hs.
     intro i; specialize (Hx i); inv Hx; auto.
 Qed.
-#[global] Hint Resolve continuous_conode : cotree.
+#[export] Hint Resolve continuous_conode : cotree.
 
 Lemma leq_cotree_le {I A} (a b : cotree I A) :
   a ⊑ b ->
@@ -281,7 +281,7 @@ Lemma cotree_eq_refl {I A} (t : cotree I A) :
   cotree_eq t t.
 Proof. revert t; cofix CH; intros []; constructor; eauto. Qed.
 
-#[global]
+#[export]
   Instance Reflexive_cotree_eq {I A} : Reflexive (@cotree_eq I A).
 Proof. intro t; apply cotree_eq_refl. Qed.
 
@@ -304,13 +304,13 @@ Lemma cotree_equ_eq {I A} (a b : cotree I A) :
   a === b -> a = b.
 Proof. intro H; apply cotree_ext, equ_cotree_eq; auto. Qed.
 
-#[global]
+#[export]
   Instance ExtType_cotree {I A} : ExtType (cotree I A).
 Proof.
   constructor; intros a b Hab; apply cotree_ext, equ_cotree_eq; auto.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_cotree_le' {I A}
   : Proper (cotree_eq ==> cotree_eq ==> flip impl) (@cotree_le I A).
 Proof.
@@ -626,7 +626,7 @@ Proof.
   - intros; apply cotree_sup_lub; auto.
 Qed.
 
-#[global]
+#[export]
   Instance dCPO_cotree {I A} : dCPO (@cotree I A).
 Proof.
   constructor; intros ch Hch.
@@ -1183,16 +1183,16 @@ Proof.
         inv Hub; apply H1.
 Qed.
 
-#[global]
+#[export]
   Instance Compact_atree {A} : Compact (atree bool A).
 Proof. constructor; intros a f Hf Ha; apply bintree_compact; auto. Qed.
 
-#[global]
+#[export]
   Instance Dense_cotree {I A} : Dense (cotree I A) (atree I A) :=
   { incl := inj
   ; ideal := flip tprefix }.
 
-#[global]
+#[export]
   Instance aCPO_cotree {A} : aCPO (cotree bool A) (atree bool A).
 Proof.
   constructor.
@@ -1218,7 +1218,7 @@ Inductive atree_cotree_le {I A} : atree I A -> cotree I A -> Prop :=
     (forall i, atree_cotree_le (f i) (g i)) ->
     atree_cotree_le (anode f) (conode g).
 
-#[global]
+#[export]
   Instance antimonotone_atree_cotree_le {I A}
   : Proper (leq ==> flip leq) (@atree_cotree_le I A).
 Proof.
@@ -1228,7 +1228,7 @@ Proof.
   - inv Hc; constructor; intro i.
     specialize (H1 i); apply H in H1; apply H1; auto.
 Qed.
-#[global] Hint Resolve antimonotone_atree_cotree_le : cotree.
+#[export] Hint Resolve antimonotone_atree_cotree_le : cotree.
 
 Definition cotree_le' {A} : cotree bool A -> cotree bool A -> Prop :=
   coop atree_cotree_le.
@@ -1329,7 +1329,7 @@ Extract Constant cofold => "
       Conode k -> g (cofold o p f g h Prelude.. k)
 ".
 
-#[global]
+#[export]
   Instance monotone_fold {I A B} `{OType B} (z : B) (f : A -> B) (g : B -> B) (h : (I -> B) -> B)
   {Hz : forall t, z ⊑ fold z f g h t}
   {Hg : Proper (leq ==> leq) g}
@@ -1343,9 +1343,9 @@ Proof.
   - apply Hg, IHa; auto.
   - apply Hh; intro x; apply H0; auto; apply H2.
 Qed.
-#[global] Hint Resolve monotone_fold : cotree.
+#[export] Hint Resolve monotone_fold : cotree.
 
-#[global]
+#[export]
   Instance antimonotone_fold {I A B} `{OType B}
   (z : B) (f : A -> B) (g : B -> B) (h : (I -> B) -> B)
   {Hz : forall t, fold z f g h t ⊑ z}
@@ -1361,9 +1361,9 @@ Proof.
     intro x; unfold compose; simpl.
     eapply H0; auto; apply H2.
 Qed.
-#[global] Hint Resolve antimonotone_fold : cotree.
+#[export] Hint Resolve antimonotone_fold : cotree.
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance monotone_cofold {I A B} (f : A -> cotree I B) : Proper (leq ==> leq) (cofold f). *)
 (* Proof. *)
 (*   apply monotone_fold. *)
@@ -1371,7 +1371,7 @@ Qed.
 (*   - apply monotone_cotau. *)
 (*   - apply monotone_conode. *)
 (* Qed. *)
-(* #[global] Hint Resolve monotone_cofold : cotree. *)
+(* #[export] Hint Resolve monotone_cofold : cotree. *)
 
 (** Computation lemmas for co folds. *)
 
@@ -1554,10 +1554,27 @@ Qed.
 Definition atree_cotree_bind {I A B} (k : A -> cotree I B) : atree I A -> cotree I B :=
   fold ⊥ k (@cotau I B) (@conode I B).
 
+(* Fixpoint tbind {I A B} (k : A -> cotree I B) (t : atree I A) : cotree I B := *)
+(*   match t with *)
+(*   | abot => cobot *)
+(*   | aleaf a => k a *)
+(*   | atau t' => cotau (tbind k t') *)
+(*   | anode f => conode (tbind k ∘ f) *)
+(*   end. *)
+
+(* Lemma atree_cotree_bind_tbind {I A B} (k : A -> cotree I B) (t : atree I A) : *)
+(*   atree_cotree_bind k t = tbind k t. *)
+(* Proof. *)
+(*   unfold atree_cotree_bind, fold. *)
+(*   revert k; induction t; intro k; simpl; auto. *)
+(*   - rewrite IHt; auto. *)
+(*   - f_equal; ext i; unfold compose; rewrite <- H; auto. *)
+(* Qed. *)
+
 Definition cotree_bind {A B} (t : cotree bool A) (k : A -> cotree bool B) : cotree bool B :=
   co (atree_cotree_bind k) t.
 
-#[global]
+#[export]
   Instance monotone_atree_cotree_bind {I A B} (k : A -> cotree I B) :
   Proper (leq ==> leq) (atree_cotree_bind k).
 Proof.
@@ -1610,11 +1627,11 @@ Definition atree_cotree_map {I A B} (f : A -> B) : atree I A -> cotree I B :=
 Definition cotree_map {A B} (f : A -> B) (t : cotree bool A) : cotree bool B :=
   co (atree_cotree_map f) t.
 
-#[global]
+#[export]
   Instance monotone_atree_cotree_map {I A B} (f : A -> B) :
   Proper (leq ==> leq) (@atree_cotree_map I A B f).
 Proof. apply monotone_fold; auto with cotree order. Qed.
-#[global] Hint Resolve monotone_atree_cotree_map : cotree.
+#[export] Hint Resolve monotone_atree_cotree_map : cotree.
 
 Lemma continuous_cotree_map {A B} (f : A -> B) :
   continuous (cotree_map f).
@@ -1626,7 +1643,7 @@ Definition atree_cotree_filter {I A} (P : A -> bool) : atree I A -> cotree I A :
 Definition cotree_filter {A} (P : A -> bool) : cotree bool A -> cotree bool A :=
   co (atree_cotree_filter P).
 
-#[global]
+#[export]
   Instance monotone_atree_cotree_filter {I A} (P : A -> bool) :
   Proper (leq ==> leq) (@atree_cotree_filter I A P).
 Proof.
@@ -1636,7 +1653,7 @@ Proof.
   - constructor; apply IHa; auto.
   - constructor; intro x; apply H, H1.
 Qed.
-#[global] Hint Resolve monotone_atree_cotree_filter : cotree.
+#[export] Hint Resolve monotone_atree_cotree_filter : cotree.
 
 (* Lifting a relation to atrees. *)
 Inductive atreeR {I A B} (R : A -> B -> Prop) : atree I A -> atree I B -> Prop :=
@@ -1699,7 +1716,7 @@ Proof.
   apply cotree_le_bind.
   intros []; constructor; apply Hg.
 Qed.
-#[global] Hint Resolve monotone_cotree_iter_F : cotree.
+#[export] Hint Resolve monotone_cotree_iter_F : cotree.
 
 Lemma co_inj_t {A} (t : cotree bool A) :
   co inj t = t.
@@ -1943,7 +1960,7 @@ Definition cotree_some {A} (P : A -> Prop) : cotree bool A -> Prop :=
 Definition cotree_all {A} (P : A -> Prop) : cotree bool A -> Prop :=
   coop (atree_all P).
 
-#[global]
+#[export]
   Instance monotone_atree_some {I A} (P : A -> Prop) : Proper (leq ==> leq) (@atree_some I A P).
 Proof.
   apply monotone_fold; auto with cotree order.
@@ -1951,7 +1968,7 @@ Proof.
   - intros f g Hfg [i Hf].
     exists i; apply Hfg; auto.
 Qed.
-#[global] Hint Resolve monotone_atree_some : cotree.
+#[export] Hint Resolve monotone_atree_some : cotree.
 
 Corollary continuous_cotree_some {A} (P : A -> Prop) :
   continuous (cotree_some P).
@@ -2033,17 +2050,17 @@ Qed.
 Lemma monotone_forall {I} :
   Proper (leq ==> leq) (fun k : I -> Prop => forall i : I, k i).
 Proof. intros f g; simpl; unfold impl; intros Hfg Hf i; apply Hfg, Hf. Qed.
-#[global] Hint Resolve monotone_forall : cotree.
+#[export] Hint Resolve monotone_forall : cotree.
 
-#[global]
+#[export]
   Instance antimonotone_atree_all {I A} (P : A -> Prop)
   : Proper (leq ==> flip leq) (@atree_all I A P).
 Proof.
   apply antimonotone_fold; auto with cotree order; intros ? ?; constructor.
 Qed.
-#[global] Hint Resolve antimonotone_atree_all : cotree.
+#[export] Hint Resolve antimonotone_atree_all : cotree.
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance antimonotone_atree_all {I A} (P : A -> Prop) : Proper (leq ==> flip leq) (@atree_all I A P). *)
 (* Proof. *)
 (*   intro a; induction a; intros b Hab Hall; simpl. *)
@@ -2052,7 +2069,7 @@ Qed.
 (*   - inv Hab; inv Hall; constructor; eapply IHa; eauto. *)
 (*   - inv Hab; inv Hall; constructor; intro i; eapply H; eauto; apply H1. *)
 (* Qed. *)
-(* #[global] Hint Resolve antimonotone_atree_all : cotree. *)
+(* #[export] Hint Resolve antimonotone_atree_all : cotree. *)
 
 Lemma cotree_all_bot {A} (P : A -> Prop) (a : A) :
   cotree_all P cobot.
@@ -2238,7 +2255,7 @@ Qed.
 (* Definition cotree_disjoint {A} `{OType A} : cotree bool A -> Prop := *)
 (*   coop (atree_disjoint). *)
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance antimonotone_atree_disjoint {I A} `{OType A} *)
 (*   : Proper (leq ==> flip leq) (@atree_disjoint I A _). *)
 (* Proof. *)
@@ -2253,7 +2270,7 @@ Qed.
 (*       eapply H4; eauto. *)
 (*       eapply monotone_atree_some; eauto; apply H2. *)
 (* Qed. *)
-(* #[global] Hint Resolve antimonotone_atree_disjoint : cotree. *)
+(* #[export] Hint Resolve antimonotone_atree_disjoint : cotree. *)
 
 Definition atree_disjoint {I A} `{OType A} (a b : atree I A) : Prop :=
   atree_all (fun x => atree_all (incomparable x) b) a /\
@@ -2288,7 +2305,7 @@ Proof.
   revert P Q; induction t; simpl; firstorder.
 Qed.
 
-#[global]
+#[export]
   Instance antimonotone_atree_pairwise_disjoint {A} `{OType A}
   : Proper (leq ==> flip leq) (@atree_pairwise_disjoint A _).
 Proof.
@@ -2311,7 +2328,7 @@ Proof.
         simpl; intros x Hx.
         eapply antimonotone_atree_all; eauto; apply H2.
 Qed.
-#[global] Hint Resolve antimonotone_atree_pairwise_disjoint : cotree.
+#[export] Hint Resolve antimonotone_atree_pairwise_disjoint : cotree.
 
 Lemma atree_all_true {I A} (t : atree I A) :
   atree_all (const True) t.
@@ -2371,7 +2388,7 @@ Proof.
   rewrite atree_cotree_bind_inj; reflexivity.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_inj {I A} : Proper (leq ==> leq) (@inj I A).
 Proof. intros a b Hab; induction Hab; simpl; constructor; auto. Qed.
 
@@ -2393,7 +2410,7 @@ Proof. intros a b Hab; induction Hab; simpl; constructor; auto. Qed.
 (*   - apply IHa; auto. *)
 (*   - intro i; eapply H; eauto; apply H1. *)
 (* Qed. *)
-(* #[global] Hint Resolve monotone_atotal : cotree. *)
+(* #[export] Hint Resolve monotone_atotal : cotree. *)
 
 (* Lemma not_total_cobot {A} : ~ total (@cobot bool A). *)
 (* Proof. *)

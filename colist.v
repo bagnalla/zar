@@ -59,11 +59,11 @@ CoInductive colist_le {A} : colist A -> colist A -> Prop :=
     colist_le l1 l2 ->
     colist_le (cocons x l1) (cocons x l2).
 
-#[global]
+#[export]
   Instance Reflexive_colist_le {A} : Reflexive (@colist_le A).
 Proof. cofix CH; intros []; constructor; eauto. Qed.
 
-#[global]
+#[export]
   Instance Transitive_colist_le {A} : Transitive (@colist_le A).
 Proof.
   cofix CH; intros x y z Hxy Hyz; inv Hxy.
@@ -72,11 +72,11 @@ Proof.
   - inv Hyz; constructor; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance PreOrder_colist_le {A} : PreOrder (@colist_le A).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_colist {A} : OType (colist A) :=
   { leq := colist_le }.
 
@@ -100,7 +100,7 @@ Lemma colist_eq_refl {A} (t : colist A) :
   colist_eq t t.
 Proof. revert t; cofix CH; intros []; constructor; eauto. Qed.
 
-#[global]
+#[export]
   Instance Reflexive_colist_eq {A} : Reflexive (@colist_eq A).
 Proof. intro t; apply colist_eq_refl. Qed.
 
@@ -118,7 +118,7 @@ Proof.
   inv Hab; inv Hba; constructor; apply CH; split; auto.
 Qed.
 
-#[global]
+#[export]
   Instance ExtType_colist {A} : ExtType (colist A).
 Proof.
   constructor; intros a b Hab; apply colist_ext, equ_colist_eq; auto.
@@ -144,14 +144,14 @@ Fixpoint coprefix {A} (n : nat) (l : colist A) : colist A :=
            end
   end.
 
-#[global]
+#[export]
   Instance Proper_colist_le {A} : Proper (equ ==> equ ==> flip impl) (@colist_le A).
 Proof.
   intros a b [Hab Hba] c d [Hcd Hdc] Hle.
   etransitivity; eauto; etransitivity; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_colist_le' {A}
   : Proper (colist_eq ==> colist_eq ==> flip impl) (@colist_le A).
 Proof.
@@ -173,7 +173,7 @@ Proof.
     constructor; apply Hs.
     intro i; specialize (Hx i); inv Hx; auto.
 Qed.
-#[global] Hint Resolve continuous_cocons : colist.
+#[export] Hint Resolve continuous_cocons : colist.
 
 Inductive alist_le {A} : alist A -> alist A -> Prop :=
 | alist_le_conil : forall l, alist_le anil l
@@ -184,11 +184,11 @@ Inductive alist_le {A} : alist A -> alist A -> Prop :=
     alist_le l1 l2 ->
     alist_le (acons x l1) (acons x l2).
 
-#[global]
+#[export]
   Instance Reflexive_alist_le {A} : Reflexive (@alist_le A).
 Proof. intro l; induction l; constructor; auto. Qed.
 
-#[global]
+#[export]
   Instance Transitive_alist_le {A} : Transitive (@alist_le A).
 Proof.
   intro a; induction a; intros b c Hab Hbc.
@@ -197,11 +197,11 @@ Proof.
   - inv Hab; inv Hbc; constructor; eapply IHa; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance PreOrder_alist_le {A} : PreOrder (@alist_le A).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_alist {A} : OType (alist A) :=
   { leq := alist_le }.
 
@@ -209,7 +209,7 @@ Lemma nil_le {A} (l : alist A) :
   anil ⊑ l.
 Proof. constructor. Qed.
 
-#[global]
+#[export]
   Instance ExtType_alist {A} : ExtType (alist A).
 Proof.
   constructor; intro a; induction a; intros b [H0 H1]; inv H0; inv H1; auto.
@@ -322,13 +322,13 @@ Proof.
   - specialize (Hch i); rewrite Hchi in Hch; inv Hch; simpl; auto.
 Qed.
 
-#[global]
+#[export]
   Instance monotone_step {A} : Proper (leq ==> leq) (@step A).
 Proof.
   intro a; revert a; cofix CH; intros x b Hab; inv Hab; auto; constructor.
 Qed.
 
-#[global]
+#[export]
   Instance monotone_lstep {A} : Proper (leq ==> leq) (@lstep A).
 Proof.
   intro a; induction a; intros b Hab; inv Hab; simpl; auto; constructor.
@@ -522,7 +522,7 @@ Proof.
   - intros; apply colist_sup_lub; auto.
 Qed.
 
-#[global]
+#[export]
   Instance dCPO_colist {A} : dCPO (@colist A).
 Proof.
   constructor; intros ch Hch.
@@ -925,16 +925,16 @@ Proof.
         inv Hub; auto.
 Qed.
 
-#[global]
+#[export]
   Instance Compact_alist {A} : Compact (alist A).
 Proof. constructor; intros a f Hf Ha; apply alist_compact; auto. Qed.
 
-#[global]
+#[export]
   Instance Dense_colist {A} : Dense (colist A) (alist A) :=
   { incl := inj
   ; ideal := flip prefix }.
 
-#[global]
+#[export]
   Instance aCPO_colist {A} : aCPO (colist A) (alist A).
 Proof.
   constructor.
@@ -957,7 +957,7 @@ Fixpoint afold {A B} (z : B) (f : B -> B) (g : A -> B -> B) (l : alist A) : B :=
   | acons x xs => g x (afold z f g xs)
   end.
 
-#[global]
+#[export]
   Instance monotone_afold {A B} `{OType B} (z : B) (f : B -> B) (g : A -> B -> B)
   {Hz : forall b, z ⊑ afold z f g b}
   {Hf : Proper (leq ==> leq) f}
@@ -970,9 +970,9 @@ Proof.
   - apply Hf; auto.
   - apply Hg, IHa; auto.
 Qed.
-#[global] Hint Resolve monotone_afold : colist.
+#[export] Hint Resolve monotone_afold : colist.
 
-#[global]
+#[export]
   Instance antimonotone_afold {A B} `{OType B} (z : B) (f : B -> B) (g : A -> B -> B)
   {Hz : forall b, afold z f g b ⊑ z}
   {Hf : Proper (leq ==> leq) f}
@@ -985,7 +985,7 @@ Proof.
   - apply Hf, IHa; auto.
   - apply Hg, IHa; auto.
 Qed.
-#[global] Hint Resolve antimonotone_afold : colist.
+#[export] Hint Resolve antimonotone_afold : colist.
 
 (** Computation lemmas for cofolds. *)
 

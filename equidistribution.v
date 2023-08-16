@@ -302,7 +302,7 @@ Inductive aproduces {A} (P : A -> Prop) : Stream bool -> atree bool A -> Prop :=
 Definition produces' {A} (P : A -> Prop) (bs : Stream bool) : cotree bool A -> Prop :=
   co (aproduces P bs).
 
-#[global]
+#[export]
   Instance monotone_aproduces {A} (P : A -> Prop) bs
   : Proper (leq ==> leq) (aproduces P bs).
 Proof.
@@ -311,7 +311,7 @@ Proof.
   - constructor; apply IHa; auto.
   - constructor; eapply H; eauto; apply H1.
 Qed.
-#[global] Hint Resolve monotone_aproduces : cotree.
+#[export] Hint Resolve monotone_aproduces : cotree.
 
 Lemma produces'_tau {A} (P : A -> Prop) bs t :
   produces' P bs t ->

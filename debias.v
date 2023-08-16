@@ -44,7 +44,7 @@ Proof.
   - constructor; eauto with tree.
     intros [|[]]; simpl; auto.
 Qed.
-#[global] Hint Resolve wf_tree'_debias : tree.
+#[export] Hint Resolve wf_tree'_debias : tree.
 
 Lemma debias_choice {A} q (f : bool -> tree A) :
   debias (Choice q f) =

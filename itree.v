@@ -162,7 +162,7 @@ Section itree_cotree_eq.
   Qed.
 End itree_cotree_eq.
 
-#[global]
+#[export]
   Hint Resolve itree_cotree_eq__mono : paco.
 
 (** Translating CF trees to itrees. *)

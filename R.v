@@ -24,7 +24,7 @@ Local Open Scope order_scope.
 Definition converges_R (g : nat -> R) (lim : R) :=
   forall eps, 0 < eps -> exists n0, forall n, (n0 <= n)%nat -> Rabs (lim - g n) < eps.
 
-#[global]
+#[export]
   Program Instance OType_R : OType R :=
   { leq := Rle }.
 Next Obligation.

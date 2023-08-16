@@ -17,6 +17,7 @@ Local Open Scope R_scope.
 From zar Require Import
   cpo
   eR
+  misc
   order
   tactics
 .

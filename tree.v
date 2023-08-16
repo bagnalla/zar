@@ -123,7 +123,7 @@ Inductive wf_tree {A} : tree A -> Prop :=
     (forall s : I, wf_tree (g s)) ->
     (forall s : I, wf_tree (k s)) ->
     wf_tree (Fix st e g k).
-#[global] Hint Constructors wf_tree : tree.
+#[export] Hint Constructors wf_tree : tree.
 
 Inductive wf_tree' {A} : tree A -> Prop :=
 | wf_leaf' : forall x, wf_tree' (Leaf x)
@@ -137,12 +137,12 @@ Inductive wf_tree' {A} : tree A -> Prop :=
     (forall s : I, wf_tree' (g s)) ->
     (forall s : I, wf_tree' (k s)) ->
     wf_tree' (Fix st e g k).
-#[global] Hint Constructors wf_tree' : tree.
+#[export] Hint Constructors wf_tree' : tree.
 
 Lemma wf_tree'_wf_tree {A} (t : tree A) :
   wf_tree' t -> wf_tree t.
 Proof. induction 1; constructor; auto; lra. Qed.
-#[global] Hint Resolve wf_tree'_wf_tree : tree.
+#[export] Hint Resolve wf_tree'_wf_tree : tree.
 
 Lemma wf_tree_bind {A B} (t : tree A) (k : A -> tree B) :
   wf_tree t ->
@@ -188,7 +188,7 @@ Lemma tree_unbiased_wf_tree {A} (t : tree A) :
   tree_unbiased t ->
   wf_tree t.
 Proof. induction 1; constructor; auto; lra. Qed.
-#[global] Hint Resolve tree_unbiased_wf_tree : tree.
+#[export] Hint Resolve tree_unbiased_wf_tree : tree.
 
 Lemma fix_approx'''_tree_bind_fix_approx {A B}
   (st : A) (e : A -> bool) (g : A -> tree A) (k : A -> tree B) (n : nat) :

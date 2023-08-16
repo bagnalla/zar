@@ -157,8 +157,8 @@ Proof.
   intros []; eauto.
 Qed.
 Import Lra.
-#[global] Hint Resolve wf_tree_btree_to_tree : tree.
-#[global] Hint Resolve wf_tree'_btree_to_tree : tree.
+#[export] Hint Resolve wf_tree_btree_to_tree : tree.
+#[export] Hint Resolve wf_tree'_btree_to_tree : tree.
 
 (* Instead of divide list, take and drop 2^n' from the list. *)
 Fixpoint list_btree_aux {A} (l : list A) (n : nat) : btree (unit + A) :=
@@ -195,7 +195,7 @@ Definition list_btree {A} (l : list A) : btree (unit + A) :=
 (*       * constructor; congruence. *)
 (* Qed. *)
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance EqType_btree {A} `{EqType A} : EqType (btree A) := *)
 (*   {| eqb := btree_eq *)
 (*    ; eqb_spec := btree_eq_spec |}. *)

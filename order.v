@@ -30,11 +30,11 @@ Class OType (A : Type) : Type :=
   ; leq_preorder : PreOrder leq
   }.
 
-#[global]
+#[export]
   Instance OType_Reflexive A `{o : OType A} : Reflexive leq.
 Proof. destruct o; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_Transitive A `{o : OType A} : Transitive leq.
 Proof. destruct o; typeclasses eauto. Qed.
 
@@ -42,7 +42,7 @@ Definition gt {A : Type} `{OType A} : relation A := fun x y => not (leq x y).
 
 Definition lt {A : Type} `{OType A} : relation A := fun x y => leq x y /\ not (leq y x).
 
-#[global]
+#[export]
   Instance Transitive_lt A `{o : OType A} : Transitive lt.
 Proof.
   destruct o as [R [Hrefl Htrans]].
@@ -68,7 +68,7 @@ Notation "⊥" := bot.
 Lemma bot_leq {A} `{PType A} :
   forall a : A, ⊥ ⊑ a.
 Proof. intro; apply bot_le. Qed.
-#[global] Hint Resolve bot_leq : order.
+#[export] Hint Resolve bot_leq : order.
 
 (* [a] is an upper bound of [f] *)
 Definition upper_bound {I A : Type} `{OType A} (a : A) (f : I -> A) :=
@@ -105,11 +105,11 @@ Definition directed {I A : Type} `{OType A} (f : I -> A) : Prop :=
 Definition downward_directed {I A : Type} `{OType A} (f : I -> A) : Prop :=
   forall i j : I, exists k : I, f k ⊑ f i /\ f k ⊑ f j.
 
-#[global]
+#[export]
   Program Instance OType_Prop : OType Prop := {| leq := impl |}.
-Next Obligation. constructor; intuition. Qed.
+Next Obligation. constructor; auto with *. Qed.
 
-#[global]
+#[export]
   Program Instance OType_arrow A B {oB : OType B} : OType (A -> B) :=
   {| leq := fun f g => forall x, leq (f x) (g x) |}.
 Next Obligation.
@@ -118,32 +118,32 @@ Next Obligation.
   - intros ?; etransitivity; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance OType_nat : OType nat := {| leq := Nat.le |}.
 
-#[global]
+#[export]
   Instance OType_list A : OType (list A) :=
   {| leq := is_prefix |}.
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance OType_Z : OType Z := {| leq := Z.le |}. *)
 
 Definition prod_le {A B} `{OType A} `{OType B} (x y : A * B) : Prop :=
   fst x ⊑ fst y /\ snd x ⊑ snd y.
 
-#[global]
+#[export]
   Instance Reflexive_prod_le {A B} `{OType A} `{OType B} : Reflexive (@prod_le A B _ _).
 Proof. constructor; reflexivity. Qed.
 
-#[global]
+#[export]
   Instance Transitive_prod_le {A B} `{OType A} `{OType B} : Transitive (@prod_le A B _ _).
 Proof. intros [] [] [] [] []; constructor; etransitivity; eauto. Qed.
 
-#[global]
+#[export]
   Instance PreOrder_prod_le {A B} `{OType A} `{OType B} : PreOrder (@prod_le A B _ _).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_prod {A B} `{OType A} `{OType B} : OType (A * B) :=
   {| leq := prod_le |}.
 
@@ -154,29 +154,29 @@ Definition sum_le {A B} `{OType A} `{OType B} (x y : A + B) : Prop :=
   | _ => False
   end.
 
-#[global]
+#[export]
   Instance Reflexive_sum_le {A B} `{OType A} `{OType B} : Reflexive (@sum_le A B _ _).
 Proof. unfold sum_le; intros []; reflexivity. Qed.
 
-#[global]
+#[export]
   Instance Transitive_sum_le {A B} `{OType A} `{OType B} : Transitive (@sum_le A B _ _).
 Proof. unfold sum_le; intros [a1|b1] [a2|b2] [a3|b3]; firstorder; etransitivity; eauto. Qed.
 
-#[global]
+#[export]
   Instance PreOrder_sum_le {A B} `{OType A} `{OType B} : PreOrder (@sum_le A B _ _).
 Proof. constructor; typeclasses eauto. Qed.
 
-#[global]
+#[export]
   Instance OType_sum {A B} `{OType A} `{OType B} : OType (A + B) :=
   {| leq := sum_le |}.
 
 Definition equ {A : Type} `{OType A} (x y : A) := x ⊑ y /\ y ⊑ x.
 
-#[global]
+#[export]
   Instance Reflexive_equ A `{o : OType A} : Reflexive equ.
 Proof. destruct o as [? [Hrefl ?]]; split; apply Hrefl. Qed.
 
-#[global]
+#[export]
   Instance Transitive_equ A `{o : OType A} : Transitive equ.
 Proof.
   intros x y z Hxy Hyz.
@@ -185,14 +185,14 @@ Proof.
   - etransitivity. apply Hyz. apply Hxy.
 Qed.
 
-#[global]
+#[export]
   Instance Symmetric_equ A `{OType A} : Symmetric equ.
 Proof. unfold Symmetric, equ; intuition. Qed.
 
-#[global]
+#[export]
   Program Instance Equivalence_equ A `{OType A} : Equivalence equ.
 
-#[global]
+#[export]
   Instance Proper_leq {A} `{OType A} : Proper (equ ==> equ ==> flip impl) leq.
 Proof.
   intros x y [Hxy Hyx] a b [Hab Hba] Hle.
@@ -200,12 +200,12 @@ Proof.
   etransitivity; eauto.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_monotone_equ {A B} `{OType A} `{OType B} (f : A -> B)
   {pf: Proper (leq ==> leq) f} : Proper (equ ==> equ) f.
 Proof. intros a b Hab; split; apply pf, Hab. Qed.
 
-#[global]
+#[export]
   Instance Proper_antimonotone_equ {A B} `{OType A} `{OType B} (f : A -> B)
   {pf: Proper (leq ==> flip leq) f} : Proper (equ ==> equ) f.
 Proof. intros a b Hab; split; apply pf, Hab. Qed.
@@ -238,12 +238,12 @@ Qed.
 (* [f] is monotone whenever it is order-preserving. *)
 Definition monotone {A B : Type} `{OType A} `{OType B} (f : A -> B) :=
   Proper (leq ==> leq) f.
-#[global] Hint Unfold monotone : order.
+#[export] Hint Unfold monotone : order.
 
 (* [f] is antimonotone whenever it is order-reversing. *)
 Definition antimonotone {A B : Type} `{OType A} `{OType B} (f : A -> B) :=
   Proper (leq ==> flip leq) f.
-#[global] Hint Unfold antimonotone : order.
+#[export] Hint Unfold antimonotone : order.
 
 Lemma monotone_chain {A B : Type} `{OType A} `{OType B} (f : A -> B) (g : nat -> A) :
   monotone f ->
@@ -260,7 +260,7 @@ Proof.
   specialize (Hg i j); destruct Hg as [k [Hk Hk']].
   exists k; split; eauto.
 Qed.
-#[global] Hint Resolve monotone_directed : order.
+#[export] Hint Resolve monotone_directed : order.
 
 Lemma antimonotone_directed {I A B : Type} `{OType A} `{OType B} (f : A -> B) (g : I -> A) :
   antimonotone f ->
@@ -271,7 +271,7 @@ Proof.
   specialize (Hg i j); destruct Hg as [k [Hk Hk']].
   exists k; split; apply Hf; auto.
 Qed.
-#[global] Hint Resolve antimonotone_directed : order.
+#[export] Hint Resolve antimonotone_directed : order.
 
 Lemma monotone_downward_directed {I A B : Type} `{OType A} `{OType B}
   (f : A -> B) (g : I -> A) :
@@ -283,7 +283,7 @@ Proof.
   specialize (Hg i j); destruct Hg as [k [Hk Hk']].
   exists k; split; apply Hf; auto.
 Qed.
-#[global] Hint Resolve monotone_downward_directed : order.
+#[export] Hint Resolve monotone_downward_directed : order.
 
 Lemma antimonotone_downward_directed {I A B : Type} `{OType A} `{OType B}
   (f : A -> B) (g : I -> A) :
@@ -295,7 +295,7 @@ Proof.
   specialize (Hg i j); destruct Hg as [k [Hk Hk']].
   exists k; split; apply Hf; auto.
 Qed.
-#[global] Hint Resolve antimonotone_downward_directed : order.
+#[export] Hint Resolve antimonotone_downward_directed : order.
 
 Lemma monotone_dec_chain {A B : Type} `{OType A} `{OType B} (f : A -> B) (g : nat -> A) :
   monotone f ->
@@ -321,7 +321,7 @@ Lemma monotone_compose {A B C : Type} `{OType A} `{OType B} `{OType C}
   monotone g ->
   monotone (g ∘ f).
 Proof. intros Hf Hg x y Hleq; apply Hg, Hf; auto. Qed.
-#[global] Hint Resolve monotone_compose : order.
+#[export] Hint Resolve monotone_compose : order.
 
 Lemma monotone_antimonotone_compose {A B C : Type} `{OType A} `{OType B} `{OType C}
   (f : A -> B) (g : B -> C) :
@@ -336,7 +336,7 @@ Lemma antimonotone_compose {A B C : Type}
   antimonotone g ->
   monotone (g ∘ f).
 Proof. intros Hf Hg x y Hleq; apply Hg, Hf; auto. Qed.
-#[global] Hint Resolve antimonotone_compose : order.
+#[export] Hint Resolve antimonotone_compose : order.
 
 Lemma chain_leq {A : Type} `{o : OType A} (f : nat -> A) (n m : nat) :
   chain f ->
@@ -398,7 +398,7 @@ Proof.
     apply Hub.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_infimum {A B : Type} {oB : OType B}
   : Proper (equ ==> equ ==> iff) (@infimum A B oB).
 Proof.
@@ -422,7 +422,7 @@ Proof.
       intro z; transitivity (f z); auto.
 Qed.
 
-#[global]
+#[export]
   Instance Proper_supremum {A B : Type} {oB : OType B}
   : Proper (equ ==> equ ==> iff) (@supremum A B oB).
 Proof.
@@ -510,7 +510,7 @@ Proof.
   - apply Nat.le_max_l.
   - apply Nat.le_max_r.
 Qed.
-#[global] Hint Resolve chain_directed : order.
+#[export] Hint Resolve chain_directed : order.
 
 Lemma dec_chain_downward_directed {A} `{OType A} (f : nat -> A) :
   dec_chain f ->
@@ -521,7 +521,7 @@ Proof.
   - apply Nat.le_max_l.
   - apply Nat.le_max_r.
 Qed.
-#[global] Hint Resolve dec_chain_downward_directed : order.
+#[export] Hint Resolve dec_chain_downward_directed : order.
 
 Lemma continuous_wcontinuous {A B} `{OType A} `{OType B} (f : A -> B) :
   continuous f ->
@@ -529,7 +529,7 @@ Lemma continuous_wcontinuous {A B} `{OType A} `{OType B} (f : A -> B) :
 Proof.
   intros Hf ch Hch s Hs; apply Hf; auto; apply chain_directed; auto.
 Qed.
-#[global] Hint Resolve continuous_wcontinuous : order.
+#[export] Hint Resolve continuous_wcontinuous : order.
 
 Lemma dec_continuous_dec_wcontinuous {A B} `{OType A} `{OType B} (f : A -> B) :
   dec_continuous f ->
@@ -537,7 +537,7 @@ Lemma dec_continuous_dec_wcontinuous {A B} `{OType A} `{OType B} (f : A -> B) :
 Proof.
   intros Hf ch Hch s Hs; apply Hf; auto; apply dec_chain_downward_directed; auto.
 Qed.
-#[global] Hint Resolve continuous_wcontinuous : order.
+#[export] Hint Resolve continuous_wcontinuous : order.
 
 Lemma upper_bound_const {A B} `{OType A} (a : A) :
   upper_bound a (@const A B a).
@@ -556,7 +556,7 @@ Proof.
     unfold const. intros x H1.
     destruct H0; apply H1; auto.
 Qed.
-#[global] Hint Resolve supremum_const : order.
+#[export] Hint Resolve supremum_const : order.
 
 Lemma supremum_const' {A B} `{OType A} `{Inhabited B} (a : A) (f : nat -> A) :
   f === const a ->
@@ -571,7 +571,7 @@ Proof.
   - unfold const; intros x H1.
     destruct H0; apply H1; auto.
 Qed.
-#[global] Hint Resolve infimum_const : order.
+#[export] Hint Resolve infimum_const : order.
 
 Lemma infimum_const' {A B} `{OType A} `{Inhabited B} (a : A) (f : nat -> A) :
   f === const a ->
@@ -593,12 +593,12 @@ Qed.
 Lemma directed_const {I A} `{OType A} (x : A) :
   directed (fun _ : I => x).
 Proof. intros _ j; exists j; split; reflexivity. Qed.
-#[global] Hint Resolve directed_const : order.
+#[export] Hint Resolve directed_const : order.
 
 Lemma downward_directed_const {I A} `{OType A} (x : A) :
   downward_directed (fun _ : I => x).
 Proof. intros _ j; exists j; split; reflexivity. Qed.
-#[global] Hint Resolve downward_directed_const : order.
+#[export] Hint Resolve downward_directed_const : order.
 
 Lemma eq_equ {A} `{OType A} x y :
   x = y -> x === y.
@@ -702,7 +702,7 @@ Proof.
   apply Hf in H1; auto.
   destruct H1 as [Hub Hlub]; apply (Hub O).
 Qed.
-#[global] Hint Resolve continuous_monotone : order.
+#[export] Hint Resolve continuous_monotone : order.
 
 Lemma cocontinuous_antimonotone {A B} `{OType A} `{OType B} (f : A -> B) :
   cocontinuous f ->
@@ -724,7 +724,7 @@ Proof.
   apply Hf in H1; auto.
   destruct H1 as [Hub Hlub]; apply (Hub O).
 Qed.
-#[global] Hint Resolve cocontinuous_antimonotone : order.
+#[export] Hint Resolve cocontinuous_antimonotone : order.
 
 Lemma wcontinuous_monotone {A B} `{OType A} `{OType B} (f : A -> B) :
   wcontinuous f ->
@@ -745,7 +745,7 @@ Proof.
   apply Hf in H1; auto.
   destruct H1 as [Hub Hlub]; apply (Hub O).
 Qed.
-#[global] Hint Resolve wcontinuous_monotone : order.
+#[export] Hint Resolve wcontinuous_monotone : order.
 
 Lemma dec_continuous_monotone {A B} `{OType A} `{OType B} (f : A -> B) :
   dec_continuous f ->
@@ -767,7 +767,7 @@ Proof.
   apply Hf in H1; auto.
   destruct H1 as [Hlb Hglb]; apply (Hlb O).
 Qed.
-#[global] Hint Resolve dec_continuous_monotone : order.
+#[export] Hint Resolve dec_continuous_monotone : order.
 
 Lemma dec_wcontinuous_monotone {A B} `{OType A} `{OType B} (f : A -> B) :
   dec_wcontinuous f ->
@@ -788,7 +788,7 @@ Proof.
   apply Hf in H1; auto.
   destruct H1 as [Hlb Hglb]; apply (Hlb O).
 Qed.
-#[global] Hint Resolve dec_wcontinuous_monotone : order.
+#[export] Hint Resolve dec_wcontinuous_monotone : order.
 
 Lemma continuous_compose {A B C} `{OType A} `{OType B} `{OType C}
   (f : A -> B) (g : B -> C) :
@@ -935,18 +935,18 @@ Corollary shift_infimum'' {A} `{OType A} (a : A) (f g : nat -> A) :
   infimum a g.
 Proof. intros Hg01 Ha Hgf; eapply shift_infimum'; eauto. Qed.
 
-#[global]
+#[export]
   Instance monotone_id {A} `{OType A} : Proper (leq ==> leq) id.
 Proof. intros ? ? Hle; apply Hle. Qed.
-#[global] Hint Resolve monotone_id : order.
+#[export] Hint Resolve monotone_id : order.
 
 Lemma continuous_id {A} `{OType A} : continuous id.
 Proof. intros ch Hch s Hs; apply Hs. Qed.
-#[global] Hint Resolve continuous_id : order.
+#[export] Hint Resolve continuous_id : order.
 
 Lemma dec_continuous_id {A} `{OType A} : dec_continuous id.
 Proof. intros ch Hch s Hs; apply Hs. Qed.
-#[global] Hint Resolve dec_continuous_id : order.
+#[export] Hint Resolve dec_continuous_id : order.
 
 Fixpoint iter_n {A} (F : A -> A) (z : A) (n : nat) : A :=
   match n with
@@ -990,7 +990,7 @@ Proof. revert F G a b; induction i; intros F G a b HFG Hab; simpl; auto. Qed.
 
 Lemma chain_id : chain (fun i : nat => i).
 Proof. intro i; simpl; lia. Qed.
-#[global] Hint Resolve chain_id : order.
+#[export] Hint Resolve chain_id : order.
 
 Lemma supremum_cond {A} `{OType A} (b : bool) (x y : A) (f g : nat -> A) :
   supremum x f ->
@@ -1034,19 +1034,19 @@ Proof. revert z ub; induction n; intros z ub Hz HF; simpl; auto. Qed.
 Class ExtType (A : Type) `{OType A} : Type :=
   { ext : forall (a b : A), a === b -> a = b }.
 
-#[global]
+#[export]
   Instance ExtType_Proper {A B} `{ExtType A} `{OType B} (f : A -> B)
   : Proper (equ ==> equ) f.
 Proof. intros x y Hxy; eapply ext in Hxy; subst; reflexivity. Qed.
 
-#[global]
+#[export]
   Instance ExtType_arrow {A B} `{ExtType B} : ExtType (A -> B).
 Proof.
   constructor; intros f g Hfg.
   ext x; rewrite equ_arrow in Hfg; specialize (Hfg x); apply ext; auto.
 Qed.
 
-(* #[global] *)
+(* #[export] *)
 (*   Instance ExtType_Prop : ExtType Prop. *)
 (* Proof. constructor; apply propositional_extensionality. Qed. *)
 
@@ -1098,12 +1098,12 @@ Proof.
   - apply Hf; auto.
   - apply Hg; auto.
 Qed.
-#[global] Hint Resolve continuous_ite : order.
+#[export] Hint Resolve continuous_ite : order.
 
 Lemma leq_refl {A} `{OType A} (x : A) :
   x ⊑ x.
 Proof. reflexivity. Qed.
-#[global] Hint Resolve leq_refl : order.
+#[export] Hint Resolve leq_refl : order.
 
 Lemma continuous_disj (P : Prop) :
   continuous (fun x : Prop => P \/ x).
@@ -1158,23 +1158,23 @@ Qed.
 Lemma continuous_const {A B} `{OType A} `{OType B} (b : B) :
   continuous (fun _ : A => b).
 Proof. intros ? ? ? ?; apply supremum_const. Qed.
-#[global] Hint Resolve continuous_const : order.
+#[export] Hint Resolve continuous_const : order.
 
 Lemma cocontinuous_const {A B} `{OType A} `{OType B} (b : B) :
   cocontinuous (fun _ : A => b).
 Proof. intros ? ? ? ?; apply infimum_const. Qed.
 
-#[global]
+#[export]
   Instance monotone_fst {A B} `{OType A} `{OType B}
   : Proper (leq ==> leq) (@fst A B).
 Proof. intros [] [] []; auto. Qed.
-#[global] Hint Resolve monotone_fst : order.
+#[export] Hint Resolve monotone_fst : order.
 
-#[global]
+#[export]
   Instance monotone_snd {A B} `{OType A} `{OType B}
   : Proper (leq ==> leq) (@snd A B).
 Proof. intros [] [] []; auto. Qed.
-#[global] Hint Resolve monotone_snd : order.
+#[export] Hint Resolve monotone_snd : order.
 
 Lemma supremum_fst {A B} `{OType A} `{OType B} (a : A) (b : B) (f : nat -> A * B) :
   supremum (a, b) f ->

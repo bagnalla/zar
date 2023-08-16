@@ -54,12 +54,12 @@ Notation "2" := eR2 : eR_scope.
 Inductive eRle : eR -> eR -> Prop :=
 | eRle_infty : forall r, eRle r infty
 | eRle_R : forall r1 pf1 r2 pf2, r1 <= r2 -> eRle (er r1 pf1) (er r2 pf2).
-#[global] Hint Constructors eRle : eR.
+#[export] Hint Constructors eRle : eR.
 
 Inductive eRlt : eR -> eR -> Prop :=
 | eRlt_infty : forall r pf, eRlt (er r pf) infty
 | eRlt_R : forall r1 pf1 r2 pf2, r1 < r2 -> eRlt (er r1 pf1) (er r2 pf2).
-#[global] Hint Constructors eRlt : eR.
+#[export] Hint Constructors eRlt : eR.
 
 Infix "<=" := eRle : eR_scope.
 Infix "<" := eRlt : eR_scope.
@@ -96,19 +96,19 @@ Lemma eRlt_le a b :
   a < b ->
   a <= b.
 Proof. intro Hab; inv Hab; constructor; lra. Qed.
-#[global] Hint Resolve eRlt_le : eR.
+#[export] Hint Resolve eRlt_le : eR.
 
 Lemma eRlt_neq a b :
   a < b ->
   a <> b.
 Proof. intro Ha; inv Ha; intro HC; inv HC; lra. Qed.
-#[global] Hint Resolve eRlt_neq : eR.
+#[export] Hint Resolve eRlt_neq : eR.
 
 Lemma eRlt_neq' a b :
   b < a ->
   a <> b.
 Proof. intro Ha; inv Ha; intro HC; inv HC; lra. Qed.
-#[global] Hint Resolve eRlt_neq' : eR.
+#[export] Hint Resolve eRlt_neq' : eR.
 
 Lemma neq_eRlt_0 a :
   a <> 0 ->
@@ -118,7 +118,7 @@ Proof.
   apply Rle_not_eq_Rlt; auto.
   intro H; subst; apply HC; apply eR_eq; reflexivity.
 Qed.
-#[global] Hint Resolve neq_eRlt_0 : eR.
+#[export] Hint Resolve neq_eRlt_0 : eR.
 
 Lemma eR_eq_dec (a b : eR) :
   {a = b} + {a <> b}.
@@ -188,19 +188,19 @@ Infix "/" := eRdiv : eR_scope.
 Lemma eRle_refl (a : eR) :
   a <= a.
 Proof. destruct a; constructor; lra. Qed.
-#[global] Hint Resolve eRle_refl : eR.
+#[export] Hint Resolve eRle_refl : eR.
 
-#[global]
+#[export]
   Instance Reflexive_eRle : Reflexive eRle.
 Proof. intro a; apply eRle_refl. Qed.
 
-#[global]
+#[export]
   Instance Transitive_eRle : Transitive eRle.
 Proof.
   intros a b c Hab Hbc; inv Hab; try solve[constructor]; inv Hbc; constructor; lra.
 Qed.
 
-#[global]
+#[export]
   Program Instance OType_eR : OType eR :=
   { leq := eRle }.
 Next Obligation. constructor; typeclasses eauto. Qed.
@@ -208,7 +208,7 @@ Next Obligation. constructor; typeclasses eauto. Qed.
 Lemma eR0_le a :
   0 <= a.
 Proof. destruct a; constructor; auto. Qed.
-#[global] Hint Resolve eR0_le : eR.
+#[export] Hint Resolve eR0_le : eR.
 
 Definition proj_eR (r : eR) : R :=
   match r with
@@ -357,11 +357,11 @@ Proof.
     - intros x Hx; constructor. }
 Qed.
 
-#[global]
+#[export]
   Instance lCPO_eR : lCPO eR.
 Proof. constructor; intros f; apply eR_complete_inf. Qed.
 
-#[global]
+#[export]
   Instance CPO_eR : CPO eR.
 Proof. constructor; intros f; apply eR_complete. Qed.
 
@@ -427,22 +427,22 @@ Proof. destruct a, b; auto; apply eR_eq; lra. Qed.
 Lemma eRplus_0_l (a : eR) :
   eR0 + a = a.
 Proof. destruct a; simpl; auto; apply eR_eq; lra. Qed.
-#[global] Hint Resolve eRplus_0_l : eR.
+#[export] Hint Resolve eRplus_0_l : eR.
 
 Lemma eRplus_0_r (a : eR) :
   a + eR0 = a.
 Proof. destruct a; simpl; auto; apply eR_eq; lra. Qed.
-#[global] Hint Resolve eRplus_0_r : eR.
+#[export] Hint Resolve eRplus_0_r : eR.
 
 Lemma eRplus_infty_l (a : eR) :
   infty + a = infty.
 Proof. destruct a; simpl; auto; apply eR_eq; lra. Qed.
-#[global] Hint Resolve eRplus_infty_l : eR.
+#[export] Hint Resolve eRplus_infty_l : eR.
 
 Lemma eRplus_infty_r (a : eR) :
   a + infty = infty.
 Proof. destruct a; simpl; auto; apply eR_eq; lra. Qed.
-#[global] Hint Resolve eRplus_infty_r : eR.
+#[export] Hint Resolve eRplus_infty_r : eR.
 
 Lemma eRmult_plus_distr_l (a b c : eR) :
   a * (b + c) = a * b + a * c.
@@ -614,7 +614,7 @@ Proof.
   - apply eR_eq; lra.
   - destr; congruence.
 Qed.
-#[global] Hint Resolve eRmult_0_l : eR.
+#[export] Hint Resolve eRmult_0_l : eR.
 
 Lemma eRmult_0_l' (a : eR) pf :
   er 0 pf * a = 0.
@@ -623,7 +623,7 @@ Proof.
   - apply eR_eq; lra.
   - destr; auto; exfalso; apply n, eR_eq; reflexivity.
 Qed.
-#[global] Hint Resolve eRmult_0_l : eR.
+#[export] Hint Resolve eRmult_0_l : eR.
 
 Lemma eRmult_0_r (a : eR) :
   a * 0 = 0.
@@ -632,7 +632,7 @@ Proof.
   - apply eR_eq; lra.
   - destr; congruence.
 Qed.
-#[global] Hint Resolve eRmult_0_r : eR.
+#[export] Hint Resolve eRmult_0_r : eR.
 
 Lemma eRmult_1_l (a : eR) :
   eR1 * a = a.
@@ -642,7 +642,7 @@ Proof.
   - apply eR_eq; lra.
   - destr; auto; inv e; lra.
 Qed.
-#[global] Hint Resolve eRmult_1_l : eR.
+#[export] Hint Resolve eRmult_1_l : eR.
 
 Lemma eRmult_1_r (a : eR) :
   a * eR1 = a.
@@ -652,19 +652,19 @@ Proof.
   - apply eR_eq; lra.
   - destr; auto; inv e; lra.
 Qed.
-#[global] Hint Resolve eRmult_1_r : eR.
+#[export] Hint Resolve eRmult_1_r : eR.
 
 Lemma eRmult_infty_l (a : eR) :
   a <> 0 ->
   infty * a = infty.
 Proof. intro Ha; unfold eRmult; destr; congruence. Qed.
-#[global] Hint Resolve eRmult_infty_l : eR.
+#[export] Hint Resolve eRmult_infty_l : eR.
 
 Lemma eRmult_infty_r (a : eR) :
   a <> 0 ->
   a * infty = infty.
 Proof. intro Ha; unfold eRmult; destruct a; destr; congruence. Qed.
-#[global] Hint Resolve eRmult_infty_r : eR.
+#[export] Hint Resolve eRmult_infty_r : eR.
 
 Lemma Q2R_0_le (q : Q) :
   (0 <= q)%Q ->
@@ -673,7 +673,7 @@ Proof. intro Hq; apply Qreals.Qle_Rle in Hq; lra. Qed.
 
 Definition Q2eR (q : Q) : eR := er (Q2R (Qmax 0 q)) (Q2R_0_le _ (Q.le_max_l _ _)).
 
-#[global]
+#[export]
   Instance Proper_Q2eR : Proper (Qeq ==> eq) Q2eR.
 Proof.
   intros p q Hpq; unfold Q2eR; apply eR_eq; rewrite Hpq; reflexivity.
@@ -732,12 +732,12 @@ Qed.
 Lemma eRminus_Q2eR_not_infty (a : R) pf (q : Q) :
   er a pf - Q2eR q <> infty.
 Proof. unfold eRminus; simpl; destr; intro HC; inv HC. Qed.
-#[global] Hint Resolve eRminus_Q2eR_not_infty : eR.
+#[export] Hint Resolve eRminus_Q2eR_not_infty : eR.
 
 Corollary eR1_eRminus_Q2eR_not_infty (q : Q) :
   eR1 - Q2eR q <> infty.
 Proof. apply eRminus_Q2eR_not_infty. Qed.
-#[global] Hint Resolve eR1_eRminus_Q2eR_not_infty : eR.
+#[export] Hint Resolve eR1_eRminus_Q2eR_not_infty : eR.
 
 Lemma Q2eR_0 :
   Q2eR 0 = 0.
@@ -755,7 +755,7 @@ Proof.
   apply Qreals.Qle_Rle.
   apply Q.max_le_compat_l; auto.
 Qed.  
-#[global] Hint Resolve Q2eR_le : eR.
+#[export] Hint Resolve Q2eR_le : eR.
 
 Corollary Q2eR_le_1 (a : Q) :
   (a <= 1)%Q ->
@@ -766,13 +766,13 @@ Proof.
   - apply Q2eR_le; auto.
   - apply eR_eq; compute; lra.
 Qed.
-#[global] Hint Resolve Q2eR_le_1 : eR.
+#[export] Hint Resolve Q2eR_le_1 : eR.
 
 Corollary Q2eR_le_0_1 (a : Q) :
   (0 <= a <= 1)%Q ->
   Q2eR a <= 1.
 Proof. intros [_ Ha]; apply Q2eR_le_1; auto. Qed.
-#[global] Hint Resolve Q2eR_le_0_1 : eR.
+#[export] Hint Resolve Q2eR_le_0_1 : eR.
 
 Lemma equ_eR (a b : eR) :
   a === b <-> a = b.
@@ -806,7 +806,7 @@ Qed.
 Lemma proj_eR_0_le (a : eR) :
   (0 <= proj_eR a)%R.
 Proof. destruct a; simpl; lra. Qed.
-#[global] Hint Resolve proj_eR_0_le : eR.
+#[export] Hint Resolve proj_eR_0_le : eR.
 
 Lemma chain_proj_eR f :
   (forall i, f i <> infty) ->
@@ -817,7 +817,7 @@ Proof.
   specialize (Hf i); inv Hf; simpl; try lra.
   exfalso; eapply H; eauto.
 Qed.
-#[global] Hint Resolve chain_proj_eR : eR.
+#[export] Hint Resolve chain_proj_eR : eR.
 
 Lemma dec_chain_proj_eR f :
   (forall i, f i <> infty) ->
@@ -828,7 +828,7 @@ Proof.
   specialize (Hf i); inv Hf; simpl; try lra.
   exfalso; eapply H; eauto.
 Qed.
-#[global] Hint Resolve dec_chain_proj_eR : eR.
+#[export] Hint Resolve dec_chain_proj_eR : eR.
 
 Lemma supremum_er_not_infty {I} (a : R) pf (f : I -> eR) i :
   supremum (er a pf) f ->
@@ -836,7 +836,7 @@ Lemma supremum_er_not_infty {I} (a : R) pf (f : I -> eR) i :
 Proof.
   intros [Hub Hlub] HC; specialize (Hub i); rewrite HC in Hub; inv Hub.
 Qed.
-#[global] Hint Resolve supremum_er_not_infty : eR.
+#[export] Hint Resolve supremum_er_not_infty : eR.
 
 Lemma supremum_er_proj_eR {A} `{Inhabited A} (a : R) pf (f : A -> eR) :
   (forall i, f i <> infty) ->
@@ -859,7 +859,7 @@ Proof.
       constructor; auto. }
     apply Hlub in Hx'; inv Hx'; simpl; lra.
 Qed.
-#[global] Hint Resolve supremum_er_proj_eR : eR.
+#[export] Hint Resolve supremum_er_proj_eR : eR.
 
 Lemma infimum_er_proj_eR {A} `{Inhabited A} (a : R) pf (f : A -> eR) :
   (forall i, f i <> infty) ->
@@ -878,7 +878,7 @@ Proof.
       apply Hglb in Hx'; inv Hx'; simpl; lra. }
     simpl; lra.
 Qed.    
-#[global] Hint Resolve infimum_er_proj_eR : eR.
+#[export] Hint Resolve infimum_er_proj_eR : eR.
 
 Lemma supremum_proj_eR_er {A} (a : R) pf (f : A -> eR) :
   (forall i, f i <> infty) ->
@@ -897,7 +897,7 @@ Proof.
     2: { exfalso; apply (Hfi i); auto. }
     inv Hx; auto.
 Qed.
-#[global] Hint Resolve supremum_proj_eR_er : eR.
+#[export] Hint Resolve supremum_proj_eR_er : eR.
 
 Lemma infimum_proj_eR_er {A} `{Inhabited A} (a : R) pf (f : A -> eR) :
   (forall i, f i <> infty) ->
@@ -925,20 +925,20 @@ Lemma proj_eR_sum a b :
   b <> infty ->
   proj_eR (a + b) = (proj_eR a + proj_eR b)%R.
 Proof. intros Ha Hb; destruct a, b; try congruence; auto. Qed.
-#[global] Hint Resolve proj_eR_sum : eR.
+#[export] Hint Resolve proj_eR_sum : eR.
 
 Lemma sum_not_infty a b :
   a <> infty ->
   b <> infty ->
   a + b <> infty.
 Proof. intros Ha Hb HC; destruct a, b; try congruence; inv HC. Qed.
-#[global] Hint Resolve sum_not_infty : eR.
+#[export] Hint Resolve sum_not_infty : eR.
 
 Lemma le_er_not_infty a b pf :
   a <= er b pf ->
   a <> infty.
 Proof. intros Hle HC; rewrite HC in Hle; inv Hle. Qed.
-#[global] Hint Resolve le_er_not_infty : eR.
+#[export] Hint Resolve le_er_not_infty : eR.
 
 Definition unbounded {A} (f : A -> eR) : Prop :=
   forall ub, upper_bound ub f -> ub = infty.
@@ -948,7 +948,7 @@ Lemma supremum_infty_unbounded {A} (f : A -> eR) :
 Proof.
   intros [Hub Hlub] x Hx; destruct x as [x|]; auto; apply Hlub in Hx; inv Hx.
 Qed.
-#[global] Hint Resolve supremum_infty_unbounded : eR.
+#[export] Hint Resolve supremum_infty_unbounded : eR.
 
 Lemma infimum_infty_inv {A} (f : A -> eR) :
   infimum infty f -> f = const infty.
@@ -964,19 +964,19 @@ Proof.
   - intro i; constructor.
   - intros x Hx; apply H in Hx; subst; reflexivity.
 Qed.
-#[global] Hint Resolve unbounded_supremum_infty : eR.
+#[export] Hint Resolve unbounded_supremum_infty : eR.
 
 Lemma eRplus_le_l (a b c : eR) :
   a + b <= c ->
   a <= c.
 Proof. intro H; destruct a, b, c; try constructor; auto; inv H; lra. Qed.
-#[global] Hint Resolve eRplus_le_l : eR.  
+#[export] Hint Resolve eRplus_le_l : eR.  
 
 Lemma eRplus_le_r (a b c : eR) :
   a + b <= c ->
   b <= c.
 Proof. intro H; destruct a, b, c; try constructor; auto; inv H; lra. Qed.
-#[global] Hint Resolve eRplus_le_r : eR.  
+#[export] Hint Resolve eRplus_le_r : eR.  
 
 Lemma unbounded_sum_l {I} (f g : I -> eR) :
   unbounded f ->
@@ -985,7 +985,7 @@ Proof.
   intros H x Hx; apply H; intro i.
   specialize (Hx i); simpl in *; eauto with eR.
 Qed.
-#[global] Hint Resolve unbounded_sum_l : eR.
+#[export] Hint Resolve unbounded_sum_l : eR.
 
 Lemma unbounded_sum_r {I} (f g : I -> eR) :
   unbounded g ->
@@ -994,7 +994,7 @@ Proof.
   intros H x Hx; apply H; intro i.
   specialize (Hx i); simpl in *; eauto with eR.
 Qed.
-#[global] Hint Resolve unbounded_sum_r : eR.
+#[export] Hint Resolve unbounded_sum_r : eR.
 
 Lemma supremum_0_inv {A} `{Inhabited A} (f : A -> eR) :
   supremum 0 f ->
@@ -1125,7 +1125,7 @@ Proof.
     lra.
   - exfalso; apply HC; constructor.
 Qed.
-#[global] Hint Resolve not_eRlt_eRle : eR.
+#[export] Hint Resolve not_eRlt_eRle : eR.
 
 (* Don't delete. *)
 Lemma supremum_0_lt_inv {A} (f : A -> eR) (a : eR) :
@@ -1201,19 +1201,19 @@ Qed.
 Lemma er_not_infty a pf :
   er a pf <> infty.
 Proof. congruence. Qed.
-#[global] Hint Resolve er_not_infty : eR.
+#[export] Hint Resolve er_not_infty : eR.
 
 Lemma leq_eRle (a b : eR) :
   a ⊑ b ->
   a <= b.
 Proof. auto. Qed.
-#[global] Hint Resolve leq_eRle : eR.
+#[export] Hint Resolve leq_eRle : eR.
 
 Lemma eRle_leq (a b : eR) :
   a <= b ->
   a ⊑ b.
 Proof. auto. Qed.
-#[global] Hint Resolve eRle_leq : eR.
+#[export] Hint Resolve eRle_leq : eR.
 
 Lemma eRmult_eq_reg_r : forall r r1 r2,
     0 < r ->
@@ -1254,7 +1254,7 @@ Proof.
   - exfalso; apply Hnz, eR_eq; reflexivity.
   - apply eR_eq, Rinv_l; auto.
 Qed.
-#[global] Hint Resolve eRinv_l : eR.
+#[export] Hint Resolve eRinv_l : eR.
 
 Lemma eRinv_r (a : eR) :
   a <> 0 ->
@@ -1267,7 +1267,7 @@ Proof.
   - exfalso; apply Hnz, eR_eq; reflexivity.
   - apply eR_eq, Rinv_r; auto.
 Qed.
-#[global] Hint Resolve eRinv_r : eR.
+#[export] Hint Resolve eRinv_r : eR.
 
 Lemma eRinv_1 (a : eR) :
   a * / 1 = a.
@@ -1276,19 +1276,19 @@ Proof.
   - apply eR_eq; lra.
   - unfold eRmult; destr; try congruence; inv e; lra.
 Qed.
-#[global] Hint Resolve eRinv_1 : eR.
+#[export] Hint Resolve eRinv_1 : eR.
 
 Lemma eRdiv_1 (a : eR) :
   a / 1 = a.
 Proof. apply eRinv_1. Qed.
-#[global] Hint Resolve eRdiv_1 : eR.
+#[export] Hint Resolve eRdiv_1 : eR.
 
 Lemma eRdiv_r (a : eR) :
   a <> 0 ->
   a <> infty ->
   a / a = 1.
 Proof. apply eRinv_r. Qed.
-#[global] Hint Resolve eRdiv_r : eR.
+#[export] Hint Resolve eRdiv_r : eR.
 
 Lemma eRmult_comm3 a b c :
   a * b * c = a * c * b.
@@ -1297,7 +1297,7 @@ Proof.
   replace (b * c) with (c * b) by apply eRmult_comm.
   rewrite <- eRmult_assoc; reflexivity.
 Qed.
-#[global] Hint Resolve eRmult_comm3 : eR.
+#[export] Hint Resolve eRmult_comm3 : eR.
 
 Lemma eRplus_eRminus a b :
   a <= b ->
@@ -1311,7 +1311,7 @@ Proof.
     + apply eR_eq; lra.
     + rewrite eRplus_0_r; apply eR_eq; lra.
 Qed.
-#[global] Hint Resolve eRplus_eRminus : eR.
+#[export] Hint Resolve eRplus_eRminus : eR.
 
 Definition diff (r1 r2 : eR) : eR :=
   match (r1, r2) with
@@ -1328,12 +1328,12 @@ Definition diff (r1 r2 : eR) : eR :=
 Lemma eR0_lt_1 :
   0 < 1.
 Proof. constructor; lra. Qed.
-#[global] Hint Resolve eR0_lt_1 : eR.
+#[export] Hint Resolve eR0_lt_1 : eR.
 
 Lemma eR0_lt_2 :
   0 < 2.
 Proof. constructor; lra. Qed.
-#[global] Hint Resolve eR0_lt_2 : eR.
+#[export] Hint Resolve eR0_lt_2 : eR.
 
 (* Sequence g converges to limit point lim. *)
 Definition converges (g : nat -> eR) (lim : eR) :=
@@ -1445,7 +1445,7 @@ Proof.
   destruct a, b; auto with eR.
   destr; auto with eR; constructor; lra.
 Qed.
-#[global] Hint Resolve eRminus_le : eR.  
+#[export] Hint Resolve eRminus_le : eR.  
 
 Lemma eRminus_0_r a :
   a - eR0 = a.
@@ -1454,7 +1454,7 @@ Proof.
   - apply eR_eq; lra.
   - congruence.
 Qed.
-#[global] Hint Resolve eRminus_0_r : eR.  
+#[export] Hint Resolve eRminus_0_r : eR.  
 
 Lemma eRminus_eq_plus a b c :
   c <> infty ->
@@ -1474,7 +1474,7 @@ Proof.
     destruct (Rle_dec a c); inv H0.
   - inv Hac.
 Qed.
-#[global] Hint Resolve eRminus_eq_plus : eR.  
+#[export] Hint Resolve eRminus_eq_plus : eR.  
 
 Lemma eRplus_eq_minus a b c :
   c <> infty ->
@@ -1485,7 +1485,7 @@ Proof.
   unfold eRminus; destruct a, b, c; simpl; inv Habc; auto; try congruence.
   destr; apply eR_eq; lra.
 Qed.
-#[global] Hint Resolve eRplus_eq_minus : eR.  
+#[export] Hint Resolve eRplus_eq_minus : eR.  
 
 Lemma eRminus_minus_le a b :
   a <> infty ->
@@ -1498,7 +1498,7 @@ Proof.
   - destruct (Rle_dec (a - b) a); apply eR_eq; lra.
   - simpl; destr; lra.
 Qed.
-#[global] Hint Resolve eRminus_minus_le : eR.
+#[export] Hint Resolve eRminus_minus_le : eR.
 
 Lemma eRmult_minus_distr_l a b c :
   a <> infty ->
@@ -1521,7 +1521,7 @@ Proof.
         apply eR_eq; lra.
   - congruence.
 Qed.
-#[global] Hint Resolve eRmult_minus_distr_l : eR.
+#[export] Hint Resolve eRmult_minus_distr_l : eR.
 
 Lemma eRmult_minus_distr_r a b c :
   c <> infty ->
@@ -1531,14 +1531,14 @@ Proof.
   rewrite eRmult_comm, eRmult_minus_distr_l; auto.
   rewrite eRmult_comm; f_equal; apply eRmult_comm.
 Qed.
-#[global] Hint Resolve eRmult_minus_distr_r : eR.
+#[export] Hint Resolve eRmult_minus_distr_r : eR.
 
 Lemma eRle_infty_not_infty a b :
   a <= b ->
   b <> infty ->
   a <> infty.
 Proof. intros Hle Hb; inv Hle; congruence. Qed.
-#[global] Hint Resolve eRle_infty_not_infty : eR.
+#[export] Hint Resolve eRle_infty_not_infty : eR.
 
 Lemma eRplus_half_plus_half a :
   a/2 + a/2 = a.
@@ -1613,7 +1613,7 @@ Proof.
   destruct b; constructor.
   apply Rmult_le_1_le; auto.
 Qed.
-#[global] Hint Resolve eRmult_le_1_le : eR.
+#[export] Hint Resolve eRmult_le_1_le : eR.
 
 Lemma eRlt_eRmult a b :
   0 < a ->
@@ -1627,13 +1627,13 @@ Proof.
   - rewrite eRmult_infty_r; try constructor; intro HC; inv HC; lra.
   - constructor; nra.
 Qed.
-#[global] Hint Resolve eRlt_eRmult : eR.
+#[export] Hint Resolve eRlt_eRmult : eR.
 
 Lemma eRpow_0_lt : forall (x:eR) (k:nat), 0 < x -> 0 < x ^ k.
 Proof.
   intros a n; revert a; induction n; intros a Hlt; simpl; auto with eR.
 Qed.
-#[global] Hint Resolve eRpow_0_lt : eR.
+#[export] Hint Resolve eRpow_0_lt : eR.
 
 Lemma eRpow_le_1 : forall (x:eR) (k:nat), x <= 1 -> x ^ k <= 1.
 Proof.
@@ -1642,14 +1642,14 @@ Proof.
   - apply eRmult_le_1_le; auto.
   - auto.
 Qed.
-#[global] Hint Resolve eRpow_le_1 : eR.
+#[export] Hint Resolve eRpow_le_1 : eR.
 
 Corollary eRpow_nz : forall (x:eR) (k:nat), 0 < x -> x ^ k <> 0.
 Proof.
   intros a k Ha; apply eRpow_0_lt with (k:=k) in Ha.
   intro HC; rewrite HC in Ha; inv Ha; lra.
 Qed.
-#[global] Hint Resolve eRpow_nz : eR.
+#[export] Hint Resolve eRpow_nz : eR.
 
 Lemma eRle_convex_sum a b c d :
   a <= 1 ->
@@ -1671,7 +1671,7 @@ Proof.
   2: { congruence. }
   constructor; nra.
 Qed.  
-#[global] Hint Resolve eRle_convex_sum : eR.
+#[export] Hint Resolve eRle_convex_sum : eR.
 
 Lemma eRplus_comm4 a b c d :
   a + b + c + d = a + c + b + d.
@@ -1702,7 +1702,7 @@ Proof.
   destr; auto.
   apply eR_eq; lra.
 Qed.
-#[global] Hint Resolve eRminus_cancel : eR.
+#[export] Hint Resolve eRminus_cancel : eR.
 
 Ltac eRauto :=
   repeat try match goal with
@@ -1740,7 +1740,7 @@ Proof.
   - destruct (Rle_dec c b); eRauto.
   - congruence.
 Qed.
-#[global] Hint Resolve eRminus_assoc : eR.
+#[export] Hint Resolve eRminus_assoc : eR.
 
 Lemma sup_scalar (f : nat -> eR) (c : eR) :
   c * sup f = sup (fun x => c * f x).
@@ -1926,7 +1926,7 @@ Proof.
   - apply eR_eq; lra.
   - destr; auto; inv e; lra.
 Qed.
-#[global] Hint Resolve eRmult_2_plus : eR.
+#[export] Hint Resolve eRmult_2_plus : eR.
 
 Lemma eRmult_half_div_2 a :
   1 / 2 * a = a / 2.
@@ -1957,7 +1957,7 @@ Proof.
   { apply Hg; auto. }
 Qed.
 
-#[global]
+#[export]
   Instance ExtType_eR : ExtType eR.
 Proof. constructor; intros a b Hab; apply eRle_antisym; apply Hab. Qed.
 
@@ -2088,7 +2088,7 @@ Proof. intros n Hn HC; inv HC; eapply not_0_INR; eauto. Qed.
 Lemma not_infty_INeR n :
   INeR n <> infty.
 Proof. intro HC; inv HC. Qed.
-#[global] Hint Resolve not_infty_INeR : eR.
+#[export] Hint Resolve not_infty_INeR : eR.
 
 Lemma eRdiv_minus_distr a b c :
   c <> 0 ->
@@ -2286,7 +2286,7 @@ Lemma INeR_positive n:
 Proof.
   intro Hn; replace 0 with (INeR 0) by apply INeR_0; apply lt_INeR; auto.
 Qed.
-#[global] Hint Resolve INeR_positive : eR.
+#[export] Hint Resolve INeR_positive : eR.
 
 Lemma sum_map_plus {A} (l : list A) f g :
   sum (map f l) + sum (map g l) = sum (map (fun x => f x + g x) l).
