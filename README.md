@@ -52,7 +52,7 @@ pip install numpy==1.24.2 scipy==1.10.1 tensorflow==2.11.0 optas==1.0.3
 
 * Basic order theory: [order.v](order.v)
 * CPOs: [cpo.v](cpo.v)
-* Algebraic CPOs and comorphisms: [aCPO.v](aCPO.v)
+* Algebraic CPOs and continuous extensions: [aCPO.v](aCPO.v)
 * Cotrees: [cotree.v](cotree.v), [cocwp.v](cocwp.v), [cocwp_facts.v](cocwp_facts.v)
 
 ## Sampling Equidistribution Theorems
