@@ -254,7 +254,7 @@ Proof.
   - destruct l; simpl in *; auto; lia.
   - rewrite Nat.add_0_r in H0.
     rewrite 2!IHn.
-    + rewrite <- app_length, take_drop_spec; reflexivity.
+    + rewrite <- length_app, take_drop_spec; reflexivity.
     + etransitivity.
       * apply length_drop_le.
       * lia.
@@ -280,7 +280,7 @@ Proof.
              - apply length_drop_le.
              - lia. }
            lia. }
-      rewrite <- app_length, take_drop_spec; reflexivity.
+      rewrite <- length_app, take_drop_spec; reflexivity.
     + etransitivity.
       * apply length_drop_le.
       * lia.
@@ -414,7 +414,7 @@ Proof.
   2: { ext x; destruct x; auto. }
   unfold list_btree.
   rewrite list_btree_aux_countb'.
-  - rewrite rev_range_spec, rev_length, range_length.
+  - rewrite rev_range_spec, length_rev, range_length.
     generalize (is_power_of_2_next_pow_2 n).
     unfold is_power_of_2.
     intros [k H].
@@ -425,7 +425,7 @@ Proof.
     rewrite <- rev_range_spec.
     rewrite countb_list_rev_range; try lia.
     f_equal; apply INeR_1.
-  - rewrite rev_range_spec, rev_length, range_length.
+  - rewrite rev_range_spec, length_rev, range_length.
     generalize (is_power_of_2_next_pow_2 n).
     unfold is_power_of_2.
     intros [k H].
@@ -474,7 +474,7 @@ Proof.
       2: { ext x; destruct x; auto. }
       unfold list_btree.
       rewrite list_btree_aux_countb'.
-      + rewrite rev_range_spec, rev_length, range_length.
+      + rewrite rev_range_spec, length_rev, range_length.
         generalize (is_power_of_2_next_pow_2 d).
         unfold is_power_of_2.
         intros [k H].
@@ -485,7 +485,7 @@ Proof.
         rewrite <- rev_range_spec.
         rewrite countb_list_rev_range_lt; try lia.
         rewrite H; reflexivity.
-      + rewrite rev_range_spec, rev_length, range_length.
+      + rewrite rev_range_spec, length_rev, range_length.
         generalize (is_power_of_2_next_pow_2 d).
         unfold is_power_of_2.
         intros [k H].
@@ -555,7 +555,7 @@ Lemma btree_infer_uniform_btree'_const_1 n :
 Proof.
   unfold uniform_btree'.
   rewrite btree_infer_list_btree_const_1.
-  rewrite rev_range_spec, rev_length, range_length; reflexivity.
+  rewrite rev_range_spec, length_rev, range_length; reflexivity.
 Qed.
 
 Lemma btree_infer_uniform_btree_const_1 n :

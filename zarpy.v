@@ -22,7 +22,7 @@ Record Samplers : Type :=
     ; die_sampler : nat -> itree boolE nat
     ; findist_sampler : list nat -> itree boolE nat }.
 
-From zar Require Import cpGCL prelude.
+From zar Require Import cpGCL cpGCLNotations prelude.
 Local Open Scope cpGCL_scope.
 
 (** Biased coin. *)

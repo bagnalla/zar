@@ -12,7 +12,7 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From zar Require Import compile cotree cpGCL cpo cwp eR itree misc order tactics tree.
+From zar Require Import compile cotree cpGCL cpGCLNotations cpo cwp eR itree misc order tactics tree.
 
 Local Open Scope cpGCL_scope.
 

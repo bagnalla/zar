@@ -32,3 +32,6 @@ nia.cache
 nlia.cache
 nra.cache
 *~
+*.pyc
+__pycache__/
+extract/*/a.out

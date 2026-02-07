@@ -61,7 +61,7 @@ pip install numpy==1.24.2 scipy==1.10.1 tensorflow==2.11.0 optas==1.0.3
 
 ## Empirical Validation
 
-[extract/](extract/) contains driver code and scripts for evaluating extracted samplers (e.g., [dueling coins](dueling_coins.v), [n-sided die](./die.v), [geometric distribution](geometric.v), [discrete gaussian](gaussian.v), [hare and tortoise](hare.v)).
+[extract/](extract/) contains driver code and scripts for evaluating extracted samplers (e.g., [dueling coins](examples/dueling_coins.v), [n-sided die](examples/die.v), [geometric distribution](examples/geometric.v), [discrete gaussian](gaussian.v), [hare and tortoise](examples/hare.v)).
 
 [fast-loaded-dice-roller/](fast-loaded-dice-roller/) contains a clone of [https://github.com/probcomp/fast-loaded-dice-roller](https://github.com/probcomp/fast-loaded-dice-roller) modified to track entropy usage.
 

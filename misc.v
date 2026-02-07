@@ -96,7 +96,7 @@ Proof. induction n; simpl; auto. Qed.
 
 Corollary length_prefix {A} (f : nat -> A) (n : nat) :
   length (prefix f n) = n.
-Proof. unfold prefix; rewrite rev_length; apply length_prefix_aux. Qed.
+Proof. unfold prefix; rewrite length_rev; apply length_prefix_aux. Qed.
 
 Inductive list_rel {A B : Type} (R : A -> B -> Prop) : list A -> list B -> Prop :=
 | list_rel_nil : list_rel R [] []
@@ -178,7 +178,7 @@ Qed.
 Lemma range_length (n : nat) :
   length (range n) = n.
 Proof.
-  induction n; simpl; auto; rewrite app_length; simpl; rewrite IHn; lia.
+  induction n; simpl; auto; rewrite length_app; simpl; rewrite IHn; lia.
 Qed.
 
 Fixpoint countb_list {A : Type} (f : A -> bool) (l : list A) : nat :=
@@ -227,7 +227,7 @@ Lemma List_forall_neq_range (n : nat) :
 Proof.
   apply List.Forall_impl with (P := fun x => (x < n)%nat).
   - intros m Hlt Heq.
-    apply EqNat.beq_nat_true_stt in Heq; lia.
+    apply Nat.eqb_eq in Heq; lia.
   - apply List_forall_lt_range.
 Qed.
   

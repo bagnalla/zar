@@ -186,7 +186,7 @@ Definition rev_range_Z (n : Z) : list Z :=
 Lemma length_rev_range_positive (p : positive) :
   length (rev_range_positive p) = Pos.to_nat p.
 Proof.
-  induction p; simpl; auto; rewrite app_length, map_length, IHp; lia.
+  induction p; simpl; auto; rewrite length_app, length_map, IHp; lia.
 Qed.
 
 Lemma length_rev_range_Z (n : Z) :
@@ -283,7 +283,7 @@ Proof.
   - destruct l; simpl in *; auto; lia.
   - rewrite Nat.add_0_r in H0.
     rewrite 2!IHn.
-    + rewrite <- app_length, take_drop_spec; reflexivity.
+    + rewrite <- length_app, take_drop_spec; reflexivity.
     + etransitivity.
       * apply length_drop_le.
       * lia.
@@ -309,7 +309,7 @@ Proof.
              - apply length_drop_le.
              - lia. }
            lia. }
-      rewrite <- app_length, take_drop_spec; reflexivity.
+      rewrite <- length_app, take_drop_spec; reflexivity.
     + etransitivity.
       * apply length_drop_le.
       * lia.

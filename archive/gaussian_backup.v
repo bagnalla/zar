@@ -8,7 +8,7 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From cwp Require Import compile cpGCL itree Q tree.
+From cwp Require Import compile cpGCL cpGCLNotations itree Q tree.
 
 Local Open Scope cpGCL_scope.
 (* Local Open Scope nat_scope. *)

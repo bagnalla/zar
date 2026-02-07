@@ -13,7 +13,7 @@ Import ITreeNotations.
 Local Open Scope itree_scope.
 
 From cwp Require Import
-  compile cotree cocwp cpGCL cpo cwp equidistribution eR misc itree order tactics tree.
+  compile cotree cocwp cpGCL cpGCLNotations cpo cwp equidistribution eR misc itree order tactics tree.
 Local Open Scope cpGCL_scope.
 
 Require Import prelude.

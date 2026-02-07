@@ -204,7 +204,7 @@ Lemma length_flatten_weights_aux (l : list Z) (n : Z) :
   length (flatten_weights_aux l n) = Z.to_nat (list_sum_Z l).
 Proof.
   revert n; induction l; intros n Hl; simpl; auto; inv Hl.
-  rewrite Z2Nat.inj_add, app_length, repeat_length; auto.
+  rewrite Z2Nat.inj_add, length_app, repeat_length; auto.
   apply list_sum_Z_nonnegative; auto.
 Qed.
 

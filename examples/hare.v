@@ -8,7 +8,7 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From zar Require Import compile cpGCL gaussian itree Q tree.
+From zar Require Import compile cpGCL cpGCLNotations gaussian itree Q tree.
 
 Local Open Scope cpGCL_scope.
 
