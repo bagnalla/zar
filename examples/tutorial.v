@@ -13,7 +13,7 @@ Import ITreeNotations.
 Local Open Scope itree_scope.
 
 From zar Require Import
-  compile cpGCL cpo cwp equidistribution eR itree misc tactics.
+  compile cpGCL cpGCLNotations cpo cwp equidistribution eR itree misc tactics.
 Local Open Scope cpGCL_scope.
 
 (** Import pre-defined cpGCL definitions and helpers. *)

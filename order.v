@@ -1031,7 +1031,7 @@ Proof. revert z ub; induction n; intros z ub Hz HF; simpl; auto. Qed.
 (** Types for which the symmetric closure of the order relation
     coincides with propositional equality. Obviously, depends on the
     choice of order relation. *)
-Class ExtType (A : Type) `{OType A} : Type :=
+Class ExtType (A : Type) `{OType A} : Prop :=
   { ext : forall (a b : A), a === b -> a = b }.
 
 #[export]

@@ -1356,7 +1356,7 @@ Proof.
   unfold diff in Hle.
   destruct (Rle_dec a r); inv Hle.
   { destruct (Req_dec a r); subst.
-    - rewrite Rminus_eq_0, Rabs_R0; auto.
+    - rewrite Rminus_diag, Rabs_R0; auto.
     - rewrite Rabs_left; lra. }
   { rewrite Rabs_right; lra. }
 Qed.

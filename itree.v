@@ -37,6 +37,8 @@ Local Open Scope eR_scope.
 
 Create HintDb itree.
 
+Unset Automatic Proposition Inductives.
+
 Variant boolE : Type -> Type :=
   | GetBool : boolE bool.
 
@@ -141,7 +143,7 @@ Section itree_cotree_eq.
     itree_cotree_eqF r1 it ct -> itree_cotree_eqF r2 it ct.
   Proof.
     intros H0 H1.
-    destruct it; inversion H1; subst; existT_inv; constructor; auto.
+    induction H1; constructor; eauto.
   Qed.
 
   Lemma itree_cotree_eq_impl
@@ -241,8 +243,12 @@ Proof.
     constructor; right; apply CH; auto.
   - inv Ht; existT_inv.
     rewrite cotree_bind_node.
-    constructor; intro b; specialize (H3 b); dupaco.
-    right; apply CH; auto.
+    constructor; intro b.
+    match goal with
+    | Hnode : forall b : bool, upaco2 _ _ (_ b) (_ b) |- _ =>
+        specialize (Hnode b); dupaco;
+        right; apply CH; auto
+    end.
 Qed.
 
 Lemma itree_cotree_eq_iter {I A}
@@ -280,7 +286,8 @@ Proof.
     intros []; pstep; constructor.
     right; apply CH; auto.
   - rewrite cotree_bind_node.
-    existT_inv; constructor; intro b; left.
+    existT_inv.
+    constructor; intro b; left.
     apply itree_cotree_eq_bind.
     + specialize (H0 b); dupaco; auto.
     + intros []; pstep; constructor.
@@ -301,8 +308,13 @@ Proof.
   destruct (observe it) eqn:Hit; inv Heq.
   - rewrite cotree_map_leaf; constructor.
   - dupaco; rewrite cotree_map_tau; constructor; right; apply CH; auto.
-  - existT_inv; rewrite cotree_map_node.
-    constructor; intro b; specialize (H3 b); dupaco; right; apply CH; auto.
+  - existT_inv.
+    rewrite cotree_map_node.
+    constructor; intro b.
+    match goal with
+    | Hnode : forall b : bool, upaco2 _ _ (_ b) (_ b) |- _ =>
+        specialize (Hnode b); dupaco; right; apply CH; auto
+    end.
 Qed.
 
 Lemma to_itree_open_to_cotree_open {A} (t : tree A) :
@@ -365,7 +377,12 @@ Proof.
   destruct (observe it) eqn:Hit; inv Heq.
   - constructor.
   - dupaco; constructor; auto.
-  - existT_inv; constructor; intro b; specialize (H3 b); dupaco; apply CH; auto.
+  - existT_inv.
+    constructor; intro b.
+    match goal with
+    | Hnode : forall b : bool, upaco2 _ _ (_ b) (_ b) |- _ =>
+        specialize (Hnode b); dupaco; apply CH; auto
+    end.
 Qed.
 
 (* Lemma itree_cotree_coitree_eq {A} (it : itree boolE A) (ct : cotree bool A) : *)

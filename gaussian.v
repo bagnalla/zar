@@ -8,7 +8,7 @@ From ITree Require Import
 Import ITreeNotations.
 Local Open Scope itree_scope.
 
-From zar Require Import compile cpGCL itree prelude Q tactics tree.
+From zar Require Import compile cpGCL cpGCLNotations itree prelude Q tactics tree.
 
 Local Open Scope cpGCL_scope.
 
@@ -36,7 +36,11 @@ Definition bernoulli_exponential_0_1 (out : string) (gamma : St -> Q) : cpGCL :=
   "a" <-- true;
   while (fun s : St => as_bool (s "a")) do
       CChoice (fun s => gamma s / N2Q (S (as_nat (s "k"))))
-              (fun b => if b then "k" <-- fun s => succ (s "k") else "a" <-- false)
+              (fun b =>
+                 match b with
+                 | true => "k" <-- fun s => succ (s "k")
+                 | false => "a" <-- false
+                 end)
   end;
   if (fun s => is_even (s "k")) then out <-- true else out <-- false end.
 
@@ -62,7 +66,11 @@ Qed.
 Definition bernoulli_exponential (out : string) (gamma : St -> Q) : cpGCL :=
   CIte (fun s => Qle_bool (gamma s) 1)
     (bernoulli_exponential_0_1 out
-       (fun s => if Qle_bool (gamma s) 1 then gamma s else 1))
+       (fun s =>
+          match Qle_bool (gamma s) 1 with
+          | true => gamma s
+          | false => 1
+          end))
     ("i" <-- S O;
     "b" <-- true;
     while (fun s => as_bool (s "b") && Qle_bool (N2Q (as_nat (s "i"))) (gamma s)) do
@@ -143,7 +151,12 @@ Definition laplace (out : string) (s t : nat) : cpGCL :=
            CIte (fun s => as_bool (s "c") && Nat.eqb (as_nat (s "y")) O)
                  skip
                  ("lp" <-- (fun s => vbool false);
-                  out <-- (fun s => vint ((1 - 2 * (if as_bool (s "c") then 1 else 0))
+                  out <-- (fun s =>
+                             vint ((1 - 2 *
+                                      (match as_bool (s "c") with
+                                       | true => 1
+                                       | false => 0
+                                       end))
                                      * Z.of_nat (as_nat (s "y")))%Z))
          else
            skip
@@ -202,7 +215,11 @@ Proof.
 Qed.
 
 Lemma lem1 b :
-  0 <= (let a := b in if Qle_bool 0 a then a else 0).
+  0 <= (let a := b in
+        match Qle_bool 0 a with
+        | true => a
+        | false => 0
+        end).
 Proof.
   simpl. destruct (Qle_bool 0 b) eqn:Hb; simpl; try lra.
   apply Qle_bool_imp_le in Hb; auto.
@@ -219,7 +236,10 @@ Definition gaussian (out : string) (sigma : Q) : cpGCL :=
     bernoulli_exponential "ol"
       (fun s => let q := Qpower (Qabs (as_int (s "z") # 1) - Qpower sigma 2 / N2Q t) 2 /
                         (2 * Qpower sigma 2) in
-             if Qle_bool 0 q then q else 0)
+             match Qle_bool 0 q with
+             | true => q
+             | false => 0
+             end)
   end;
   out <-- (fun s => s "z").
 

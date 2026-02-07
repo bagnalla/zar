@@ -22,9 +22,6 @@ Record SamplerPackage : Type :=
     ; die_sampler : Z -> itree boolE Z
     ; findist_sampler : list Z -> itree boolE Z }.
 
-From zar Require Import cpGCL prelude.
-Local Open Scope cpGCL_scope.
-
 (** Biased coin. *)
 
 Definition coin_itree (p : Q) : itree boolE bool :=
@@ -185,7 +182,8 @@ From Coq Require Import ExtrOcamlBasic ExtrOcamlString.
 Definition samplers : SamplerPackage :=
   mkSamplers coin_itree die_itree findist_itree.
 
-Extraction "extract/ocamlzar/samplers.ml" samplers.
+Set Extraction Output Directory "extract/ocamlzar".
+Extraction "samplers.ml" samplers.
 
 (* From Coq Require Import ExtrHaskellBasic. *)
 (* Extraction Language Haskell. *)

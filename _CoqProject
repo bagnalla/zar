@@ -8,6 +8,7 @@ compile.v
 colist.v
 cotree.v
 cpGCL.v
+cpGCLNotations.v
 cpo.v
 cwp.v
 cwp_tcwp.v
