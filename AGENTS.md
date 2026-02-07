@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 This repository is centered on Coq proofs and verified samplers.
-- Root `*.v` files: core formalization (`cpGCL.v`, `cwp.v`, `tree.v`, `uniform.v`, etc.).
+- `theories/`: core Coq formalization (`cpGCL.v`, `cwp.v`, `tree.v`, `uniform.v`, etc.).
 - `examples/`: non-core Coq example programs and extraction-focused proofs (`examples/die.v`, `examples/tutorial.v`, etc.).
 - `archive/`: historical/scratch Coq files kept for reference.
 - `_CoqProject`, `Makefile`, `Makefile.conf`: Coq build configuration.
