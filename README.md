@@ -4,7 +4,7 @@ Paper: https://arxiv.org/abs/2211.06747
 
 ## Setup
 
-* Coq development:
+### Coq
 ```
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam pin add coq 8.20.1
@@ -12,8 +12,8 @@ opam install coq-itree
 make -j4
 ```
 
-* [Zarpy](https://pypi.org/project/zarpy/) Python3 package (see [python/zar/test/test.py](python/zar/test/test.py) for an example
-of using it after installation):
+### [Zarpy](https://pypi.org/project/zarpy/) Python3 package
+(see [python/zar/test/test.py](python/zar/test/test.py) for an example of using it after installation)
 ```
 opam install pythonlib ppx_import ppx_deriving
 cd python/zar/ocaml
@@ -22,7 +22,7 @@ cd ..
 make install
 ```
 
-* Extracted sampler analysis scripts (e.g., [analyze.py](extract/geometric/analyze.py)):
+### Extracted sampler analysis scripts (e.g., [analyze.py](extract/geometric/analyze.py)):
 ```
 pip install numpy==1.24.2 scipy==1.10.1 tensorflow==2.11.0 optas==1.0.3
 ```
