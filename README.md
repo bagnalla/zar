@@ -27,35 +27,37 @@ make install
 pip install numpy==1.24.2 scipy==1.10.1 tensorflow==2.11.0 optas==1.0.3
 ```
 
-## Foundational
+## Code
+
+### Foundational
 
 * Axioms: [axioms.v](theories/axioms.v)
 * Extended reals: [eR.v](theories/eR.v)
 * Tactics: [tactics.v](theories/tactics.v)
 
-## cpGCL and cwp
+### cpGCL and cwp
 
 * cpGCL syntax: [cpGCL.v](theories/cpGCL.v)
 * cwp semantics: [cwp.v](theories/cwp.v)
 
-## CF Trees
+### CF Trees
 
 * CF trees: [tree.v](theories/tree.v), [tcwp.v](theories/tcwp.v), [tcwp_facts.v](theories/tcwp_facts.v)
 * Compiler from cpGCL to CF trees: [compile.v](theories/compile.v), [cwp_tcwp.v](theories/cwp_tcwp.v)
 * De-biasing: [uniform.v](theories/uniform.v), [debias.v](theories/debias.v)
 
-## Generating Interaction Trees
+### Generating Interaction Trees
 
 * Generating itrees: [itree.v](theories/itree.v)
 
-## Order/Domain Theory and Algebraic Coinductives
+### Order/Domain Theory and Algebraic Coinductives
 
 * Basic order theory: [order.v](theories/order.v)
 * CPOs: [cpo.v](theories/cpo.v)
 * Algebraic CPOs and continuous extensions: [aCPO.v](theories/aCPO.v)
 * Cotrees: [cotree.v](theories/cotree.v), [cocwp.v](theories/cocwp.v), [cocwp_facts.v](theories/cocwp_facts.v)
 
-## Sampling Equidistribution Theorems
+### Sampling Equidistribution Theorems
 
 * Equidistribution theorems for itrees, cotrees, CF trees, and cpGCL: [equidistribution.v](theories/equidistribution.v)
 
