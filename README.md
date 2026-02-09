@@ -6,8 +6,8 @@ Paper: https://arxiv.org/abs/2211.06747
 
 * Coq development:
 ```
-opam pin add coq 8.16.0
 opam repo add coq-released https://coq.inria.fr/opam/released
+opam pin add coq 8.20.1
 opam install coq-itree
 make -j4
 ```
